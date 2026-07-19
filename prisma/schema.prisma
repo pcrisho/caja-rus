@@ -179,6 +179,10 @@ model WasteAdjustment {
   id          String       @id @default(uuid()) @db.Uuid
   productId   String       @map("product_id") @db.Uuid
   adminId     String       @map("admin_id") @db.Uuid
+  // Convención de signo: SIEMPRE positiva = "cantidad removida del stock".
+  // La lógica de aplicación (Server Action) es responsable de restarla de
+  // Product.stock; nunca almacenar un valor negativo aquí. Reforzado con
+  // CHECK (quantity > 0) a nivel de base de datos (ver migración).
   quantity    Decimal      @db.Decimal(10, 3)
   reason      WasteReason
   description String?      @db.VarChar(200)
@@ -220,12 +224,16 @@ model SaleItem {
   saleId     String  @map("sale_id") @db.Uuid
   productId  String  @map("product_id") @db.Uuid
   quantity   Decimal @db.Decimal(10, 3)
-  unitPrice  Decimal @map("unit_price") @db.Decimal(10, 2)
-  totalPrice Decimal @map("total_price") @db.Decimal(10, 2)
+  // Decimal(12,4) para igualar la precisión de Product.sellingPrice y evitar
+  // pérdida de precisión al vender productos fraccionados (KILOGRAM). El
+  // redondeo a 2 decimales debe ocurrir solo al agregar en Sale.totalAmount.
+  unitPrice  Decimal @map("unit_price") @db.Decimal(12, 4)
+  totalPrice Decimal @map("total_price") @db.Decimal(12, 4)
 
   sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
 
+  @@index([saleId])
   @@index([productId])
   @@map("sale_items")
 }
@@ -263,12 +271,15 @@ model PurchaseItem {
   purchaseId String  @map("purchase_id") @db.Uuid
   productId  String  @map("product_id") @db.Uuid
   quantity   Decimal @db.Decimal(10, 3)
-  unitCost   Decimal @map("unit_cost") @db.Decimal(10, 2)
-  totalCost  Decimal @map("total_cost") @db.Decimal(10, 2)
+  // Decimal(12,4): ver nota de precisión en SaleItem.
+  unitCost   Decimal @map("unit_cost") @db.Decimal(12, 4)
+  totalCost  Decimal @map("total_cost") @db.Decimal(12, 4)
 
   purchase Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
   product  Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
 
+  @@index([purchaseId])
+  @@index([productId])
   @@map("purchase_items")
 }
 
@@ -345,6 +356,7 @@ model NrusPayment {
 
   summary NrusMonthlySummary @relation(fields: [summaryId], references: [id], onDelete: Cascade)
 
+  @@index([summaryId])
   @@map("nrus_payments")
 }
 

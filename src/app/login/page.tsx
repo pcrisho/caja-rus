@@ -2,14 +2,28 @@ import { auth, signIn } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 
+/**
+ * Solo permite rutas internas relativas (`/pos`, `/dashboard?x=1`, etc.).
+ * Bloquea URLs absolutas y protocol-relative (`//evil.com`) para evitar un
+ * Open Redirect vía `?callbackUrl=`. Ver docs/audit/informe-auditoria-cajarus.md #1.2.
+ */
+function sanitizeCallbackUrl(callbackUrl: string | undefined): string {
+  if (!callbackUrl) return "/pos";
+  if (!callbackUrl.startsWith("/") || callbackUrl.startsWith("//")) {
+    return "/pos";
+  }
+  return callbackUrl;
+}
+
 export default async function LoginPage(props: {
   searchParams: Promise<{ error?: string; callbackUrl?: string }>;
 }) {
   const session = await auth();
-  const { error, callbackUrl } = await props.searchParams;
+  const { error, callbackUrl: rawCallbackUrl } = await props.searchParams;
+  const callbackUrl = sanitizeCallbackUrl(rawCallbackUrl);
 
   if (session?.user) {
-    redirect(callbackUrl ?? "/pos");
+    redirect(callbackUrl);
   }
 
   return (
@@ -36,7 +50,7 @@ export default async function LoginPage(props: {
         action={async () => {
           "use server";
           try {
-            await signIn("google", { redirectTo: callbackUrl ?? "/pos" });
+            await signIn("google", { redirectTo: callbackUrl });
           } catch (error) {
             if (error instanceof AuthError) {
               redirect(`/login?error=${error.type}`);

@@ -1,1 +1,43 @@
 @import "tailwindcss";
+
+/**
+ * NOTA para quien implemente componentes (ver DESIGN.md §2 "Color"):
+ *
+ * Se intentó definir tokens semánticos custom aquí vía `@theme` (p. ej.
+ * `--color-brand-primary` → utilidad `bg-brand-primary`), pero se encontró
+ * un bug/limitación reproducible en este stack exacto (Next.js 16.2.10 con
+ * Turbopack + Tailwind CSS v4.3.3): clases de utilidad NUEVAS basadas en
+ * colores custom de `@theme` no se generan cuando se usan en archivos
+ * `.tsx` (confirmado con build limpio y con el dev server corriendo en
+ * caliente), aunque el token en sí SÍ se registra correctamente (funciona
+ * si se usa con `@apply` dentro de un archivo `.css`). Los colores nativos
+ * de Tailwind (`bg-emerald-600`, `text-blue-900`, etc.) sí funcionan sin
+ * problema — son los que ya usa `src/app/login/page.tsx`.
+ *
+ * Por eso, DESIGN.md documenta la marca como un MAPEO a clases nativas de
+ * Tailwind (ya probadas) en vez de tokens custom. Si en el futuro se quiere
+ * revisitar esto (p. ej. tras actualizar Next/Tailwind), usar `@apply` en
+ * un archivo CSS de componente es la vía que sí funcionó en las pruebas.
+ */
+
+
+/**
+ * Tokens de marca — ver DESIGN.md y docs/02-brandboard.md.
+ * Tailwind v4 genera automáticamente utilidades `bg-*`/`text-*`/`border-*`
+ * para cada variable `--color-*` declarada aquí (p. ej. `bg-brand-primary`).
+ */
+@theme {
+  --color-brand-primary: #059669; /* Verde Caja — acciones, cobrar, éxito */
+  --color-brand-primary-strong: #047857; /* emerald-700: usar cuando el texto
+    normal (no bold/grande) necesite 4.5:1 real sobre blanco — ver DESIGN.md
+    §5 (el #059669 solo da ~3.77:1, insuficiente para texto normal) */
+  --color-brand-secondary: #1e3a8a; /* Azul Control — navegación, confianza */
+  --color-brand-warning: #d97706; /* Ámbar Alerta — stock bajo, NRUS 85% */
+  --color-brand-warning-strong: #b45309; /* amber-700: mismo caso que arriba,
+    para texto normal sobre blanco */
+  --color-brand-danger: #dc2626; /* red-600 — NO está en el brandboard
+    original; agregado para acciones destructivas (anular venta, eliminar).
+    Ajustar si Producto/Marca define un rojo propio. */
+  --color-brand-surface: #f3f4f6; /* Gris — fondos de tarjetas (cards) */
+}
+

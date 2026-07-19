@@ -90,6 +90,12 @@ out
 # Prisma generated client
 src/generated/
 
+# Artefactos generados por next-pwa/workbox (se regeneran en cada build una
+# vez que el plugin PWA se reactive; no deben versionarse — ver
+# docs/audit/informe-auditoria-cajarus.md #3.2).
+public/sw.js
+public/workbox-*.js
+
 # Nuxt.js build / generate output
 .nuxt
 dist

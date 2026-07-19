@@ -1,6 +1,11 @@
 import { UserRole } from "@/generated/prisma/enums";
 
 declare module "next-auth" {
+  interface User {
+    role?: UserRole;
+    isActive?: boolean;
+  }
+
   interface Session {
     user: {
       id: string;
@@ -18,5 +23,7 @@ declare module "next-auth/jwt" {
     role: UserRole;
     isActive: boolean;
     id: string;
+    /** Epoch ms de la última vez que se releyó role/isActive desde la BD. */
+    validatedAt: number;
   }
 }

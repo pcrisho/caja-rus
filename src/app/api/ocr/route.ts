@@ -3,18 +3,26 @@ import { generateObject } from "ai";
 import { z } from "zod";
 import { visionModel } from "@/lib/ai";
 import { auth } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const invoiceOcrSchema = z.object({
   supplierRuc: z
     .string()
+    .length(11, "El RUC debe tener exactamente 11 dígitos.")
+    .regex(/^\d{11}$/, "El RUC debe contener solo dígitos.")
     .describe("RUC del proveedor. 11 dígitos numéricos."),
   supplierName: z
     .string()
+    .min(1)
     .describe("Razón social o nombre comercial del proveedor."),
   invoiceNumber: z
     .string()
+    .min(1)
     .describe("Serie y número: F001-00012345 o B120-23423."),
-  purchaseDate: z.string().describe("Fecha ISO: YYYY-MM-DD."),
+  purchaseDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Formato de fecha inválido, se espera YYYY-MM-DD.")
+    .describe("Fecha ISO: YYYY-MM-DD."),
   items: z
     .array(
       z.object({
@@ -23,22 +31,35 @@ const invoiceOcrSchema = z.object({
           .describe("Nombre del producto tal cual en la factura."),
         quantity: z
           .number()
+          .positive()
           .describe("Cantidad comprada. Permite decimales (ej. 12.500)."),
-        unitCost: z.number().describe("Costo unitario en Soles."),
-        totalCost: z.number().describe("Monto total del ítem."),
+        unitCost: z.number().nonnegative().describe("Costo unitario en Soles."),
+        totalCost: z.number().nonnegative().describe("Monto total del ítem."),
       })
     )
+    .min(1)
     .describe("Lista detallada de productos."),
   baseAmount: z
     .number()
+    .nonnegative()
     .optional()
     .describe("Base imponible (subtotal antes de IGV)."),
   igvAmount: z
     .number()
+    .nonnegative()
     .optional()
     .describe("Monto del IGV si está discriminado."),
-  totalAmount: z.number().describe("Monto total final de la factura."),
+  totalAmount: z.number().positive().describe("Monto total final de la factura."),
 });
+
+// Nota: los montos siguen siendo `number` (float) en este schema porque es lo
+// que `generateObject` puede validar de la salida del modelo de IA. Al
+// persistir estos valores con Prisma, SIEMPRE convertir explícitamente con
+// `new Prisma.Decimal(value.toFixed(2))` en vez de pasar el float crudo, para
+// evitar errores de redondeo de punto flotante en montos legalmente
+// sensibles (NRUS). Ver docs/audit/informe-auditoria-cajarus.md #5.5.
+
+const OCR_RATE_LIMIT = { limit: 10, windowMs: 5 * 60 * 1000 }; // 10 facturas / 5 min por usuario
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -52,12 +73,42 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const rateLimit = checkRateLimit(session.user.id, OCR_RATE_LIMIT);
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      {
+        error:
+          "Demasiadas facturas procesadas en poco tiempo. Espera unos minutos e intenta de nuevo.",
+      },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": Math.ceil(
+            (rateLimit.resetAt - Date.now()) / 1000
+          ).toString(),
+        },
+      }
+    );
+  }
+
   try {
     const { imageUrl } = await req.json();
 
-    if (!imageUrl) {
+    if (!imageUrl || typeof imageUrl !== "string") {
       return NextResponse.json(
         { error: "URL de imagen requerida." },
+        { status: 400 }
+      );
+    }
+
+    // Defensa contra SSRF: solo se permite pedir imágenes que ya viven en
+    // nuestro propio bucket público de R2. Sin esto, un ADMIN (o una sesión
+    // ADMIN comprometida) podría usar el servidor como proxy para sondear
+    // la red interna. Ver docs/audit/informe-auditoria-cajarus.md #1.4.
+    const r2PublicUrl = process.env.R2_PUBLIC_URL;
+    if (!r2PublicUrl || !imageUrl.startsWith(r2PublicUrl)) {
+      return NextResponse.json(
+        { error: "La imagen debe provenir del almacenamiento de facturas." },
         { status: 400 }
       );
     }
@@ -108,12 +159,16 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true, data: extractedInvoice });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error en OCR:", error);
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Error inesperado al procesar la factura.";
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Error inesperado al procesar la factura.",
+        error: message,
       },
       { status: 500 }
     );
