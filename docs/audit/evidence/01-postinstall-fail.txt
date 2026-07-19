@@ -1,0 +1,15 @@
+$ pnpm install --frozen-lockfile
+(ejecutado el 2026-07-18T22:33:01-05:00)
+
+--- Resultado: postinstall (prisma generate) FALLA ---
+(node:87210) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+
+> caja-rus@0.1.0 postinstall /home/pcrisostomo/Documentos/GitHub/caja-rus
+> prisma generate
+
+Failed to load config file "/home/pcrisostomo/Documentos/GitHub/caja-rus" as a TypeScript/JavaScript module. Error: PrismaConfigEnvError: Cannot resolve environment variable: DATABASE_URL.
+ ELIFECYCLE  Command failed with exit code 1.

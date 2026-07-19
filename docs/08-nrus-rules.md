@@ -4,6 +4,15 @@ Lógica financiera para el control del régimen tributario simplificado de la SU
 
 Fuente normativa: **Decreto Legislativo N° 1269, Nuevo Régimen Único Simplificado, modificado por D.L. 1529**.
 
+> ⚠️ **Antes de implementar cualquier lógica de categorización NRUS:** validar
+> las cifras vigentes (cuotas y topes mensuales) directamente contra la
+> Resolución/tabla oficial de SUNAT del año en curso, no solo contra este
+> documento. SUNAT actualiza estos montos periódicamente. Además, se
+> recomienda almacenarlos como **configuración versionada** (tabla o archivo
+> de config con fecha de vigencia) en vez de constantes hardcodeadas en el
+> código, para no requerir un despliegue cada vez que cambien. Ver
+> docs/audit/informe-auditoria-cajarus.md #7.2.
+
 ## Categorías del NRUS
 
 | Categoría | Límite Mensual (Ingresos o Compras) | Cuota Mensual SUNAT |

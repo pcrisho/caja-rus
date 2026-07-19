@@ -1,0 +1,57 @@
+=== PRUEBA: migration.sql vs prisma/schema.prisma (drift real) ===
+Metodología: se levantó un Postgres 16 limpio (Docker), se aplicó
+'prisma migrate deploy' (la ÚNICA migración existente en el repo),
+y luego se comparó el estado resultante de la BD contra schema.prisma
+usando 'prisma migrate diff'. Cualquier salida no-vacía = drift real.
+
+$ npx prisma migrate deploy
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": PostgreSQL database "cajarus_audit", schema "public" at "localhost:15433"
+
+1 migration found in prisma/migrations
+
+Applying migration `20260719012739_init_schema`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20260719012739_init_schema/
+    └─ migration.sql
+
+All migrations have been successfully applied.
+
+$ npx prisma migrate diff --from-config-datasource prisma.config.ts --to-schema prisma/schema.prisma --script
+(diff entre la BD ya migrada y el schema.prisma actual)
+Loaded Prisma config from prisma.config.ts.
+
+-- CreateEnum
+CREATE TYPE "waste_reason" AS ENUM ('EXPIRED', 'DAMAGED', 'BROKEN', 'LOST', 'STOLEN', 'OTHER');
+
+-- CreateTable
+CREATE TABLE "waste_adjustments" (
+    "id" UUID NOT NULL,
+    "product_id" UUID NOT NULL,
+    "admin_id" UUID NOT NULL,
+    "quantity" DECIMAL(10,3) NOT NULL,
+    "reason" "waste_reason" NOT NULL,
+    "description" VARCHAR(200),
+    "adjusted_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "waste_adjustments_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "waste_adjustments_product_id_idx" ON "waste_adjustments"("product_id");
+
+-- CreateIndex
+CREATE INDEX "waste_adjustments_admin_id_adjusted_at_idx" ON "waste_adjustments"("admin_id", "adjusted_at");
+
+-- AddForeignKey
+ALTER TABLE "waste_adjustments" ADD CONSTRAINT "waste_adjustments_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "waste_adjustments" ADD CONSTRAINT "waste_adjustments_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
