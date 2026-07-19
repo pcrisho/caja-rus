@@ -19,6 +19,21 @@ Aplicación web mobile-first para la gestión de inventario, ventas y control fi
 | PWA | @ducanh2912/next-pwa |
 | Estado Local | Dexie.js (IndexedDB) + Zustand |
 
+## Requisitos
+
+- Node.js >= 20
+- pnpm 10
+
+## Comenzar
+
+```bash
+git clone <repo>
+cd caja-rus
+cp .env.example .env   # completar credenciales
+pnpm install
+pnpm dev               # http://localhost:3000
+```
+
 ## Estado del Proyecto
 
 - [x] PRD y visión de producto
@@ -43,3 +58,7 @@ Aplicación web mobile-first para la gestión de inventario, ventas y control fi
 
 - Ver [`docs/`](./docs/) para documentación detallada.
 - [`AGENTS.md`](./AGENTS.md) — guía para agentes de IA (comandos, convenciones, setup).
+
+## Licencia
+
+[MIT](./LICENSE)
