@@ -25,120 +25,114 @@ Estrategia Offline-First para permitir ventas incluso con conexión inestable.
 
 ## 2. Configuración de Next.js
 
-```javascript
-// next.config.js
-const withPWA = require("@ducanh2912/next-pwa").default({
-  dest: "public",
-  disable: process.env.NODE_ENV === "development",
-  register: true,
-  skipWaiting: true,
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
-  reloadOnOnline: true,
-});
+```typescript
+// next.config.ts (ESM)
+import type { NextConfig } from "next";
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   reactStrictMode: true,
 };
 
-module.exports = withPWA(nextConfig);
+export default nextConfig;
 ```
 
-## 3. Estado Local Offline con Zustand
+> **Nota:** El plugin PWA (`@ducanh2912/next-pwa`) está en dependencias pero desactivado temporalmente en `next.config.ts` por incompatibilidad con Turbopack (Next.js 16). Se reactivará cuando el plugin sea compatible o se migre a Webpack.
+
+## 3. IndexedDB con Dexie.js
+
+Para datos offline estructurados (catálogo de productos, ventas pendientes), se usa Dexie.js como capa de persistencia sobre IndexedDB, complementando Zustand para estado de UI volátil.
 
 ```typescript
-// store/useOfflineStore.ts
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+// store/db.ts
+import Dexie, { type EntityTable } from "dexie";
 
-export interface OfflineProduct {
+interface OfflineProduct {
   id: string;
   barcode: string | null;
   name: string;
   sellingPrice: number;
   unitType: "UNIT" | "KILOGRAM";
   stock: number;
+  updatedAt: string;
 }
 
-export interface OfflineSaleItem {
+interface PendingSale {
+  id: string;
+  cashierId: string;
+  paymentMethod: string;
+  items: { productId: string; quantity: number; unitPrice: number }[];
+  totalAmount: number;
+  saleDate: string;
+  synced: boolean;
+}
+
+const db = new Dexie("CajaRUSOffline") as Dexie & {
+  products: EntityTable<OfflineProduct, "id">;
+  pendingSales: EntityTable<PendingSale, "id">;
+};
+
+db.version(1).stores({
+  products: "&id, barcode, name, *updatedAt",
+  pendingSales: "&id, synced, saleDate",
+});
+
+export type { OfflineProduct, PendingSale };
+export { db };
+```
+
+## 4. Capas de Estado
+
+| Capa | Tecnología | Propósito |
+|---|---|---|
+| UI efímera | Zustand (React state) | Carrito activo, modals, loading states |
+| Persistencia offline estructurada | Dexie.js (IndexedDB) | Catálogo de productos, ventas pendientes |
+| Sesión | Auth.js JWT | Autenticación (cookie httpOnly) |
+
+### Zustand — Estado de UI
+
+```typescript
+// store/useCartStore.ts
+import { create } from "zustand";
+
+interface CartItem {
   productId: string;
+  name: string;
   quantity: number;
   unitPrice: number;
 }
 
-export interface OfflineSale {
-  id: string;
-  cashierId: string;
-  paymentMethod: "CASH" | "YAPE" | "PLIN" | "CARD";
-  items: OfflineSaleItem[];
-  totalAmount: number;
-  saleDate: string;
+interface CartState {
+  items: CartItem[];
+  addItem: (item: CartItem) => void;
+  removeItem: (productId: string) => void;
+  clearCart: () => void;
 }
 
-interface OfflineState {
-  products: OfflineProduct[];
-  salesQueue: OfflineSale[];
-  isOnline: boolean;
-
-  setProducts: (products: OfflineProduct[]) => void;
-  updateProductStockLocal: (productId: string, quantityToSubtract: number) => void;
-  addSaleToQueue: (sale: Omit<OfflineSale, "id" | "saleDate">) => void;
-  clearQueue: () => void;
-  removeSaleFromQueue: (saleId: string) => void;
-  setOnlineStatus: (status: boolean) => void;
-}
-
-export const useOfflineStore = create<OfflineState>()(
-  persist(
-    (set, get) => ({
-      products: [],
-      salesQueue: [],
-      isOnline: typeof window !== "undefined" ? navigator.onLine : true,
-
-      setProducts: (products) => set({ products }),
-
-      updateProductStockLocal: (productId, quantityToSubtract) => {
-        const currentProducts = get().products;
-        const updatedProducts = currentProducts.map((p) => {
-          if (p.id === productId) {
-            return { ...p, stock: Math.max(0, p.stock - quantityToSubtract) };
-          }
-          return p;
-        });
-        set({ products: updatedProducts });
-      },
-
-      addSaleToQueue: (saleData) => {
-        const newSale: OfflineSale = {
-          ...saleData,
-          id: crypto.randomUUID(),
-          saleDate: new Date().toISOString(),
+export const useCartStore = create<CartState>()((set) => ({
+  items: [],
+  addItem: (item) =>
+    set((state) => {
+      const existing = state.items.find((i) => i.productId === item.productId);
+      if (existing) {
+        return {
+          items: state.items.map((i) =>
+            i.productId === item.productId
+              ? { ...i, quantity: i.quantity + item.quantity }
+              : i
+          ),
         };
-        set((state) => ({ salesQueue: [...state.salesQueue, newSale] }));
-        saleData.items.forEach((item) => {
-          get().updateProductStockLocal(item.productId, item.quantity);
-        });
-      },
-
-      clearQueue: () => set({ salesQueue: [] }),
-
-      removeSaleFromQueue: (saleId) =>
-        set((state) => ({
-          salesQueue: state.salesQueue.filter((s) => s.id !== saleId),
-        })),
-
-      setOnlineStatus: (status) => set({ isOnline: status }),
+      }
+      return { items: [...state.items, item] };
     }),
-    {
-      name: "cajarus-offline-storage",
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
-);
+  removeItem: (productId) =>
+    set((state) => ({
+      items: state.items.filter((i) => i.productId !== productId),
+    })),
+  clearCart: () => set({ items: [] }),
+}));
 ```
 
-## 4. Sincronizador Automático
+## 5. Sincronizador Automático
 
 ```typescript
 // components/OfflineSyncProvider.tsx
@@ -210,7 +204,7 @@ export default function OfflineSyncProvider({
 }
 ```
 
-## 5. Flujo Offline
+## 6. Flujo Offline
 
 ```mermaid
 flowchart TD

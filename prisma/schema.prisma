@@ -1,10 +1,10 @@
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
-generator client {
-  provider = "prisma-client-js"
+datasource db {
+  provider = "postgresql"
 }
 
 // ──────────────────────────────────────────
@@ -60,6 +60,17 @@ enum NrusPaymentStatus {
   @@map("nrus_payment_status")
 }
 
+enum WasteReason {
+  EXPIRED
+  DAMAGED
+  BROKEN
+  LOST
+  STOLEN
+  OTHER
+
+  @@map("waste_reason")
+}
+
 // ──────────────────────────────────────────
 // Auth (Auth.js)
 // ──────────────────────────────────────────
@@ -107,14 +118,15 @@ model User {
   createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz
   updatedAt    DateTime   @updatedAt @map("updated_at") @db.Timestamptz
 
-  accounts       Account[]
-  sessions       Session[]
-  sales          Sale[]
-  purchases      Purchase[]
-  expenses       Expense[]
-  cashClosures   CashClosure[]
-  nrusSummaries  NrusMonthlySummary[]
-  auditLogs      AuditLog[]
+  accounts         Account[]
+  sessions         Session[]
+  sales            Sale[]
+  purchases        Purchase[]
+  expenses         Expense[]
+  cashClosures     CashClosure[]
+  nrusSummaries    NrusMonthlySummary[]
+  auditLogs        AuditLog[]
+  wasteAdjustments WasteAdjustment[]
 
   @@map("users")
 }
@@ -147,15 +159,38 @@ model Product {
   createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz
   updatedAt    DateTime       @updatedAt @map("updated_at") @db.Timestamptz
 
-  category      Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  saleItems     SaleItem[]
-  purchaseItems PurchaseItem[]
+  category         Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  saleItems        SaleItem[]
+  purchaseItems    PurchaseItem[]
+  wasteAdjustments WasteAdjustment[]
 
   @@index([barcode])
   @@index([name])
   @@index([categoryId])
   @@index([isActive, barcode])
   @@map("products")
+}
+
+// ──────────────────────────────────────────
+// Inventory Adjustments (Waste / Spoilage)
+// ──────────────────────────────────────────
+
+model WasteAdjustment {
+  id          String       @id @default(uuid()) @db.Uuid
+  productId   String       @map("product_id") @db.Uuid
+  adminId     String       @map("admin_id") @db.Uuid
+  quantity    Decimal      @db.Decimal(10, 3)
+  reason      WasteReason
+  description String?      @db.VarChar(200)
+  adjustedAt  DateTime     @default(now()) @map("adjusted_at") @db.Timestamptz
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  admin   User    @relation(fields: [adminId], references: [id], onDelete: Restrict)
+
+  @@index([productId])
+  @@index([adminId, adjustedAt])
+  @@map("waste_adjustments")
 }
 
 // ──────────────────────────────────────────
@@ -280,16 +315,16 @@ model CashClosure {
 // ──────────────────────────────────────────
 
 model NrusMonthlySummary {
-  id              String   @id @default(uuid()) @db.Uuid
-  userId          String   @map("user_id") @db.Uuid
-  year            Int
-  month           Int
-  totalSales      Decimal  @default(0.00) @map("total_sales") @db.Decimal(10, 2)
-  totalPurchases  Decimal  @default(0.00) @map("total_purchases") @db.Decimal(10, 2)
-  currentCategory Int      @default(1) @map("current_category")
-  consecutiveExcess Int   @default(0) @map("consecutive_excess")
-  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @map("user_id") @db.Uuid
+  year              Int
+  month             Int
+  totalSales        Decimal  @default(0.00) @map("total_sales") @db.Decimal(10, 2)
+  totalPurchases    Decimal  @default(0.00) @map("total_purchases") @db.Decimal(10, 2)
+  currentCategory   Int      @default(1) @map("current_category")
+  consecutiveExcess Int      @default(0) @map("consecutive_excess")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   user     User         @relation(fields: [userId], references: [id], onDelete: Restrict)
   payments NrusPayment[]

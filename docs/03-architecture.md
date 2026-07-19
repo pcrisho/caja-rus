@@ -12,7 +12,7 @@ graph TB
 
     subgraph Vercel["Vercel (Edge + Serverless)"]
         Next["Next.js App Router"]
-        MW["Middleware (auth)"]
+        MW["Proxy (auth)"]
         SA["Server Actions"]
         API["API Routes"]
         SC["Server Components"]
@@ -81,10 +81,12 @@ cajarus/
 │   ├── components/
 │   │   ├── ui/                       # Botones XXL, cards, inputs
 │   │   └── barcode-scanner.tsx       # Escáner con fallback
+│   ├── generated/
+│   │   └── prisma/                   # Prisma Client generado (output)
 │   ├── lib/
 │   │   ├── auth.ts                   # Configuración Auth.js v5
 │   │   ├── auth-helpers.ts           # requireAuth(), requireRole()
-│   │   ├── prisma.ts                 # Singleton Prisma
+│   │   ├── prisma.ts                 # Singleton Prisma (PrismaPg adapter)
 │   │   ├── r2.ts                     # S3 Client para Cloudflare R2
 │   │   ├── ai.ts                     # Vercel AI SDK (Gemini)
 │   │   └── env.ts                    # Validación de variables de entorno
@@ -94,7 +96,10 @@ cajarus/
 │   │   └── useOfflineStore.ts        # Zustand persistente
 │   ├── types/
 │   │   └── next-auth.d.ts            # Tipos extendidos de Session + JWT
-│   └── middleware.ts                 # Protección de rutas + verificación de rol
+│   ├── proxy.ts                      # Auth.js proxy (reemplaza middleware.ts)
+├── prisma/
+│   ├── schema.prisma                 # Modelo de datos (Prisma 7)
+├── prisma.config.ts                  # Configuración CLI Prisma 7
 ├── public/
 │   └── manifest.json                 # PWA manifest
 └── prisma/
@@ -144,4 +149,6 @@ sequenceDiagram
 5. **Offline-First**: Zustand persiste en localStorage, cola de sincronización.
 6. **Edge Runtime para OCR**: Procesamiento de imágenes en Vercel Edge.
 7. **Transacciones serializables**: Las operaciones de venta usan `isolationLevel: Serializable` con `SELECT FOR UPDATE` para evitar condiciones de carrera sobre el stock.
-8. **Índices compuestos**: Sale`[cashierId, saleDate]`, SaleItem`[productId]`, Purchase`[adminId, purchaseDate]` para consultas frecuentes de reportes y búsquedas.
+8. **Prisma 7 Adapter Pattern**: El cliente Prisma usa `@prisma/adapter-pg` con `pg.Pool` en lugar de conexión directa por URL. Ver `src/lib/prisma.ts`.
+9. **Proxy en lugar de Middleware**: Next.js 16 cambió el contrato de Middleware. Ahora se usa `src/proxy.ts` que exporta `{auth, signIn, signOut}` para compatibilidad con Auth.js v5.
+10. **Índices compuestos**: Sale`[cashierId, saleDate]`, SaleItem`[productId]`, Purchase`[adminId, purchaseDate]` para consultas frecuentes de reportes y búsquedas.

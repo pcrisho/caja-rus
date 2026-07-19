@@ -6,7 +6,7 @@ Procesamiento de facturas y boletas de proveedores peruanos (SUNAT) usando Verce
 
 ```mermaid
 sequenceDiagram
-    participant Cel as Celular (Mamá)
+    participant Cel as Celular (Administrador)
     participant R2 as Cloudflare R2
     participant SA as Server Action
     participant AI as Gemini API

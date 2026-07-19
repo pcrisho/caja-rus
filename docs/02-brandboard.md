@@ -2,7 +2,7 @@
 
 **Esencia de Marca:** El control de tu negocio, al toque.
 
-CajaRUS no busca ser un software corporativo frío. Es una herramienta aliada, cercana y clara, diseñada para que los bodegueros peruanos sientan orgullo y tranquilidad al ver crecer sus ganancias sin miedo a los topes de la SUNAT.
+CajaRUS no busca ser un software corporativo frío. Es una herramienta aliada, cercana y clara, diseñada para que los bodegueros peruanos sientan orgullo y tranquilidad al ver crecer su negocio de forma segura, escalable y entendible.
 
 ## 1. Paleta de Colores
 
@@ -59,7 +59,7 @@ No se cargan fuentes externas para optimizar rendimiento en dispositivos de gama
 |---|---|
 | Cercana pero Respetuosa | "¡Buen margen! Estás ganando X por este producto" |
 | Directa al Grano | "Escanea el producto" → "Elige método de pago" → "Venta guardada" |
-| Visualmente Alentadora | "¡Mes cerrado con éxito! Tu cuota es de S/ 25" |
+| Visualmente Alentadora | "¡Mes cerrado con éxito! Tu cuota es de S/ 20" |
 
 ### 4.1 Mensajes de Error en Español Peruano Coloquial
 

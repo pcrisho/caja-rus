@@ -2,18 +2,18 @@
 
 ## Visión del Producto
 
-Crear una aplicación web móvil que actúe como el centro operativo y financiero para una bodega minorista, permitiendo la digitalización de inventarios, ventas rápidas y control del régimen NRUS sin fricción tecnológica para usuarios no nativos digitales.
+Crear una aplicación web móvil que actúe como el centro operativo y financiero para bodegas minoristas, permitiendo la digitalización de inventarios, ventas rápidas y control del régimen NRUS sin fricción tecnológica para usuarios no nativos digitales.
 
 ## Problema
 
-Tiendas de abarrotes familiares en Perú operan sin sistemas digitales. El control de inventario, precios, ventas y finanzas se lleva manualmente, generando descuadres de caja, estrés por los topes del NRUS y pérdida de tiempo en tareas administrativas.
+Tiendas de abarrotes en Perú operan sin sistemas digitales. El control de inventario, precios, ventas y finanzas se lleva manualmente, generando descuadres de caja, estrés falta de organización y pérdida de tiempo y gestión en tareas administrativas.
 
 ## Usuarios Target
 
 | Usuario | Perfil | Necesidad |
 |---|---|---|
-| Mamá (Administradora) | Gestiona compras, finanzas, proveedores | Control total del negocio, alertas NRUS, carga de facturas |
-| Papá (Cajero/Operador) | Atiende clientes, registro de ventas | POS rápido, consulta de precios, alertas de stock |
+| Dueñ@ (Administrador(a)) | Gestiona compras, finanzas, proveedores | Control total del negocio, alertas NRUS, carga de facturas |
+| Cajero/Operador | Atiende clientes, registro de ventas | POS rápido, consulta de precios, alertas de stock |
 | Tú (Soporte Técnico) | Configuración y mantenimiento | Gestión de usuarios, reportes, supervisión |
 
 ## Stack Tecnológico Validado
@@ -127,8 +127,8 @@ mindmap
 
   | Categoría | Cuota Mensual | Límite Ingresos Brutos Mensuales |
   |---|---|---|
-  | Categoría 1 | S/ 25 | Hasta S/ 5,000 |
-  | Categoría 2 | S/ 55 | Hasta S/ 25,000 |
+  | Categoría 1 | S/ 20 | Hasta S/ 5,000 |
+  | Categoría 2 | S/ 50 | Hasta S/ 8,000 |
 
 - Alerta al 85% del límite (S/ 4,250 para Categoría 1)
 - Alerta crítica al acercarse a S/ 8,000 (transición a Categoría 2)

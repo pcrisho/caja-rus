@@ -8,8 +8,8 @@ Fuente normativa: **Decreto Legislativo N° 1269, Nuevo Régimen Único Simplifi
 
 | Categoría | Límite Mensual (Ingresos o Compras) | Cuota Mensual SUNAT |
 |---|---|---|
-| Categoría 1 | Hasta S/ 5,000 | S/ 25 |
-| Categoría 2 | Hasta S/ 8,000 | S/ 55 |
+| Categoría 1 | Hasta S/ 5,000 | S/ 20 |
+| Categoría 2 | Hasta S/ 8,000 | S/ 50 |
 | EXCEDIDO | Más de S/ 8,000 | Régimen MYPE Tributario |
 
 ## Cálculo del Límite Operativo
@@ -43,8 +43,8 @@ $$
 $$
 \text{Cuota mensual (S/.)} =
 \begin{cases}
-25.00, & \text{si Categoría} = 1 \\
-55.00, & \text{si Categoría} = 2 \\
+20.00, & \text{si Categoría} = 1 \\
+50.00, & \text{si Categoría} = 2 \\
 \text{Régimen MYPE / Alerta Crítica}, & \text{si Categoría} = \text{EXCEDIDO}
 \end{cases}
 $$
@@ -62,13 +62,13 @@ flowchart TD
     A["Calcular L_mes =<br/>max(V_mes, C_mes)"] --> B{"L_mes > 0?"}
 
     B -->|"Sí"| C{"L_mes <= 5,000?"}
-    C -->|"Sí"| D["Categoría 1<br/>Cuota: S/ 25"]
+    C -->|"Sí"| D["Categoría 1<br/>Cuota: S/ 20"]
     D --> E{"L_mes >= 4,250?"}
     E -->|"Sí"| F["⚠️ Alerta preventiva:<br/>85% de Cat1 alcanzado"]
     E -->|"No"| G["✅ Todo normal"]
 
     C -->|"No"| H{"L_mes <= 8,000?"}
-    H -->|"Sí"| I["Categoría 2<br/>Cuota: S/ 55"]
+    H -->|"Sí"| I["Categoría 2<br/>Cuota: S/ 50"]
     I --> J{"L_mes >= 6,800?"}
     J -->|"Sí"| K["⚠️ Alerta preventiva:<br/>85% de Cat2 alcanzado"]
     J -->|"No"| G
@@ -141,7 +141,7 @@ model NrusPayment {
   id               String           @id @default(cuid())
   nrusSummaryId    String
   nrusSummary      NrusMonthlySummary @relation(fields: [nrusSummaryId], references: [id])
-  amount           Decimal          // S/ 25 o S/ 55
+  amount           Decimal          // S/ 20 o S/ 50
   status           NrusPaymentStatus @default(PENDING)
   dueDate          DateTime         // Primeros 5 días hábiles del mes siguiente
   paidAt           DateTime?

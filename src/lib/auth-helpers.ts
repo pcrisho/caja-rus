@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@/generated/prisma/enums";
 
 export type AuthResult = {
   userId: string;

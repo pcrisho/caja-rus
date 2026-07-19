@@ -12,10 +12,12 @@ erDiagram
     User ||--o{ CashClosure : "realiza"
     User ||--o{ NrusMonthlySummary : "pertenece a"
     User ||--o{ AuditLog : "genera"
+    User ||--o{ WasteAdjustment : "registra"
     Sale ||--|{ SaleItem : "contiene"
     Category ||--o{ Product : "clasifica"
     Product ||--o{ SaleItem : "vendido en"
     Product ||--o{ PurchaseItem : "comprado en"
+    Product ||--o{ WasteAdjustment : "ajustado por"
     Purchase ||--|{ PurchaseItem : "contiene"
     NrusMonthlySummary ||--o{ NrusPayment : "genera"
 
@@ -170,6 +172,17 @@ erDiagram
         json metadata "nullable"
         datetime created_at
     }
+
+    WasteAdjustment {
+        uuid id PK
+        uuid product_id FK
+        uuid admin_id FK
+        decimal quantity "3 decimales"
+        enum reason "EXPIRED | DAMAGED | BROKEN | LOST | STOLEN | OTHER"
+        varchar description "nullable"
+        datetime adjusted_at
+        datetime created_at
+    }
 ```
 
 ## Schema Prisma
@@ -177,11 +190,11 @@ erDiagram
 ```prisma
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 // ──────────────────────────────────────────
@@ -284,16 +297,50 @@ model User {
   createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz
   updatedAt    DateTime   @updatedAt @map("updated_at") @db.Timestamptz
 
-  accounts       Account[]
-  sessions       Session[]
-  sales          Sale[]
-  purchases      Purchase[]
-  expenses       Expense[]
-  cashClosures   CashClosure[]
-  nrusSummaries  NrusMonthlySummary[]
-  auditLogs      AuditLog[]
+  accounts         Account[]
+  sessions         Session[]
+  sales            Sale[]
+  purchases        Purchase[]
+  expenses         Expense[]
+  cashClosures     CashClosure[]
+  nrusSummaries    NrusMonthlySummary[]
+  auditLogs        AuditLog[]
+  wasteAdjustments WasteAdjustment[]
 
   @@map("users")
+}
+
+// ──────────────────────────────────────────
+// Inventory Adjustments (Waste / Spoilage)
+// ──────────────────────────────────────────
+
+enum WasteReason {
+  EXPIRED
+  DAMAGED
+  BROKEN
+  LOST
+  STOLEN
+  OTHER
+
+  @@map("waste_reason")
+}
+
+model WasteAdjustment {
+  id          String       @id @default(uuid()) @db.Uuid
+  productId   String       @map("product_id") @db.Uuid
+  adminId     String       @map("admin_id") @db.Uuid
+  quantity    Decimal      @db.Decimal(10, 3)
+  reason      WasteReason
+  description String?      @db.VarChar(200)
+  adjustedAt  DateTime     @default(now()) @map("adjusted_at") @db.Timestamptz
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  admin   User    @relation(fields: [adminId], references: [id], onDelete: Restrict)
+
+  @@index([productId])
+  @@index([adminId, adjustedAt])
+  @@map("waste_adjustments")
 }
 
 // ──────────────────────────────────────────
@@ -324,9 +371,10 @@ model Product {
   createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz
   updatedAt    DateTime       @updatedAt @map("updated_at") @db.Timestamptz
 
-  category      Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  saleItems     SaleItem[]
-  purchaseItems PurchaseItem[]
+  category         Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  saleItems        SaleItem[]
+  purchaseItems    PurchaseItem[]
+  wasteAdjustments WasteAdjustment[]
 
   @@index([barcode])
   @@index([name])
@@ -515,21 +563,25 @@ model AuditLog {
 
 1. **`Decimal(10,3)` en stock y cantidades**: 3 decimales para precisión en ventas por peso (ej. 0.750 kg). Evita errores de redondeo.
 
-2. **`Decimal(12,4)` en precios**: Mayor precisión en costos y precios de venta para operaciones con IGV y descuentos.
+2. **Prisma 7 driver adapter**: El datasource no incluye `url` — esta se configura en `prisma.config.ts` mediante `defineConfig`. En runtime, `PrismaClient` recibe un adapter `PrismaPg(pool)` en `src/lib/prisma.ts`.
 
-3. **`NrusMonthlySummary` como tabla de resumen**: Evita recalcular `SUM` sobre miles de registros cada vez que se abre el dashboard. Se actualiza vía `upsert` en cada venta/compra. Contiene `consecutiveExcess` para detectar meses seguidos sobrecategoría.
+3. **`Decimal(12,4)` en precios**: Mayor precisión en costos y precios de venta para operaciones con IGV y descuentos.
 
-4. **`ocr_raw_data` como JSON**: Almacena la respuesta cruda de la IA para auditoría y depuración. Permite reconciliar diferencias.
+4. **`WasteAdjustment` para mermas**: Cada ajuste de inventario por desperdicio, daño, o pérdida queda registrado con `adminId`, `reason`, y `quantity`. Las mermas reducen el stock del producto y son auditables.
 
-5. **Enums mapeados a `snake_case`**: `user_role`, `unit_type`, `payment_method` en la BD física, pero `UserRole`, `UnitType`, `PaymentMethod` en TypeScript.
+5. **`NrusMonthlySummary` como tabla de resumen**: Evita recalcular `SUM` sobre miles de registros cada vez que se abre el dashboard. Se actualiza vía `upsert` en cada venta/compra. Contiene `consecutiveExcess` para detectar meses seguidos sobrecategoría.
 
-6. **`barcode` nullable**: Productos sin código de barras (verduras, pan, granel) pueden existir sin dicho campo.
+6. **`ocr_raw_data` como JSON**: Almacena la respuesta cruda de la IA para auditoría y depuración. Permite reconciliar diferencias.
 
-7. **`passwordHash` nullable**: Usuarios que usan autenticación OAuth (Google) no tienen contraseña local. Solo usuarios creados vía credenciales tradicionales tendrán este campo.
+7. **Enums mapeados a `snake_case`**: `user_role`, `unit_type`, `payment_method` en la BD física, pero `UserRole`, `UnitType`, `PaymentMethod` en TypeScript.
 
-8. **Auth.js v5 con Prisma Adapter**: Las tablas `Account` y `Session` son gestionadas automáticamente por el adaptador de Auth.js. Las sesiones usan estrategia JWT (sin tabla `Session` en ese modo), pero la tabla existe para compatibilidad con base de datos.
+8. **`barcode` nullable**: Productos sin código de barras (verduras, pan, granel) pueden existir sin dicho campo.
 
-9. **Índices compuestos estratégicos**:
+9. **`passwordHash` nullable**: Usuarios que usan autenticación OAuth (Google) no tienen contraseña local. Solo usuarios creados vía credenciales tradicionales tendrán este campo.
+
+10. **Auth.js v5 con Prisma Adapter**: Las tablas `Account` y `Session` son gestionadas automáticamente por el adaptador de Auth.js. Las sesiones usan estrategia JWT (sin tabla `Session` en ese modo), pero la tabla existe para compatibilidad con base de datos.
+
+11. **Índices compuestos estratégicos**:
    - `Sale[cashierId, saleDate]` — consultas de reportes por cajero y fecha
    - `SaleItem[productId]` — búsquedas de ventas de un producto específico
    - `Purchase[adminId, purchaseDate]` — consultas de compras por administrador
@@ -537,8 +589,8 @@ model AuditLog {
    - `AuditLog[entity, entityId]` — trazabilidad de cambios por entidad
    - `Expense[adminId, expenseDate]` — reportes de gastos
 
-10. **PaymentMethod.MIXED**: Soportar pagos combinados (ej. S/ 5 en efectivo + S/ 10 en YAPE) en una misma venta.
+12. **PaymentMethod.MIXED**: Soportar pagos combinados (ej. S/ 5 en efectivo + S/ 10 en YAPE) en una misma venta.
 
-11. **Sale.status y Purchase.status**: Estados para ciclo de vida completo. `Sale.CANCELLED` permite anular ventas sin borrar registros. `Purchase.PENDING` vs `CONFIRMED` permite diferir la confirmación de compras.
+13. **Sale.status y Purchase.status**: Estados para ciclo de vida completo. `Sale.CANCELLED` permite anular ventas sin borrar registros. `Purchase.PENDING` vs `CONFIRMED` permite diferir la confirmación de compras.
 
-12. **AuditLog**: Registro de auditoría centralizado para acciones críticas (anulación de ventas, cambios de precio, ajustes de stock). Cada entrada referencia `userId`, `entity`, `entityId`, y `metadata` JSON con el detalle del cambio.
+14. **AuditLog**: Registro de auditoría centralizado para acciones críticas (anulación de ventas, cambios de precio, ajustes de stock). Cada entrada referencia `userId`, `entity`, `entityId`, y `metadata` JSON con el detalle del cambio.

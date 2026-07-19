@@ -69,7 +69,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["Mamá abre módulo<br/>Registrar Compra"] --> B["Toma foto a la<br/>factura física"]
+    A["Administrador abre módulo<br/>Registrar Compra"] --> B["Toma foto a la<br/>factura física"]
     B --> C["Sube imagen a<br/>Cloudflare R2"]
     C --> D["Server Action envía<br/>URL a Gemini API"]
 
@@ -82,7 +82,7 @@ flowchart TD
     H -->|"Sí (fuzzy match)"| I["Marca en verde"]
     H -->|"No (nuevos)"| J["Marca en ámbar<br/>Boton: Asignar precio"]
 
-    I --> K["Mamá confirma"]
+    I --> K["Usuario confirma"]
     J --> K
     K --> L["Presiona Confirmar e Ingresar"]
 
@@ -138,7 +138,7 @@ flowchart LR
     E -->|"Sí"| F["Alerta Ámbar:<br/>Prepárese para<br/>Categoría 2"]
 
     D --> G{"L_mes > S/ 5,000?"}
-    G -->|"Sí"| H["Cambia a Categoría 2<br/>Cuota: S/ 55/mes"]
+    G -->|"Sí"| H["Cambia a Categoría 2<br/>Cuota: S/ 50/mes"]
 
     H --> I{"L_mes >= 85%<br/>de S/ 8,000?<br/>(S/ 6,800)"}
     I -->|"Sí"| J["Alerta Ámbar:<br/>Límite próximo"]
@@ -150,7 +150,7 @@ flowchart LR
     M -->|"Sí"| N["🔴 EXCLUSIÓN NRUS<br/>Excedió 2 meses consecutivos<br/>Pasar a Régimen MYPE"]
     M -->|"No"| O["🔴 ALERTA CRÍTICA<br/>Excedió NRUS este mes"]
 
-    E -->|"No"| P["Todo normal<br/>Categoría 1<br/>Cuota: S/ 25/mes"]
+    E -->|"No"| P["Todo normal<br/>Categoría 1<br/>Cuota: S/ 20/mes"]
     G -->|"No"| P
     I -->|"No"| P
     K -->|"No"| P
