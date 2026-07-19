@@ -34,6 +34,11 @@ pnpm install
 pnpm dev               # http://localhost:3000
 ```
 
+## IA / Agentes
+
+El proyecto usa **codebase-memory-mcp** para que agentes de IA naveguen el código
+sin consumir tokens en exceso. Ver [`AGENTS.md`](./AGENTS.md) para instrucciones.
+
 ## Estado del Proyecto
 
 - [x] PRD y visión de producto
@@ -57,7 +62,8 @@ pnpm dev               # http://localhost:3000
 ## Documentación
 
 - Ver [`docs/`](./docs/) para documentación detallada.
-- [`AGENTS.md`](./AGENTS.md) — guía para agentes de IA (comandos, convenciones, setup).
+- [`AGENTS.md`](./AGENTS.md) — guía para agentes de IA (MCP, comandos, convenciones, setup).
+- `.codebase-memory/graph.db.zst` — grafo de conocimiento del código (commiteado para compartir).
 
 ## Licencia
 
