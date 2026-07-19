@@ -10,8 +10,8 @@ Estrategia Offline-First para permitir ventas incluso con conexión inestable.
   "background_color": "#ffffff",
   "display": "standalone",
   "scope": "/",
-  "start_url": "/pos",
-  "name": "CajaRUS - El control de tu bodega al toque",
+  "start_url": "/tenants",
+  "name": "CajaRUS - El control de tus bodegas al toque",
   "short_name": "CajaRUS",
   "description": "Punto de venta y control financiero inteligente para bodegas del Nuevo RUS en Perú.",
   "orientation": "portrait",
@@ -48,6 +48,7 @@ import Dexie, { type EntityTable } from "dexie";
 
 interface OfflineProduct {
   id: string;
+  tenantId: string;
   barcode: string | null;
   name: string;
   sellingPrice: number;
@@ -58,6 +59,7 @@ interface OfflineProduct {
 
 interface PendingSale {
   id: string;
+  tenantId: string;
   cashierId: string;
   paymentMethod: string;
   items: { productId: string; quantity: number; unitPrice: number }[];
@@ -71,10 +73,21 @@ const db = new Dexie("CajaRUSOffline") as Dexie & {
   pendingSales: EntityTable<PendingSale, "id">;
 };
 
-db.version(1).stores({
-  products: "&id, barcode, name, *updatedAt",
-  pendingSales: "&id, synced, saleDate",
+db.version(2).stores({
+  products: "&id, tenantId, barcode, name, *updatedAt",
+  pendingSales: "&id, tenantId, synced, saleDate",
 });
+
+// Helpers tenant-scoped: el código que consume el store offline nunca debe
+// tener la opción de "olvidarse" del filtro por tenantId (IndexedDB es una
+// sola BD local compartida entre TODAS las bodegas del usuario en ese
+// dispositivo). Ver src/store/db.ts para la implementación completa,
+// incluyendo `clearTenantOfflineData(tenantId)` para no arrastrar datos de
+// una bodega a otra en el mismo dispositivo.
+export function getProductsForTenant(tenantId: string) { /* ... */ }
+export function getPendingSalesForTenant(tenantId: string) { /* ... */ }
+export function addPendingSaleForTenant(sale: PendingSale) { /* ... */ }
+export function clearTenantOfflineData(tenantId: string) { /* ... */ }
 
 export type { OfflineProduct, PendingSale };
 export { db };
@@ -86,7 +99,7 @@ export { db };
 |---|---|---|
 | UI efímera | Zustand (React state) | Carrito activo, modals, loading states |
 | Persistencia offline estructurada | Dexie.js (IndexedDB) | Catálogo de productos, ventas pendientes |
-| Sesión | Auth.js JWT | Autenticación (cookie httpOnly) |
+| Sesión | Auth.js JWT | Autenticación (cookie httpOnly) + tenant activo |
 
 ### Zustand — Estado de UI
 
@@ -170,6 +183,7 @@ export default function OfflineSyncProvider({
       for (const sale of salesQueue) {
         try {
           await createSaleAction({
+            tenantId: sale.tenantId,
             cashierId: sale.cashierId,
             paymentMethod: sale.paymentMethod,
             items: sale.items.map((item) => ({
@@ -208,13 +222,13 @@ export default function OfflineSyncProvider({
 
 ```mermaid
 flowchart TD
-    A["Usuario realiza venta"] --> B{"Hay conexión?"}
+    A["Usuario realiza venta en su bodega"] --> B{"Hay conexión?"}
 
     B -->|"Sí"| C["Server Action directa"]
-    C --> D["BD actualizada"]
+    C --> D["BD actualizada para ese tenant"]
 
     B -->|"No"| E["Guarda en Zustand<br/>(localStorage)"]
-    E --> F["Stock offline actualizado"]
+    E --> F["Stock offline actualizado del tenant"]
     F --> G["Muestra banner Ámbar"]
 
     G --> H{"Vuelve la conexión?"}

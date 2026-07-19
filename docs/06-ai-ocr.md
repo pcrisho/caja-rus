@@ -2,6 +2,19 @@
 
 Procesamiento de facturas y boletas de proveedores peruanos (SUNAT) usando Vercel AI SDK + Google Gemini.
 
+> ⚠️ **Convención obligatoria de aislamiento por tenant en R2**: el bucket
+> público (`R2_PUBLIC_URL`) es **compartido entre todas las bodegas** — no
+> hay un bucket por tenant. Por eso, toda key que se suba a R2 (facturas,
+> imágenes de producto, etc.) **debe** vivir bajo el prefijo
+> `${tenantId}/...` (ej. `11111111-.../factura-abc123.jpg`). `POST /api/ocr`
+> ya valida este prefijo contra el `tenantId` de la bodega activa antes de
+> descargar la imagen — si el flujo de subida (presigned URL, aún no
+> implementado) no respeta esta convención, esa validación rechazará la
+> imagen con 403 aunque el resto del request sea válido. No basta con
+> validar que la URL pertenezca al bucket de R2 en general: eso permite que
+> el ADMIN de una bodega procese, vía OCR, una imagen subida por **otra**
+> bodega si conoce (o adivina) su URL pública.
+
 ## Arquitectura del Procesamiento
 
 ```mermaid
@@ -13,10 +26,11 @@ sequenceDiagram
     participant DB as PostgreSQL
 
     Cel->>Cel: Toma foto de factura
-    Cel->>R2: Sube imagen (Presigned URL)
+    Cel->>R2: Sube imagen (Presigned URL,<br/>key = "${tenantId}/...")
     R2-->>Cel: URL pública de imagen
-    Cel->>SA: POST /api/ocr { imageUrl }
+    Cel->>SA: POST /api/ocr { imageUrl, tenantSlug }
 
+    SA->>SA: Resuelve tenantContext por tenantSlug<br/>y valida que la key de la URL<br/>empiece con tenantContext.tenantId
     SA->>R2: Descarga imagen (arrayBuffer)
     SA->>AI: generateObject({ schema, image })
     AI-->>SA: { supplierRuc, items, totalAmount, ... }
@@ -173,4 +187,4 @@ export async function POST(req: NextRequest) {
 2. Una vez subida, el celular hace un `POST /api/ocr` con la URL de la imagen
 3. El endpoint procesa con Gemini y retorna JSON estructurado
 4. La app renderiza un **borrador editable** para validación humana
-5. Al confirmar, se actualiza inventario y registro de compras en PostgreSQL
+5. Al confirmar, se actualiza inventario y registro de compras en PostgreSQL dentro del tenant activo

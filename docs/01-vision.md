@@ -2,7 +2,7 @@
 
 ## Visión del Producto
 
-Crear una aplicación web móvil que actúe como el centro operativo y financiero para bodegas minoristas, permitiendo la digitalización de inventarios, ventas rápidas y control del régimen NRUS sin fricción tecnológica para usuarios no nativos digitales.
+Crear una aplicación web móvil que actúe como el centro operativo y financiero para bodegas minoristas, permitiendo la digitalización de inventarios, ventas rápidas y control del régimen NRUS sin fricción tecnológica para usuarios no nativos digitales. La plataforma opera como multitenant: una sola BD compartida, múltiples bodegas aisladas por `tenant`.
 
 ## Problema
 
@@ -12,8 +12,8 @@ Tiendas de abarrotes en Perú operan sin sistemas digitales. El control de inven
 
 | Usuario | Perfil | Necesidad |
 |---|---|---|
-| Dueñ@ (Administrador(a)) | Gestiona compras, finanzas, proveedores | Control total del negocio, alertas NRUS, carga de facturas |
-| Cajero/Operador | Atiende clientes, registro de ventas | POS rápido, consulta de precios, alertas de stock |
+| Dueñ@ (Administrador(a)) | Gestiona compras, finanzas, proveedores | Control total de su bodega, alertas NRUS, carga de facturas |
+| Cajero/Operador | Atiende clientes, registro de ventas | POS rápido dentro de su bodega, consulta de precios, alertas de stock |
 | Tú (Soporte Técnico) | Configuración y mantenimiento | Gestión de usuarios, reportes, supervisión |
 
 ## Stack Tecnológico Validado
@@ -25,14 +25,14 @@ Tiendas de abarrotes en Perú operan sin sistemas digitales. El control de inven
 - PWA con `@ducanh2912/next-pwa`
 - Estado offline con Zustand + localStorage
 - Escáner de barras con `BarcodeDetector` API + fallback `html5-qrcode`
-- **Auth con Google OAuth** (NextAuth.js / Auth.js)
+- **Auth con Google OAuth** (NextAuth.js / Auth.js) + membresías por bodega
 - **AuditLog** — registro inmutable de acciones críticas (ventas, anulaciones, cambios de inventario, inicios de sesión)
 
 ## Roles y Permisos (RBAC)
 
 ```mermaid
 graph TD
-    subgraph ADMIN["Administrador"]
+    subgraph ADMIN["Administrador por bodega"]
         direction LR
         A1["Ventas (CRUD)"]
         A2["Inventario (CRUD)"]
@@ -44,7 +44,7 @@ graph TD
         A8["Cierre de Caja"]
     end
 
-    subgraph CASHIER["Cajero / Operador"]
+    subgraph CASHIER["Cajero / Operador por bodega"]
         direction LR
         C1["Registro de Ventas"]
         C2["Consulta de Precios"]
@@ -150,8 +150,8 @@ mindmap
 
 ## Roadmap MVP
 
-1. Inicialización del proyecto y configuración de base de datos
-2. Sistema de autenticación con Google OAuth + roles
+1. Inicialización del proyecto y configuración de base de datos multitenant
+2. Sistema de autenticación con Google OAuth + tenants + membresías
 3. Importación CSV de catálogo de productos
 4. Módulo POS (escáner + carrito + cobro con MIXED)
 5. Módulo de inventario (CRUD + alertas)
@@ -159,8 +159,8 @@ mindmap
 7. Dashboard financiero y control NRUS (con gastos operativos opcionales)
 8. Módulo de devoluciones / Notas de Crédito
 9. Cierre de Caja
-10. AuditLog
-11. PWA y sincronización offline
+10. AuditLog por bodega
+11. PWA y sincronización offline por tenant
 
 ## Post-MVP (v2)
 

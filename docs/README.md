@@ -2,7 +2,7 @@
 
 **El control de tu negocio, al toque.**
 
-Aplicación web mobile-first para la gestión de inventario, ventas y control financiero de bodegas peruanas bajo el régimen NRUS (SUNAT).
+Aplicación web mobile-first para la gestión de inventario, ventas y control financiero de bodegas peruanas bajo el régimen NRUS (SUNAT), con arquitectura multitenant en una sola base de datos compartida.
 
 ## Stack Tecnológico
 
@@ -36,13 +36,13 @@ Aplicación web mobile-first para la gestión de inventario, ventas y control fi
 
 - [x] PRD y visión de producto
 - [x] Brandboard y diseño visual
-- [x] Modelo de datos (Prisma 7) con 15 modelos y 7 enums
+- [x] Modelo de datos multitenant (Prisma 7) con tenants + membresías
 - [x] Arquitectura del sistema con Auth.js v5 + Google OAuth
 - [x] Inicialización del proyecto Next.js 16 + TypeScript + Tailwind v4
 - [x] Configuración Prisma 7 (adapter pattern + prisma-client)
 - [x] Configuración PWA (manifest + service worker)
 - [x] Variables de entorno documentadas (`.env.example`)
-- [x] Autenticación con Google OAuth (Auth.js v5 + proxy + JWT)
+- [x] Autenticación con Google OAuth (Auth.js v5 + proxy + JWT + tenant activo)
 - [x] Endpoint OCR protegido con validaciones
 - [ ] Módulo POS (escáner + carrito + cobro)
 - [ ] Módulo de inventario (CRUD + alertas + categorías)

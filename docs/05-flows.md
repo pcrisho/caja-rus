@@ -4,34 +4,35 @@
 
 ```mermaid
 flowchart TD
-    A["Abre la App"] --> B{"Pantalla principal<br/>(POS directo)"}
-    B --> C["Escanea código de barras<br/>con cámara"]
-    B --> D["Busca por nombre<br/>o voz (IA)"]
+    A["Abre la App"] --> B{"Selector de bodega<br/>(tenant activo)"}
+    B --> C["Entra al POS de la bodega"]
+    C --> D["Escanea código de barras<br/>con cámara"]
+    C --> E["Busca por nombre<br/>o voz (IA)"]
 
-    C --> E{"Producto por<br/>unidad o peso?"}
-    D --> E
+    D --> F{"Producto por<br/>unidad o peso?"}
+    E --> F
 
-    E -->|"Unidad"| F["Suma +1 al carrito"]
-    E -->|"Peso (KG)"| G["Abre teclado numérico<br/>Ingresa peso (ej: 0.750)"]
-    G --> H["Calcula precio proporcional<br/>en tiempo real"]
+    F -->|"Unidad"| G["Suma +1 al carrito"]
+    F -->|"Peso (KG)"| H["Abre teclado numérico<br/>Ingresa peso (ej: 0.750)"]
+    H --> I["Calcula precio proporcional<br/>en tiempo real"]
 
-    F --> I["Muestra carrito"]
-    H --> I
+    G --> J["Muestra carrito"]
+    I --> J
 
-    I --> J["Ajusta cantidades<br/>con +/-"]
-    J --> K["Selecciona método de pago<br/>(Yape / Plin / Efectivo / MIXED)"]
-    K --> L["Presiona botón verde<br/>CONFIRMAR Y REGISTRAR"]
+    J --> K["Ajusta cantidades<br/>con +/-"]
+    K --> L["Selecciona método de pago<br/>(Yape / Plin / Efectivo / MIXED)"]
+    L --> M["Presiona botón verde<br/>CONFIRMAR Y REGISTRAR"]
 
-    L --> M{"Hay conexión?"}
+    M --> N{"Hay conexión?"}
 
-    M -->|"Sí"| N["Server Action: createSale"]
-    N --> O["Descuenta stock en BD"]
-    O --> P["Actualiza NRUS Monthly"]
-    P --> Q["Vibración háptica<br/>Limpia pantalla"]
+    N -->|"Sí"| O["Server Action: createSale"]
+    O --> P["Descuenta stock en BD<br/>(por tenant)"]
+    P --> Q["Actualiza NRUS Monthly<br/>(por tenant)"]
+    Q --> R["Vibración háptica<br/>Limpia pantalla"]
 
-    M -->|"No"| R["Guarda en cola local<br/>(Zustand + localStorage)"]
-    R --> S["Muestra banner offline<br/>Ámbar"]
-    S --> Q
+    N -->|"No"| S["Guarda en cola local<br/>(Zustand + localStorage)"]
+    S --> T["Muestra banner offline<br/>Ámbar"]
+    T --> R
 ```
 
 ### Wireframe Conceptual — Pantalla POS
@@ -69,7 +70,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["Administrador abre módulo<br/>Registrar Compra"] --> B["Toma foto a la<br/>factura física"]
+    A["Administrador abre módulo<br/>Registrar Compra dentro de su bodega"] --> B["Toma foto a la<br/>factura física"]
     B --> C["Sube imagen a<br/>Cloudflare R2"]
     C --> D["Server Action envía<br/>URL a Gemini API"]
 
@@ -86,9 +87,9 @@ flowchart TD
     J --> K
     K --> L["Presiona Confirmar e Ingresar"]
 
-    L --> M["Actualiza inventario<br/>(stock + costos)"]
-    M --> N["Registra compra en<br/>historial financiero"]
-    N --> O["Actualiza totalPurchases<br/>del NRUS mensual"]
+    L --> M["Actualiza inventario<br/>(stock + costos, por tenant)"]
+    M --> N["Registra compra en<br/>historial financiero de la bodega"]
+    N --> O["Actualiza totalPurchases<br/>del NRUS mensual de esa bodega"]
 ```
 
 ### Wireframe Conceptual — Pantalla OCR
@@ -126,21 +127,21 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    A["Venta registrada"] --> B["Suma al totalSales<br/>del mes actual"]
-    A2["Compra registrada"] --> B2["Suma al totalPurchases<br/>del mes actual"]
+    A["Venta registrada"] --> B["Suma al totalSales<br/>de la bodega del mes actual"]
+    A2["Compra registrada"] --> B2["Suma al totalPurchases<br/>de la bodega del mes actual"]
 
     B --> C{"max(totalSales,<br/>totalPurchases) > 0?"}
     B2 --> C
 
     C -->|"Sí"| D["Calcula L_mes = max(V, C)"]
 
-    D --> E{"L_mes >= 85%<br/>de S/ 5,000?<br/>(S/ 4,250)"}
+    D --> E{"L_mes >= 85%<br/>de S/ 5,000?<br/>(S/ 4,250) por bodega"}
     E -->|"Sí"| F["Alerta Ámbar:<br/>Prepárese para<br/>Categoría 2"]
 
     D --> G{"L_mes > S/ 5,000?"}
     G -->|"Sí"| H["Cambia a Categoría 2<br/>Cuota: S/ 50/mes"]
 
-    H --> I{"L_mes >= 85%<br/>de S/ 8,000?<br/>(S/ 6,800)"}
+    H --> I{"L_mes >= 85%<br/>de S/ 8,000?<br/>(S/ 6,800) por bodega"}
     I -->|"Sí"| J["Alerta Ámbar:<br/>Límite próximo"]
 
     H --> K{"L_mes > S/ 8,000?"}
@@ -163,6 +164,13 @@ flowchart LR
 ```
 
 ## 4. Flujo de Devolución / Nota de Crédito
+
+> Modelo de datos: `SaleReturn` (una devolución, con `reason` y `processedById`)
+> + `SaleReturnItem` (uno por cada `SaleItem` devuelto, con su propia
+> `quantity`/`totalAmount`). Antes de esto no existía ninguna tabla para
+> devoluciones — solo `SaleStatus.REFUNDED` a nivel de venta completa, que no
+> alcanza para devoluciones parciales (ej. devolver 1 de 3 productos de una
+> misma venta). Ver `docs/04-schema.md`.
 
 ```mermaid
 flowchart TD

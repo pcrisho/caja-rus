@@ -1,6 +1,6 @@
 # Reglas del NRUS (Nuevo RUS) — CajaRUS
 
-Lógica financiera para el control del régimen tributario simplificado de la SUNAT en Perú.
+Lógica financiera para el control del régimen tributario simplificado de la SUNAT en Perú. En CajaRUS, estos cálculos se ejecutan por tenant/bodega.
 
 Fuente normativa: **Decreto Legislativo N° 1269, Nuevo Régimen Único Simplificado, modificado por D.L. 1529**.
 
@@ -36,7 +36,7 @@ Donde:
 
 ### Nota sobre devoluciones
 
-Si se realiza una **devolución** y la venta original se registró en el mismo mes, el `totalSales` debe **reducirse** en el monto devuelto. Si la venta original fue de un mes anterior, la devolución **no modifica** el NRUS de meses previos, pero se registra en el historial de ajustes.
+Si se realiza una **devolución** y la venta original se registró en el mismo mes, el `totalSales` de esa bodega debe **reducirse** en el monto devuelto. Si la venta original fue de un mes anterior, la devolución **no modifica** el NRUS de meses previos, pero se registra en el historial de ajustes de ese tenant.
 
 ## Determinación de Categoría
 
@@ -133,6 +133,7 @@ enum NrusPaymentStatus {
 
 model NrusMonthlySummary {
   id                String   @id @default(cuid())
+  tenantId          String
   year              Int
   month             Int
   totalSales        Decimal  @default(0)
@@ -142,12 +143,13 @@ model NrusMonthlySummary {
 
   payments          NrusPayment[]
 
-  @@unique([year, month])
+  @@unique([tenantId, year, month])
   @@map("nrus_monthly_summaries")
 }
 
 model NrusPayment {
   id               String           @id @default(cuid())
+  tenantId         String
   nrusSummaryId    String
   nrusSummary      NrusMonthlySummary @relation(fields: [nrusSummaryId], references: [id])
   amount           Decimal          // S/ 20 o S/ 50
@@ -239,8 +241,8 @@ if (summary.currentCategory === 2 && L_mes > 8000) {
 
 1. **Límite es el máximo** entre ingresos y compras del mes ($L_{mes} = \max(V_{mes}, C_{mes})$)
 2. **Alerta al 85%** de cada categoría para prevenir excedentes
-3. **Alerta crítica** si $L_{mes} > 8,000$: obliga a migrar al Régimen MYPE Tributario
-4. **Exclusión por 2 meses consecutivos**: si `consecutiveExcess >= 2`, exclusión automática del NRUS
+ 3. **Alerta crítica** si $L_{mes} > 8,000$: obliga a migrar al Régimen MYPE Tributario
+ 4. **Exclusión por 2 meses consecutivos**: si `consecutiveExcess >= 2`, exclusión automática del NRUS
 5. **Resumen mensual persistido** en `NrusMonthlySummary` para evitar recálculos costosos
 6. El campo `consecutiveExcess` se resetea a 0 si un mes no excede el límite
 7. **No se emiten facturas** en NRUS, solo boletas

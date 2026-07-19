@@ -2,7 +2,6 @@ import { UserRole } from "@/generated/prisma/enums";
 
 declare module "next-auth" {
   interface User {
-    role?: UserRole;
     isActive?: boolean;
   }
 
@@ -12,18 +11,40 @@ declare module "next-auth" {
       email: string;
       name: string;
       image?: string | null;
-      role: UserRole;
       isActive: boolean;
+      tenantId?: string | null;
+      tenantSlug?: string | null;
+      tenantName?: string | null;
+      tenantRole?: UserRole | null;
+      tenantMemberships?: Array<{
+        tenantId: string;
+        tenantSlug: string;
+        tenantName: string;
+        tenantRole: UserRole;
+        isPrimary: boolean;
+        isActive: boolean;
+      }>;
     };
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    role: UserRole;
     isActive: boolean;
     id: string;
-    /** Epoch ms de la última vez que se releyó role/isActive desde la BD. */
+    tenantId?: string;
+    tenantSlug?: string;
+    tenantName?: string;
+    tenantRole?: UserRole;
+    tenantMemberships?: Array<{
+      tenantId: string;
+      tenantSlug: string;
+      tenantName: string;
+      tenantRole: UserRole;
+      isPrimary: boolean;
+      isActive: boolean;
+    }>;
+    /** Epoch ms de la última vez que se releyó la sesión desde la BD. */
     validatedAt: number;
   }
 }

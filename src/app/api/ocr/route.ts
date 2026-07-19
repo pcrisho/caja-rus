@@ -4,6 +4,7 @@ import { z } from "zod";
 import { visionModel } from "@/lib/ai";
 import { auth } from "@/lib/auth";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getTenantContextBySlug } from "@/lib/tenancy";
 
 const invoiceOcrSchema = z.object({
   supplierRuc: z
@@ -66,38 +67,54 @@ export async function POST(req: NextRequest) {
   if (!session?.user) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
-  if (session.user.role !== "ADMIN") {
-    return NextResponse.json(
-      { error: "Solo administradores" },
-      { status: 403 }
-    );
-  }
-
-  const rateLimit = checkRateLimit(session.user.id, OCR_RATE_LIMIT);
-  if (!rateLimit.success) {
-    return NextResponse.json(
-      {
-        error:
-          "Demasiadas facturas procesadas en poco tiempo. Espera unos minutos e intenta de nuevo.",
-      },
-      {
-        status: 429,
-        headers: {
-          "Retry-After": Math.ceil(
-            (rateLimit.resetAt - Date.now()) / 1000
-          ).toString(),
-        },
-      }
-    );
-  }
 
   try {
-    const { imageUrl } = await req.json();
+    const { imageUrl, tenantSlug } = await req.json();
 
     if (!imageUrl || typeof imageUrl !== "string") {
       return NextResponse.json(
         { error: "URL de imagen requerida." },
         { status: 400 }
+      );
+    }
+
+    if (!tenantSlug || typeof tenantSlug !== "string") {
+      return NextResponse.json(
+        { error: "Debes indicar la bodega activa." },
+        { status: 400 }
+      );
+    }
+
+    const tenantContext = await getTenantContextBySlug(
+      session.user.id,
+      tenantSlug
+    );
+
+    if (!tenantContext || tenantContext.tenantRole !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Solo administradores de esa bodega" },
+        { status: 403 }
+      );
+    }
+
+    const rateLimit = checkRateLimit(
+      `${tenantContext.tenantId}:${session.user.id}`,
+      OCR_RATE_LIMIT
+    );
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          error:
+            "Demasiadas facturas procesadas en poco tiempo. Espera unos minutos e intenta de nuevo.",
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": Math.ceil(
+              (rateLimit.resetAt - Date.now()) / 1000
+            ).toString(),
+          },
+        }
       );
     }
 
@@ -110,6 +127,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "La imagen debe provenir del almacenamiento de facturas." },
         { status: 400 }
+      );
+    }
+
+    // Aislamiento multitenant sobre el objeto en R2: el bucket es público y
+    // compartido entre TODAS las bodegas (`R2_PUBLIC_URL` es una sola raíz
+    // para todo el sistema), así que validar solo el prefijo del bucket no
+    // alcanza — un ADMIN de esta bodega podría, en teoría, pasar la URL de
+    // una factura subida por OTRA bodega y hacer que el modelo la procese
+    // dentro de su propia sesión. Por convención, toda key subida a R2 DEBE
+    // vivir bajo `${tenantId}/...` (el flujo de subida de facturas, aún no
+    // implementado, debe respetar esto). Aquí se valida ese prefijo de
+    // forma estricta (fail-closed): si no hay upload todavía, esta ruta
+    // simplemente no dejará pasar ninguna imagen que no siga la convención.
+    const imagePath = imageUrl.slice(r2PublicUrl.length).replace(/^\/+/, "");
+    const [imageTenantId] = imagePath.split("/");
+    if (imageTenantId !== tenantContext.tenantId) {
+      return NextResponse.json(
+        { error: "La imagen no pertenece a esta bodega." },
+        { status: 403 }
       );
     }
 

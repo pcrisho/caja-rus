@@ -6,20 +6,56 @@
 erDiagram
     User ||--o{ Account : "tiene"
     User ||--o{ Session : "tiene"
-    User ||--o{ Sale : "registra"
+    Tenant ||--o{ TenantMember : "tiene"
+    Tenant ||--o{ Category : "clasifica"
+    Tenant ||--o{ Product : "contiene"
+    Tenant ||--o{ Sale : "registra"
+    Tenant ||--o{ Purchase : "administra"
+    Tenant ||--o{ Expense : "registra"
+    Tenant ||--o{ CashClosure : "realiza"
+    Tenant ||--o{ NrusMonthlySummary : "resume"
+    Tenant ||--o{ AuditLog : "genera"
+    Tenant ||--o{ WasteAdjustment : "registra"
+    Tenant ||--o{ NrusPayment : "cobra"
+    Tenant ||--o{ SaleReturn : "registra"
+    User ||--o{ TenantMember : "pertenece a"
+    User ||--o{ Sale : "cajero"
     User ||--o{ Purchase : "administra"
     User ||--o{ Expense : "registra"
     User ||--o{ CashClosure : "realiza"
-    User ||--o{ NrusMonthlySummary : "pertenece a"
     User ||--o{ AuditLog : "genera"
     User ||--o{ WasteAdjustment : "registra"
+    User ||--o{ SaleReturn : "procesa"
     Sale ||--|{ SaleItem : "contiene"
+    Sale ||--o{ SaleReturn : "devuelta en"
     Category ||--o{ Product : "clasifica"
     Product ||--o{ SaleItem : "vendido en"
     Product ||--o{ PurchaseItem : "comprado en"
     Product ||--o{ WasteAdjustment : "ajustado por"
     Purchase ||--|{ PurchaseItem : "contiene"
     NrusMonthlySummary ||--o{ NrusPayment : "genera"
+    SaleReturn ||--|{ SaleReturnItem : "contiene"
+    SaleItem ||--o{ SaleReturnItem : "devuelto en"
+
+    Tenant {
+        uuid id PK
+        varchar name
+        varchar slug UK
+        boolean is_active
+        datetime created_at
+        datetime updated_at
+    }
+
+    TenantMember {
+        uuid id PK
+        uuid tenant_id FK
+        uuid user_id FK
+        enum role
+        boolean is_primary
+        boolean is_active
+        datetime created_at
+        datetime updated_at
+    }
 
     Account {
         uuid id PK
@@ -46,7 +82,6 @@ erDiagram
         datetime email_verified "nullable"
         varchar image "nullable"
         varchar password_hash "nullable"
-        enum user_role
         boolean is_active
         datetime created_at
         datetime updated_at
@@ -54,12 +89,14 @@ erDiagram
 
     Category {
         uuid id PK
+        uuid tenant_id FK
         varchar name UK
     }
 
     Product {
         uuid id PK
-        varchar barcode UK "nullable"
+        uuid tenant_id FK
+        varchar barcode "nullable"
         varchar name
         text description "nullable"
         uuid category_id FK "nullable"
@@ -76,6 +113,7 @@ erDiagram
 
     Sale {
         uuid id PK
+        uuid tenant_id FK
         uuid cashier_id FK
         decimal total_amount
         enum payment_method "CASH | YAPE | PLIN | CARD | MIXED"
@@ -87,6 +125,7 @@ erDiagram
 
     SaleItem {
         uuid id PK
+        uuid tenant_id FK
         uuid sale_id FK
         uuid product_id FK
         decimal quantity "3 decimales"
@@ -96,6 +135,7 @@ erDiagram
 
     Purchase {
         uuid id PK
+        uuid tenant_id FK
         uuid admin_id FK
         char supplier_ruc "nullable"
         varchar supplier_name "nullable"
@@ -112,6 +152,7 @@ erDiagram
 
     PurchaseItem {
         uuid id PK
+        uuid tenant_id FK
         uuid purchase_id FK
         uuid product_id FK
         decimal quantity
@@ -121,6 +162,7 @@ erDiagram
 
     Expense {
         uuid id PK
+        uuid tenant_id FK
         uuid admin_id FK
         varchar description
         decimal amount
@@ -131,6 +173,7 @@ erDiagram
 
     CashClosure {
         uuid id PK
+        uuid tenant_id FK
         uuid cashier_id FK
         decimal expected_amount
         decimal counted_amount
@@ -141,7 +184,7 @@ erDiagram
 
     NrusMonthlySummary {
         uuid id PK
-        uuid user_id FK
+        uuid tenant_id FK
         int year
         int month
         decimal total_sales
@@ -154,6 +197,7 @@ erDiagram
 
     NrusPayment {
         uuid id PK
+        uuid tenant_id FK
         uuid summary_id FK
         decimal amount
         date due_date
@@ -165,6 +209,7 @@ erDiagram
 
     AuditLog {
         uuid id PK
+        uuid tenant_id FK
         uuid user_id FK
         varchar action
         varchar entity
@@ -175,6 +220,7 @@ erDiagram
 
     WasteAdjustment {
         uuid id PK
+        uuid tenant_id FK
         uuid product_id FK
         uuid admin_id FK
         decimal quantity "3 decimales"
@@ -183,385 +229,68 @@ erDiagram
         datetime adjusted_at
         datetime created_at
     }
+
+    SaleReturn {
+        uuid id PK
+        uuid tenant_id FK
+        uuid sale_id FK
+        uuid processed_by_id FK
+        enum reason "DEFECTIVE | WRONG_ITEM | CUSTOMER_CHANGED_MIND | OTHER"
+        decimal total_amount
+        varchar notes "nullable"
+        datetime returned_at
+        datetime created_at
+    }
+
+    SaleReturnItem {
+        uuid id PK
+        uuid tenant_id FK
+        uuid return_id FK
+        uuid sale_item_id FK
+        decimal quantity "3 decimales"
+        decimal total_amount
+    }
 ```
 
 ## Schema Prisma
 
-```prisma
-datasource db {
-  provider = "postgresql"
-}
-
-generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
-}
-
-// ──────────────────────────────────────────
-// Enums
-// ──────────────────────────────────────────
-
-enum UserRole {
-  ADMIN
-  CASHIER
-
-  @@map("user_role")
-}
-
-enum UnitType {
-  UNIT
-  KILOGRAM
-
-  @@map("unit_type")
-}
-
-enum PaymentMethod {
-  CASH
-  YAPE
-  PLIN
-  CARD
-  MIXED
-
-  @@map("payment_method")
-}
-
-enum SaleStatus {
-  COMPLETED
-  CANCELLED
-  REFUNDED
-
-  @@map("sale_status")
-}
-
-enum PurchaseStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
-
-  @@map("purchase_status")
-}
-
-enum NrusPaymentStatus {
-  PENDING
-  PAID_ON_TIME
-  PAID_LATE
-  OVERDUE
-
-  @@map("nrus_payment_status")
-}
-
-// ──────────────────────────────────────────
-// Auth (Auth.js)
-// ──────────────────────────────────────────
-
-model Account {
-  id                String  @id @default(uuid()) @db.Uuid
-  userId            String  @map("user_id") @db.Uuid
-  type              String  @db.VarChar(50)
-  provider          String  @db.VarChar(50)
-  providerAccountId String  @map("provider_account_id") @db.VarChar(255)
-  refreshToken      String? @map("refresh_token") @db.Text
-  accessToken       String? @map("access_token") @db.Text
-  expiresAt         Int?    @map("expires_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@map("accounts")
-}
-
-model Session {
-  id           String   @id @default(uuid()) @db.Uuid
-  sessionToken String   @unique @map("session_token") @db.VarChar(255)
-  userId       String   @map("user_id") @db.Uuid
-  expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("sessions")
-}
-
-// ──────────────────────────────────────────
-// Users
-// ──────────────────────────────────────────
-
-model User {
-  id           String     @id @default(uuid()) @db.Uuid
-  name         String     @db.VarChar(100)
-  email        String     @unique @db.VarChar(150)
-  emailVerified DateTime? @map("email_verified") @db.Timestamptz
-  image        String?    @db.VarChar(512)
-  passwordHash String?    @map("password_hash") @db.VarChar(255)
-  role         UserRole   @default(CASHIER)
-  isActive     Boolean    @default(true) @map("is_active")
-  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt    DateTime   @updatedAt @map("updated_at") @db.Timestamptz
-
-  accounts         Account[]
-  sessions         Session[]
-  sales            Sale[]
-  purchases        Purchase[]
-  expenses         Expense[]
-  cashClosures     CashClosure[]
-  nrusSummaries    NrusMonthlySummary[]
-  auditLogs        AuditLog[]
-  wasteAdjustments WasteAdjustment[]
-
-  @@map("users")
-}
-
-// ──────────────────────────────────────────
-// Inventory Adjustments (Waste / Spoilage)
-// ──────────────────────────────────────────
-
-enum WasteReason {
-  EXPIRED
-  DAMAGED
-  BROKEN
-  LOST
-  STOLEN
-  OTHER
-
-  @@map("waste_reason")
-}
-
-model WasteAdjustment {
-  id          String       @id @default(uuid()) @db.Uuid
-  productId   String       @map("product_id") @db.Uuid
-  adminId     String       @map("admin_id") @db.Uuid
-  quantity    Decimal      @db.Decimal(10, 3)
-  reason      WasteReason
-  description String?      @db.VarChar(200)
-  adjustedAt  DateTime     @default(now()) @map("adjusted_at") @db.Timestamptz
-  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz
-
-  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
-  admin   User    @relation(fields: [adminId], references: [id], onDelete: Restrict)
-
-  @@index([productId])
-  @@index([adminId, adjustedAt])
-  @@map("waste_adjustments")
-}
-
-// ──────────────────────────────────────────
-// Catalog & Inventory
-// ──────────────────────────────────────────
-
-model Category {
-  id       String    @id @default(uuid()) @db.Uuid
-  name     String    @unique @db.VarChar(100)
-  products Product[]
-
-  @@map("categories")
-}
-
-model Product {
-  id           String         @id @default(uuid()) @db.Uuid
-  barcode      String?        @unique @db.VarChar(50)
-  name         String         @db.VarChar(150)
-  description  String?        @db.Text
-  categoryId   String?        @map("category_id") @db.Uuid
-  costPrice    Decimal        @map("cost_price") @db.Decimal(12, 4)
-  sellingPrice Decimal        @map("selling_price") @db.Decimal(12, 4)
-  unitType     UnitType       @default(UNIT) @map("unit_type")
-  stock        Decimal        @default(0.000) @db.Decimal(10, 3)
-  minStock     Decimal        @default(5.000) @map("min_stock") @db.Decimal(10, 3)
-  imageUrl     String?        @map("image_url") @db.VarChar(512)
-  isActive     Boolean        @default(true) @map("is_active")
-  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt    DateTime       @updatedAt @map("updated_at") @db.Timestamptz
-
-  category         Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  saleItems        SaleItem[]
-  purchaseItems    PurchaseItem[]
-  wasteAdjustments WasteAdjustment[]
-
-  @@index([barcode])
-  @@index([name])
-  @@index([categoryId])
-  @@index([isActive, barcode])
-  @@map("products")
-}
-
-// ──────────────────────────────────────────
-// Sales
-// ──────────────────────────────────────────
-
-model Sale {
-  id            String        @id @default(uuid()) @db.Uuid
-  cashierId     String        @map("cashier_id") @db.Uuid
-  totalAmount   Decimal       @map("total_amount") @db.Decimal(10, 2)
-  paymentMethod PaymentMethod @default(CASH) @map("payment_method")
-  status        SaleStatus    @default(COMPLETED)
-  saleDate      DateTime      @default(now()) @map("sale_date") @db.Timestamptz
-  cancelledAt   DateTime?     @map("cancelled_at") @db.Timestamptz
-  cancelReason  String?       @map("cancel_reason") @db.VarChar(200)
-
-  cashier User     @relation(fields: [cashierId], references: [id], onDelete: Restrict)
-  items   SaleItem[]
-
-  @@index([saleDate])
-  @@index([cashierId, saleDate])
-  @@map("sales")
-}
-
-model SaleItem {
-  id         String  @id @default(uuid()) @db.Uuid
-  saleId     String  @map("sale_id") @db.Uuid
-  productId  String  @map("product_id") @db.Uuid
-  quantity   Decimal @db.Decimal(10, 3)
-  unitPrice  Decimal @map("unit_price") @db.Decimal(10, 2)
-  totalPrice Decimal @map("total_price") @db.Decimal(10, 2)
-
-  sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
-
-  @@index([productId])
-  @@map("sale_items")
-}
-
-// ──────────────────────────────────────────
-// Purchases & OCR
-// ──────────────────────────────────────────
-
-model Purchase {
-  id              String         @id @default(uuid()) @db.Uuid
-  adminId         String         @map("admin_id") @db.Uuid
-  supplierRuc     String?        @map("supplier_ruc") @db.Char(11)
-  supplierName    String?        @map("supplier_name") @db.VarChar(150)
-  invoiceNumber   String?        @map("invoice_number") @db.VarChar(50)
-  totalAmount     Decimal        @map("total_amount") @db.Decimal(10, 2)
-  baseAmount      Decimal?       @map("base_amount") @db.Decimal(10, 2)
-  igvAmount       Decimal?       @map("igv_amount") @db.Decimal(10, 2)
-  invoiceImageUrl String?        @map("invoice_image_url") @db.VarChar(512)
-  purchaseDate    DateTime       @default(now()) @map("purchase_date") @db.Timestamptz
-  status          PurchaseStatus @default(CONFIRMED)
-  ocrRawData      Json?          @map("ocr_raw_data")
-  createdAt       DateTime       @default(now()) @map("created_at") @db.Timestamptz
-
-  admin User         @relation(fields: [adminId], references: [id], onDelete: Restrict)
-  items PurchaseItem[]
-
-  @@index([purchaseDate])
-  @@index([adminId, purchaseDate])
-  @@index([supplierRuc])
-  @@map("purchases")
-}
-
-model PurchaseItem {
-  id         String  @id @default(uuid()) @db.Uuid
-  purchaseId String  @map("purchase_id") @db.Uuid
-  productId  String  @map("product_id") @db.Uuid
-  quantity   Decimal @db.Decimal(10, 3)
-  unitCost   Decimal @map("unit_cost") @db.Decimal(10, 2)
-  totalCost  Decimal @map("total_cost") @db.Decimal(10, 2)
-
-  purchase Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
-  product  Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
-
-  @@map("purchase_items")
-}
-
-// ──────────────────────────────────────────
-// Expenses (Operativos)
-// ──────────────────────────────────────────
-
-model Expense {
-  id          String   @id @default(uuid()) @db.Uuid
-  adminId     String   @map("admin_id") @db.Uuid
-  description String   @db.VarChar(200)
-  amount      Decimal  @db.Decimal(10, 2)
-  category    String   @db.VarChar(50)
-  expenseDate DateTime @default(now()) @map("expense_date") @db.Timestamptz
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
-
-  admin User @relation(fields: [adminId], references: [id], onDelete: Restrict)
-
-  @@index([adminId, expenseDate])
-  @@map("expenses")
-}
-
-// ──────────────────────────────────────────
-// Cash Management
-// ──────────────────────────────────────────
-
-model CashClosure {
-  id             String   @id @default(uuid()) @db.Uuid
-  cashierId      String   @map("cashier_id") @db.Uuid
-  expectedAmount Decimal  @map("expected_amount") @db.Decimal(10, 2)
-  countedAmount  Decimal  @map("counted_amount") @db.Decimal(10, 2)
-  difference     Decimal  @db.Decimal(10, 2)
-  closedAt       DateTime @default(now()) @map("closed_at") @db.Timestamptz
-  notes          String?  @db.Text
-
-  cashier User @relation(fields: [cashierId], references: [id], onDelete: Restrict)
-
-  @@index([cashierId, closedAt])
-  @@map("cash_closures")
-}
-
-// ──────────────────────────────────────────
-// NRUS (SUNAT)
-// ──────────────────────────────────────────
-
-model NrusMonthlySummary {
-  id                String   @id @default(uuid()) @db.Uuid
-  userId            String   @map("user_id") @db.Uuid
-  year              Int
-  month             Int
-  totalSales        Decimal  @default(0.00) @map("total_sales") @db.Decimal(10, 2)
-  totalPurchases    Decimal  @default(0.00) @map("total_purchases") @db.Decimal(10, 2)
-  currentCategory   Int      @default(1) @map("current_category")
-  consecutiveExcess Int      @default(0) @map("consecutive_excess")
-  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz
-
-  user     User         @relation(fields: [userId], references: [id], onDelete: Restrict)
-  payments NrusPayment[]
-
-  @@unique([userId, year, month])
-  @@map("nrus_monthly_summaries")
-}
-
-model NrusPayment {
-  id        String            @id @default(uuid()) @db.Uuid
-  summaryId String            @map("summary_id") @db.Uuid
-  amount    Decimal           @db.Decimal(10, 2)
-  dueDate   DateTime          @map("due_date") @db.Date
-  paidAt    DateTime?         @map("paid_at") @db.Timestamptz
-  lateFee   Decimal?          @map("late_fee") @db.Decimal(10, 2)
-  status    NrusPaymentStatus @default(PENDING)
-  createdAt DateTime          @default(now()) @map("created_at") @db.Timestamptz
-
-  summary NrusMonthlySummary @relation(fields: [summaryId], references: [id], onDelete: Cascade)
-
-  @@map("nrus_payments")
-}
-
-// ──────────────────────────────────────────
-// Audit
-// ──────────────────────────────────────────
-
-model AuditLog {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @map("user_id") @db.Uuid
-  action    String   @db.VarChar(100)
-  entity    String   @db.VarChar(50)
-  entityId  String   @map("entity_id") @db.Uuid
-  metadata  Json?
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
-
-  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
-
-  @@index([userId, createdAt])
-  @@index([entity, entityId])
-  @@map("audit_logs")
-}
-```
+El esquema completo vive en `prisma/schema.prisma`. La versión actual es multitenant con una sola BD compartida.
+
+### Modelos clave
+
+| Modelo | Rol |
+|---|---|
+| `Tenant` | Bodega/negocio aislado |
+| `TenantMember` | Membresía y rol por bodega |
+| `User` | Identidad global compartida |
+| `Category` / `Product` | Catálogo por tenant |
+| `Sale` / `SaleItem` | Ventas por tenant |
+| `SaleReturn` / `SaleReturnItem` | Devoluciones (parciales) de una venta, por tenant |
+| `Purchase` / `PurchaseItem` | Compras por tenant |
+| `Expense` / `CashClosure` | Operación por tenant |
+| `NrusMonthlySummary` / `NrusPayment` | Control NRUS por tenant |
+| `AuditLog` | Trazabilidad por tenant |
+| `WasteAdjustment` | Merma/ajuste por tenant |
+
+### Reglas de aislamiento
+
+- Todo dato operativo lleva `tenantId`.
+- `User.role` dejó de ser global; el rol vive en `TenantMember.role`.
+- Las únicas tablas globales son `User`, `Account`, `Session`, `Tenant` y `TenantMember`.
+- Las unicidades críticas ahora son por tenant, por ejemplo `@@unique([tenantId, year, month])` en `NrusMonthlySummary` y `@@unique([tenantId, barcode])` en `Product`.
+- **Integridad referencial compuesta (nivel BD, no solo aplicación)**: `Product`, `Sale`, `Purchase`, `SaleItem`, `NrusMonthlySummary` y `SaleReturn` tienen un `@@unique([tenantId, id])` que sirve de target para FKs compuestas desde sus tablas hijas (ej. `SaleItem` referencia a `Sale` y a `Product` vía `(tenantId, saleId) → sales(tenantId, id)` y `(tenantId, productId) → products(tenantId, id)`, no solo por `id`). Esto hace imposible, a nivel de base de datos, que un ítem de venta/compra/merma/devolución apunte a una venta/compra/producto de **otra** bodega — antes solo dependía de que el código de aplicación nunca se equivocara.
+- **FKs de "membership" (agregadas a mano en la migración SQL, no representables como relación Prisma sin duplicar el modelo)**: `Sale.cashierId`, `Purchase.adminId`, `Expense.adminId`, `CashClosure.cashierId`, `WasteAdjustment.adminId`, `AuditLog.userId` y `SaleReturn.processedById` tienen, además de su FK simple a `User`, una FK compuesta `(tenantId, <campo>) → tenant_members(tenantId, userId)`. Esto garantiza que quien vendió/compró/ajustó/auditó una fila fue (o fue alguna vez) miembro real de esa bodega — no solo "cualquier usuario válido del sistema". Es defensa en profundidad: el control principal sigue siendo que cada Server Action llame a `requireTenantRole(tenantSlug, ...)` antes de escribir.
+- **Índice único parcial** `tenant_members_one_primary_per_user` (`WHERE is_primary = true`, agregado a mano): garantiza que un usuario nunca tenga más de una bodega marcada como "primaria" simultáneamente. Prisma no soporta índices únicos parciales en su DSL.
+- **CHECK constraints** (agregados a mano): `products.stock >= 0`, `waste_adjustments.quantity > 0`, `sale_items.quantity > 0`, `purchase_items.quantity > 0`, `sale_return_items.quantity > 0`.
+- ⚠️ Todo lo agregado "a mano" arriba (FKs de membership, índice parcial, CHECK) **no está representado en `schema.prisma`** porque el DSL de Prisma no tiene equivalente nativo para estas construcciones sin forzar relaciones fantasma. Si en el futuro se regenera la migración desde cero con `prisma migrate dev`, hay que **volver a agregar ese bloque a mano al final del nuevo `.sql`** — Prisma no lo va a recrear solo, y de hecho `prisma migrate diff` va a reportar las FKs de membership como "drift" porque no existen en el modelo. Ver el comentario correspondiente al final de `prisma/migrations/*/migration.sql`.
 
 ## Decisiones de Diseño
 
-1. **`Decimal(10,3)` en stock y cantidades**: 3 decimales para precisión en ventas por peso (ej. 0.750 kg). Evita errores de redondeo.
+1. **Modelo multitenant compartido**: una sola BD y un solo esquema; el aislamiento se garantiza por `tenantId` en cada tabla operativa y por membresía en `TenantMember`.
+
+2. **`User` es global**: identidad compartida entre bodegas. El rol deja de ser global y pasa a `TenantMember.role`.
+
+3. **`Decimal(10,3)` en stock y cantidades**: 3 decimales para precisión en ventas por peso (ej. 0.750 kg). Evita errores de redondeo.
 
 2. **Prisma 7 driver adapter**: El datasource no incluye `url` — esta se configura en `prisma.config.ts` mediante `defineConfig`. En runtime, `PrismaClient` recibe un adapter `PrismaPg(pool)` en `src/lib/prisma.ts`.
 
@@ -569,7 +298,7 @@ model AuditLog {
 
 4. **`WasteAdjustment` para mermas**: Cada ajuste de inventario por desperdicio, daño, o pérdida queda registrado con `adminId`, `reason`, y `quantity`. Las mermas reducen el stock del producto y son auditables.
 
-5. **`NrusMonthlySummary` como tabla de resumen**: Evita recalcular `SUM` sobre miles de registros cada vez que se abre el dashboard. Se actualiza vía `upsert` en cada venta/compra. Contiene `consecutiveExcess` para detectar meses seguidos sobrecategoría.
+6. **`NrusMonthlySummary` como tabla de resumen**: Evita recalcular `SUM` sobre miles de registros cada vez que se abre el dashboard. Se actualiza vía `upsert` en cada venta/compra. Contiene `consecutiveExcess` para detectar meses seguidos sobrecategoría. **Ya no tiene `userId`**: el NRUS es una obligación de la bodega/RUC (el `tenantId`), no de un usuario individual, y el `@@unique` siempre fue `[tenantId, year, month]` sin incluir `userId` — el campo era un resabio del diseño pre-multitenant que no participaba ni en la unicidad ni en ninguna lógica de negocio real.
 
 6. **`ocr_raw_data` como JSON**: Almacena la respuesta cruda de la IA para auditoría y depuración. Permite reconciliar diferencias.
 
@@ -579,18 +308,22 @@ model AuditLog {
 
 9. **`passwordHash` nullable**: Usuarios que usan autenticación OAuth (Google) no tienen contraseña local. Solo usuarios creados vía credenciales tradicionales tendrán este campo.
 
-10. **Auth.js v5 con Prisma Adapter**: Las tablas `Account` y `Session` son gestionadas automáticamente por el adaptador de Auth.js. Las sesiones usan estrategia JWT (sin tabla `Session` en ese modo), pero la tabla existe para compatibilidad con base de datos.
+10. **Auth.js v5 con Prisma Adapter**: Las tablas `Account` y `Session` son gestionadas automáticamente por el adaptador de Auth.js. Las sesiones usan estrategia JWT (sin tabla `Session` en ese modo), pero la tabla existe para compatibilidad con base de datos. La sesión transporta el tenant activo y las membresías visibles.
 
 11. **Índices compuestos estratégicos**:
-   - `Sale[cashierId, saleDate]` — consultas de reportes por cajero y fecha
-   - `SaleItem[productId]` — búsquedas de ventas de un producto específico
-   - `Purchase[adminId, purchaseDate]` — consultas de compras por administrador
-   - `Product[isActive, barcode]` — búsqueda rápida de productos activos por código
-   - `AuditLog[entity, entityId]` — trazabilidad de cambios por entidad
-   - `Expense[adminId, expenseDate]` — reportes de gastos
+   - `Sale[tenantId, saleDate]` — consultas de reportes por bodega y fecha
+   - `SaleItem[tenantId, productId]` — búsquedas de ventas de un producto específico por bodega
+   - `Purchase[tenantId, adminId, purchaseDate]` — consultas de compras por administrador y bodega
+   - `Product[tenantId, barcode]` — búsqueda rápida de productos por código dentro de la bodega
+   - `AuditLog[tenantId, entity, entityId]` — trazabilidad de cambios por entidad y bodega
+   - `Expense[tenantId, adminId, expenseDate]` — reportes de gastos
 
 12. **PaymentMethod.MIXED**: Soportar pagos combinados (ej. S/ 5 en efectivo + S/ 10 en YAPE) en una misma venta.
 
 13. **Sale.status y Purchase.status**: Estados para ciclo de vida completo. `Sale.CANCELLED` permite anular ventas sin borrar registros. `Purchase.PENDING` vs `CONFIRMED` permite diferir la confirmación de compras.
 
 14. **AuditLog**: Registro de auditoría centralizado para acciones críticas (anulación de ventas, cambios de precio, ajustes de stock). Cada entrada referencia `userId`, `entity`, `entityId`, y `metadata` JSON con el detalle del cambio.
+
+15. **`SaleReturn` / `SaleReturnItem` para devoluciones parciales**: antes no existía ningún modelo de datos para devoluciones — solo `SaleStatus.REFUNDED` a nivel de venta completa, aunque `docs/05-flows.md` ya describía un flujo `createReturn`. `SaleReturn` permite devolver uno o varios `SaleItem` de una misma `Sale` (no la venta entera), con su propio `reason` (`ReturnReason`) y `processedById`. Igual que `Sale`/`Purchase`, referencia a su venta y a cada `SaleItem` con FKs compuestas por tenant.
+
+16. **Hardening manual de la migración SQL (no expresable en `schema.prisma`)**: Prisma no tiene DSL para CHECK constraints ni índices únicos parciales, así que tres invariantes viven solo en el `.sql` de la migración, agregadas a mano al final: (a) CHECK de cantidades/stock no-negativos, (b) el índice único parcial de `TenantMember.isPrimary`, y (c) las FKs compuestas de "membership" hacia `tenant_members`. Este bloque está claramente delimitado y comentado al final de `prisma/migrations/*/migration.sql` — si se regenera la migración desde cero, hay que volver a copiarlo, porque `prisma migrate dev` no lo va a recrear (y de hecho `prisma migrate diff` reporta las FKs de membership como drift, ya que no existen en el modelo Prisma).

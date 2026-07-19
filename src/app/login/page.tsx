@@ -3,14 +3,15 @@ import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 
 /**
- * Solo permite rutas internas relativas (`/pos`, `/dashboard?x=1`, etc.).
+ * Solo permite rutas internas relativas (`/tenants`, `/t/mi-bodega/pos`,
+ * `/dashboard?x=1`, etc.).
  * Bloquea URLs absolutas y protocol-relative (`//evil.com`) para evitar un
  * Open Redirect vía `?callbackUrl=`. Ver docs/audit/informe-auditoria-cajarus.md #1.2.
  */
 function sanitizeCallbackUrl(callbackUrl: string | undefined): string {
-  if (!callbackUrl) return "/pos";
+  if (!callbackUrl) return "/tenants";
   if (!callbackUrl.startsWith("/") || callbackUrl.startsWith("//")) {
-    return "/pos";
+    return "/tenants";
   }
   return callbackUrl;
 }
@@ -22,7 +23,7 @@ export default async function LoginPage(props: {
   const { error, callbackUrl: rawCallbackUrl } = await props.searchParams;
   const callbackUrl = sanitizeCallbackUrl(rawCallbackUrl);
 
-  if (session?.user) {
+  if (session?.user?.isActive) {
     redirect(callbackUrl);
   }
 
@@ -31,7 +32,7 @@ export default async function LoginPage(props: {
       <div className="w-full max-w-sm text-center mb-8">
         <h1 className="text-5xl font-bold text-emerald-600 mb-2">CajaRUS</h1>
         <p className="text-gray-500 text-lg">
-          El control de tu negocio, al toque.
+          El control de tus bodegas, al toque.
         </p>
       </div>
 
@@ -86,7 +87,7 @@ export default async function LoginPage(props: {
       </form>
 
       <p className="text-sm text-gray-400 mt-8 text-center">
-        Solo usuarios autorizados de la bodega.
+        Solo usuarios asignados pueden entrar.
       </p>
     </div>
   );
