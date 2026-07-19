@@ -41,4 +41,5 @@ Aplicación web mobile-first para la gestión de inventario, ventas y control fi
 
 ## Documentación
 
-Ver [`docs/`](./docs/) para documentación detallada.
+- Ver [`docs/`](./docs/) para documentación detallada.
+- [`AGENTS.md`](./AGENTS.md) — guía para agentes de IA (comandos, convenciones, setup).
