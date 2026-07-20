@@ -90,9 +90,13 @@ model Account {
   type              String  @db.VarChar(50)
   provider          String  @db.VarChar(50)
   providerAccountId String  @map("provider_account_id") @db.VarChar(255)
-  refreshToken      String? @map("refresh_token") @db.Text
-  accessToken       String? @map("access_token") @db.Text
-  expiresAt         Int?    @map("expires_at")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String? @db.Text
+  scope             String? @db.Text
+  id_token          String? @db.Text
+  session_state     String? @db.Text
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -123,6 +127,7 @@ model User {
   image        String?    @db.VarChar(512)
   passwordHash String?    @map("password_hash") @db.VarChar(255)
   isActive     Boolean    @default(true) @map("is_active")
+  isFirstLogin Boolean    @default(true) @map("is_first_login")
   createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz
   updatedAt    DateTime   @updatedAt @map("updated_at") @db.Timestamptz
 
@@ -163,6 +168,7 @@ model Tenant {
   wasteAdjustments WasteAdjustment[]
   saleReturns      SaleReturn[]
   saleReturnItems  SaleReturnItem[]
+  salePayments     SalePayment[]
 
   @@map("tenants")
 }
@@ -293,6 +299,21 @@ model WasteAdjustment {
 // Sales
 // ──────────────────────────────────────────
 
+model SalePayment {
+  id       String        @id @default(uuid()) @db.Uuid
+  tenantId String        @map("tenant_id") @db.Uuid
+  saleId   String        @map("sale_id") @db.Uuid
+  method   PaymentMethod
+  amount   Decimal       @db.Decimal(10, 2)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  sale   Sale   @relation(fields: [tenantId, saleId], references: [tenantId, id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([saleId])
+  @@map("sale_payments")
+}
+
 model Sale {
   id            String        @id @default(uuid()) @db.Uuid
   tenantId      String        @map("tenant_id") @db.Uuid
@@ -312,6 +333,7 @@ model Sale {
   cashier User     @relation(fields: [cashierId], references: [id], onDelete: Restrict)
   items   SaleItem[]
   returns SaleReturn[]
+  payments SalePayment[]
 
   // Target de las FKs compuestas de sale_items y sale_returns.
   @@unique([tenantId, id])
@@ -593,3 +615,21 @@ model SaleReturnItem {
   @@index([tenantId, saleItemId])
   @@map("sale_return_items")
 }
+
+// ──────────────────────────────────────────
+// Leads (Landing Page)
+// ──────────────────────────────────────────
+
+model Lead {
+  id            String   @id @default(uuid()) @db.Uuid
+  name          String   @db.VarChar(100)
+  bodegaName    String?  @map("bodega_name") @db.VarChar(150)
+  phone         String   @db.VarChar(30)
+  email         String   @db.VarChar(150)
+  currentSystem String?  @map("current_system") @db.VarChar(50)
+  notes         String?  @db.Text
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("leads")
+}
+

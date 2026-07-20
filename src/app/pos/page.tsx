@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { getTenantLandingPath } from "@/lib/tenancy";
+import { getTenantLandingPath, getTenantMemberships } from "@/lib/tenancy";
 import { redirect } from "next/navigation";
 
 export default async function LegacyPosPage() {
@@ -8,7 +8,7 @@ export default async function LegacyPosPage() {
     redirect("/login");
   }
 
-  const memberships = session.user.tenantMemberships ?? [];
+  const memberships = await getTenantMemberships(session.user.id);
   const activeMemberships = memberships.filter((membership) => membership.isActive);
   const primaryMembership =
     activeMemberships.find((membership) => membership.isPrimary) ??

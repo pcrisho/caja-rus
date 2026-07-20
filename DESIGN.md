@@ -1,23 +1,21 @@
-# DESIGN.md — CajaRUS Style Reference
+# DESIGN.md — CajaRUS Style Reference (High-Contrast Industrial POS)
 
-> Bodega al mediodía, no oficina de SaaS. Verde caja, azul de confianza,
-> ámbar de alerta — sobre blanco y gris cálido, con texto grande y trazo
-> grueso para leerse bajo el sol con una sola mano.
+> Bodega al mediodía, no oficina de SaaS genérica. Estructura tipo caja
+> registradora industrial: bordes nítidos de 1px/2px, etiquetas en mayúsculas
+> con tracking técnico, montos en bold nítido y botones sólidos en verde
+> esmeralda profundo — sobre blanco y gris cálido, diseñado para leerse bajo
+> el sol con una sola mano.
 
 **Theme:** light (único modo — ver §8 "Dark mode")
 
-CajaRUS corre sobre un lienzo neutro y luminoso: blanco puro y un gris
-cálido de apoyo (`gray-50`/`gray-100`) sosteniendo texto casi negro
-(`gray-900`) y tres colores con significado funcional, no decorativo —
-verde para "cobrar/bien", ámbar para "atención", azul para "navegación
-y confianza". A diferencia de un sistema editorial de escritorio, aquí
-la restricción no es el silencio tipográfico sino la **legibilidad bajo
-luz solar directa con una sola mano**: nada de peso 300 susurrado, nada
-de cursiva editorial — títulos y montos en bold grande, cuerpo nunca
-por debajo de 14px, botones de 56px de alto. Tarjetas planas con
-bordes de 1px en vez de sombras pesadas (las sombras se ven sucias al
-sol; un borde nítido no). El sistema se siente como una caja
-registradora bien organizada, no como una revista de diseño.
+CajaRUS corre sobre un lienzo neutro, técnico y luminoso: blanco puro (`#FFFFFF`) y un gris
+de soporte (`gray-50`/`gray-100`) sosteniendo texto casi negro (`gray-900`).
+Inspirado en interfaces financieras e industriales de alto contraste (Industrial POS),
+el sistema elimina los degradados difusos, sombras sucias y botones redondeados genéricos.
+En su lugar, emplea:
+- **Etiquetas y Subtítulos Técnicos:** En mayúsculas nítidas con espaciado (`text-[11px] font-bold tracking-wider uppercase text-gray-500`).
+- **Tarjetas Estructuradas:** Bloques blancos nítidos con bordes definidos de 1px o 2px (`border border-gray-300` / `border-2 border-gray-200`) y radio controlado (`rounded-xl` / `rounded-lg`).
+- **Botones de Acción de Alto Impacto:** Botones rectangulares táctiles XXL (56px) en verde esmeralda profundo (`bg-emerald-700` / `text-white font-bold uppercase tracking-wide`), con retroalimentación física inmediata (`active:scale-95`).
 
 Este documento es la referencia obligatoria para cualquier trabajo de
 frontend (ver `AGENTS.md`). Todo lo afirmado sobre contraste de color y
@@ -26,6 +24,7 @@ comportamiento real de Tailwind fue **verificado por ejecución real**
 ver §9 "Notas técnicas verificadas".
 
 ## 0. Principios rectores
+
 
 1. **El usuario no es nativo digital.** Dueños y cajeros de bodega, muchas
    veces usando el celular con una mano mientras atienden. Prioridad #1:

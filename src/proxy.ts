@@ -6,21 +6,20 @@ import {
   getTenantContextBySlug,
 } from "@/lib/tenancy";
 
-const publicRoutes = [
+const publicPageRoutes = [
   "/login",
-  "/api/auth",
-  "/_next/static",
+  "/register",
   "/manifest.json",
   "/sw.js",
+];
+
+const publicRoutePrefixes = [
+  "/api/auth",
+  "/_next/static",
   "/icons",
 ];
 
-// Claves = primer segmento de ruta DENTRO de la bodega activa, es decir
-// `/t/[tenantSlug]/<segmento>`. Ojo: estas rutas no existen todavía en el
-// código (products/sales/purchases/dashboard son trabajo pendiente), pero el
-// gating queda listo para cuando se creen bajo `/t/[tenantSlug]/...` — no
-// bajo rutas top-level como `/dashboard`, que ya no reflejan la arquitectura
-// real y nunca harían match aquí.
+// Rutas que requieren rol ADMIN para el segmento `/t/[slug]/[subpath]`
 const roleRouteMap: Record<string, string[]> = {
   dashboard: ["ADMIN"],
   purchases: ["ADMIN"],
@@ -35,7 +34,12 @@ export default auth(async (req) => {
   const requestedTenantSlug = tenantRouteMatch?.[1];
   const requestedTenantSubPath = tenantRouteMatch?.[2];
 
-  if (publicRoutes.some((route) => path.startsWith(route))) {
+  const isPublicPage = publicPageRoutes.includes(path);
+  const isPublicPrefix = publicRoutePrefixes.some(
+    (route) => path === route || path.startsWith(`${route}/`)
+  );
+
+  if (path === "/" || isPublicPage || isPublicPrefix) {
     return NextResponse.next();
   }
 
@@ -52,39 +56,49 @@ export default auth(async (req) => {
     );
   }
 
+  // Si la ruta es /tenants, dejar pasar siempre — la página se encargará
+  // de redirigir a la bodega correcta con datos frescos de la BD.
+  if (path === "/tenants" || path.startsWith("/tenants?")) {
+    return NextResponse.next();
+  }
+
+  // Obtener membresías: primero desde el JWT (rápido), si está vacío consultar BD.
   const cachedMemberships = session.user.tenantMemberships ?? [];
-  const activeMemberships = cachedMemberships.length
-    ? cachedMemberships.filter((membership) => membership.isActive)
-    : (await getTenantMemberships(session.user.id)).filter(
-        (membership) => membership.isActive
-      );
-  const requestedMembership = requestedTenantSlug
-    ? activeMemberships.find(
-        (membership) => membership.tenantSlug === requestedTenantSlug
-      ) ?? (await getTenantContextBySlug(session.user.id, requestedTenantSlug))
-    : null;
+  let activeMemberships = cachedMemberships.filter((m) => m.isActive);
 
-  if (!activeMemberships.length && !isApiRoute && path !== "/tenants") {
-    return NextResponse.redirect(
-      new URL(getTenantHubPath("tenant_missing"), nextUrl.origin)
-    );
+  if (activeMemberships.length === 0) {
+    const dbMemberships = await getTenantMemberships(session.user.id);
+    activeMemberships = dbMemberships.filter((m) => m.isActive);
   }
 
-  if (requestedTenantSlug && !requestedMembership) {
-    return NextResponse.redirect(
-      new URL(getTenantHubPath("unauthorized"), nextUrl.origin)
-    );
+  // Usuario sin bodega: redirigir al onboarding solo si no tiene membresía activa en BD.
+  if (activeMemberships.length === 0 && !isApiRoute) {
+    return NextResponse.redirect(new URL("/register?setup=google", nextUrl.origin));
   }
 
-  const allowedRoles = requestedTenantSubPath
-    ? roleRouteMap[requestedTenantSubPath]
-    : undefined;
-  if (allowedRoles) {
-    const routeRole = requestedMembership?.tenantRole;
-    if (!routeRole || !allowedRoles.includes(routeRole as string)) {
+  // Validar acceso a ruta de tenant específico
+  if (requestedTenantSlug) {
+    const requestedMembership =
+      activeMemberships.find((m) => m.tenantSlug === requestedTenantSlug) ??
+      (await getTenantContextBySlug(session.user.id, requestedTenantSlug));
+
+    if (!requestedMembership) {
       return NextResponse.redirect(
         new URL(getTenantHubPath("unauthorized"), nextUrl.origin)
       );
+    }
+
+    // Verificar rol si la sub-ruta lo requiere
+    const allowedRoles = requestedTenantSubPath
+      ? roleRouteMap[requestedTenantSubPath]
+      : undefined;
+    if (allowedRoles) {
+      const routeRole = requestedMembership.tenantRole;
+      if (!routeRole || !allowedRoles.includes(routeRole as string)) {
+        return NextResponse.redirect(
+          new URL(getTenantHubPath("unauthorized"), nextUrl.origin)
+        );
+      }
     }
   }
 

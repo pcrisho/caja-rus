@@ -9,6 +9,7 @@ const r2PublicHostname = process.env.R2_PUBLIC_URL
   : undefined;
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["192.168.18.78"],
   images: {
     remotePatterns: r2PublicHostname
       ? [{ protocol: "https", hostname: r2PublicHostname }]

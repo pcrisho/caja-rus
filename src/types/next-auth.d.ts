@@ -3,6 +3,7 @@ import { UserRole } from "@/generated/prisma/enums";
 declare module "next-auth" {
   interface User {
     isActive?: boolean;
+    isFirstLogin?: boolean;
   }
 
   interface Session {
@@ -12,6 +13,7 @@ declare module "next-auth" {
       name: string;
       image?: string | null;
       isActive: boolean;
+      isFirstLogin?: boolean;
       tenantId?: string | null;
       tenantSlug?: string | null;
       tenantName?: string | null;
@@ -31,6 +33,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     isActive: boolean;
+    isFirstLogin?: boolean;
     id: string;
     tenantId?: string;
     tenantSlug?: string;
