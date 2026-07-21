@@ -30,7 +30,7 @@ export default async function PurchasesPage({
 
         <Link
           href={`/t/${tenantSlug}/purchases/new`}
-          className="w-full bg-emerald-600 text-white rounded-xl py-4 flex items-center justify-center gap-2 hover:bg-emerald-700 active:scale-95 transition-transform font-bold text-lg"
+          className="w-full bg-emerald-600 text-white py-4 flex items-center justify-center gap-2 hover:bg-emerald-700 active:scale-95 transition-transform font-bold font-mono text-lg"
         >
           <Plus size={24} />
           REGISTRAR COMPRA
@@ -40,14 +40,14 @@ export default async function PurchasesPage({
           <h2 className="text-gray-900 dark:text-zinc-50 font-bold text-lg">Últimas Compras</h2>
           
           {purchases.length === 0 ? (
-            <div className="text-center py-10 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800">
-              <Receipt size={48} className="text-gray-300 dark:text-zinc-600 mx-auto mb-2" />
+            <div className="text-center py-10 bg-gray-100 dark:bg-zinc-800">
+              <Receipt size={48} className="text-gray-400 dark:text-zinc-500 mx-auto mb-2" />
               <p className="text-gray-500 dark:text-zinc-400 text-sm">No has registrado compras aún.</p>
             </div>
           ) : (
             purchases.map((purchase) => (
-              <div key={purchase.id} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl p-4 flex flex-col gap-3">
-                <div className="flex justify-between items-start border-b border-gray-200 dark:border-zinc-700 pb-3">
+              <div key={purchase.id} className="bg-white dark:bg-zinc-900 p-4 flex flex-col gap-3">
+                <div className="flex justify-between items-start border-b border-gray-100 dark:border-zinc-800 pb-3">
                   <div>
                     <h3 className="text-gray-900 dark:text-zinc-50 font-bold text-base leading-tight">
                       {purchase.supplierName || 'Proveedor sin nombre'}
@@ -58,7 +58,7 @@ export default async function PurchasesPage({
                     </p>
                   </div>
                   <div className="text-right whitespace-nowrap">
-                    <p className="text-gray-900 dark:text-zinc-50 font-bold text-lg">S/ {Number(purchase.totalAmount).toFixed(2)}</p>
+                    <p className="text-gray-900 dark:text-zinc-50 font-bold text-lg tabular-nums">S/ {Number(purchase.totalAmount).toFixed(2)}</p>
                   </div>
                 </div>
                 
@@ -66,7 +66,7 @@ export default async function PurchasesPage({
                   {purchase.items?.slice(0, 3).map((item: any) => (
                     <div key={item.id} className="flex justify-between text-sm text-gray-700 dark:text-zinc-300">
                       <span className="truncate pr-2">{item.quantity}x {item.product?.name || 'Producto eliminado'}</span>
-                      <span className="font-medium whitespace-nowrap">S/ {Number(item.totalCost).toFixed(2)}</span>
+                      <span className="font-medium whitespace-nowrap tabular-nums">S/ {Number(item.totalCost).toFixed(2)}</span>
                     </div>
                   ))}
                   {purchase.items?.length > 3 && (
@@ -81,4 +81,3 @@ export default async function PurchasesPage({
     </main>
   );
 }
-

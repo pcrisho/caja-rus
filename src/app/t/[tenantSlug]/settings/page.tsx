@@ -36,7 +36,7 @@ export default async function SettingsPage({
           title="Configuración de la Bodega"
         />
 
-        <section className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl p-6">
+        <section className="bg-white dark:bg-zinc-900 p-6">
           <h2 className="text-lg font-bold text-gray-900 dark:text-zinc-50 mb-4">Datos Generales</h2>
           <div className="flex flex-col gap-3">
             <div>
@@ -50,30 +50,39 @@ export default async function SettingsPage({
           </div>
         </section>
 
-        <section className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 flex flex-col gap-4">
+        <section className="bg-white dark:bg-zinc-900 p-6 flex flex-col gap-4">
           <h2 className="text-lg font-bold text-gray-900 dark:text-zinc-50 mb-2">Apariencia</h2>
           <ThemeToggle />
         </section>
 
-        <section className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 flex flex-col gap-4">
+        <section className="bg-white dark:bg-zinc-900 p-6 flex flex-col gap-4">
           <h2 className="text-lg font-bold text-gray-900 dark:text-zinc-50 mb-2">Sesión</h2>
           <LogoutButton />
         </section>
 
-        <section className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 flex flex-col gap-4">
+        <section className="bg-white dark:bg-zinc-900 p-6 flex flex-col gap-4">
           <h2 className="text-lg font-bold text-gray-900 dark:text-zinc-50 mb-2">Administración</h2>
           
-          <Link href={`/t/${tenantSlug}/settings/users`} className="w-full text-left bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 p-4 rounded-xl font-semibold text-gray-900 dark:text-zinc-50 border border-gray-200 dark:border-zinc-800 flex justify-between items-center transition-colors">
+          <Link
+            href={`/t/${tenantSlug}/settings/users`}
+            className="w-full bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 p-4 font-semibold text-gray-900 dark:text-zinc-50 flex justify-between items-center transition-colors"
+          >
             Gestión de Usuarios / Personal
             <span className="text-gray-400 dark:text-zinc-500">→</span>
           </Link>
 
-          <Link href={`/t/${tenantSlug}/cash-closure`} className="w-full text-left bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 p-4 rounded-xl font-semibold text-gray-900 dark:text-zinc-50 border border-gray-200 dark:border-zinc-800 flex justify-between items-center transition-colors">
+          <Link
+            href={`/t/${tenantSlug}/cash-closure`}
+            className="w-full bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 p-4 font-semibold text-gray-900 dark:text-zinc-50 flex justify-between items-center transition-colors"
+          >
             Cierre de Caja
             <span className="text-gray-400 dark:text-zinc-500">→</span>
           </Link>
 
-          <Link href={`/t/${tenantSlug}/returns`} className="w-full text-left bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 p-4 rounded-xl font-semibold text-gray-900 dark:text-zinc-50 border border-gray-200 dark:border-zinc-800 flex justify-between items-center transition-colors">
+          <Link
+            href={`/t/${tenantSlug}/returns`}
+            className="w-full bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 p-4 font-semibold text-gray-900 dark:text-zinc-50 flex justify-between items-center transition-colors"
+          >
             Devoluciones
             <span className="text-gray-400 dark:text-zinc-500">→</span>
           </Link>

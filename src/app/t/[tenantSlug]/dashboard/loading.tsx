@@ -1,34 +1,41 @@
-import { Skeleton, PageHeaderSkeleton } from "@/components/ui/skeleton";
+import { DsSkeleton } from "@/components/design-system/DsSkeleton";
+import { DsCard } from "@/components/design-system/DsCard";
 
 export default function DashboardLoading() {
   return (
     <main className="min-h-dvh bg-gray-50 dark:bg-zinc-950 px-4 py-6 pb-24">
       <div className="mx-auto flex w-full max-w-md flex-col gap-6">
-        <PageHeaderSkeleton />
+        <div className="flex flex-col gap-1.5 py-2 mb-2">
+          <DsSkeleton className="h-5 w-20" />
+          <DsSkeleton className="h-8 w-48" />
+        </div>
 
-        {/* NRUS Summary Card Skeleton */}
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 flex flex-col gap-4">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-4 w-full rounded-full" />
-          <div className="grid grid-cols-2 gap-4 pt-2">
-            <Skeleton className="h-16 w-full rounded-xl" />
-            <Skeleton className="h-16 w-full rounded-xl" />
+        <DsCard variant="flat" padding="lg">
+          <div className="flex flex-col gap-4">
+            <DsSkeleton className="h-4 w-32" />
+            <DsSkeleton className="h-8 w-48" />
+            <DsSkeleton className="h-4 w-full" />
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <DsSkeleton className="h-16 w-full" />
+              <DsSkeleton className="h-16 w-full" />
+            </div>
           </div>
-        </div>
+        </DsCard>
 
-        {/* Chart Skeleton */}
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 flex flex-col gap-4">
-          <Skeleton className="h-4 w-40" />
-          <Skeleton className="h-32 w-full rounded-xl" />
-        </div>
+        <DsCard variant="flat" padding="lg">
+          <div className="flex flex-col gap-4">
+            <DsSkeleton className="h-4 w-40" />
+            <DsSkeleton className="h-32 w-full" />
+          </div>
+        </DsCard>
 
-        {/* Expense List Skeleton */}
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 flex flex-col gap-4">
-          <Skeleton className="h-5 w-36" />
-          <Skeleton className="h-14 w-full rounded-xl" />
-          <Skeleton className="h-14 w-full rounded-xl" />
-        </div>
+        <DsCard variant="flat" padding="lg">
+          <div className="flex flex-col gap-4">
+            <DsSkeleton className="h-5 w-36" />
+            <DsSkeleton className="h-14 w-full" />
+            <DsSkeleton className="h-14 w-full" />
+          </div>
+        </DsCard>
       </div>
     </main>
   );

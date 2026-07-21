@@ -3,7 +3,7 @@
 type Props = {
   lMes: number;
   category: number;
-  threshold: number; // 5000 para cat1, 8000 para cat2
+  threshold: number;
 };
 
 const THRESHOLDS = {
@@ -26,7 +26,7 @@ export function NrusThermometer({ lMes, category, threshold }: Props) {
     lMes > threshold
       ? "¡Excedido! Debes pasar al Régimen MYPE"
       : pct >= alertPct
-      ? "⚠ Estás al 85% del límite — cuidado"
+      ? "Estás al 85% del límite — cuidado"
       : "Vas bien";
 
   const statusColor =
@@ -38,10 +38,9 @@ export function NrusThermometer({ lMes, category, threshold }: Props) {
 
   return (
     <div className="flex flex-col gap-2">
-      {/* Barra */}
-      <div className="bg-gray-200 dark:bg-zinc-700 rounded-full h-4 overflow-hidden">
+      <div className="bg-gray-200 dark:bg-zinc-700 h-4 overflow-hidden">
         <div
-          className={`h-full rounded-full ${barColor} transition-all duration-500`}
+          className={`h-full ${barColor} transition-all duration-500`}
           style={{ width: `${pct}%` }}
           role="progressbar"
           aria-valuenow={lMes}
@@ -50,7 +49,6 @@ export function NrusThermometer({ lMes, category, threshold }: Props) {
         />
       </div>
 
-      {/* Labels */}
       <div className="flex items-center justify-between">
         <p className={`text-sm font-semibold ${statusColor}`}>{statusText}</p>
         <p className="text-sm text-gray-500 dark:text-zinc-400">
@@ -58,7 +56,6 @@ export function NrusThermometer({ lMes, category, threshold }: Props) {
         </p>
       </div>
 
-      {/* Marca del 85% */}
       <div className="relative h-1">
         <div
           className="absolute top-0 w-px h-3 bg-gray-400 dark:bg-zinc-500"
