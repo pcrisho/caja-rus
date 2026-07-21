@@ -276,6 +276,16 @@ export function PosClient({ tenantSlug, initialProducts }: Props) {
           </DsCard>
         )
       )}
+
+      {items.length === 0 && (
+        <button
+          onClick={() => setShowScanner(true)}
+          className="fixed bottom-24 right-4 z-30 w-14 h-14 bg-emerald-600 text-white flex items-center justify-center active:scale-95 transition-transform"
+          aria-label="Escanear código de barras"
+        >
+          <Camera size={24} />
+        </button>
+      )}
     </div>
   );
 }
