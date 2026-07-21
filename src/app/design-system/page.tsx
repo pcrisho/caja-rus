@@ -62,7 +62,7 @@ export default function DesignSystemPage() {
         </header>
 
         {/* Color palette quick reference */}
-        <section className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-200 dark:border-zinc-800">
+        <section className="bg-white dark:bg-zinc-900 rounded-2xl p-6">
           <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 mb-4">
             Paleta de Colores
           </h2>
