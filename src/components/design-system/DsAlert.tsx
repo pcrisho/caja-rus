@@ -9,12 +9,12 @@ type DsAlertProps = {
 
 const variantStyles = {
   success:
-    "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400",
+    "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400",
   warning:
-    "bg-amber-100 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-400",
+    "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
   error:
-    "bg-red-100 dark:bg-red-900/30 border-red-200 dark:border-red-700 text-red-700 dark:text-red-400",
-  info: "bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 text-blue-900 dark:text-blue-400",
+    "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400",
+  info: "bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-400",
 };
 
 const defaultIcons = {
@@ -27,7 +27,7 @@ const defaultIcons = {
 export function DsAlert({ variant, message, icon }: DsAlertProps) {
   return (
     <div
-      className={`flex items-start gap-3 p-4 rounded-xl border ${variantStyles[variant]}`}
+      className={`flex items-start gap-3 p-4 rounded-xl ${variantStyles[variant]}`}
       role="alert"
     >
       <span className="shrink-0 mt-0.5">{icon || defaultIcons[variant]}</span>
