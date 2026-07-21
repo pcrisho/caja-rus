@@ -1,0 +1,61 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+/**
+ * NOTA para quien implemente componentes (ver DESIGN.md §9 "Notas técnicas
+ * verificadas"):
+ *
+ * Se intentó definir tokens semánticos custom aquí vía `@theme` (p. ej.
+ * `--color-brand-primary` → utilidad `bg-brand-primary`), pero se encontró
+ * un bug/limitación reproducible en este stack exacto (Next.js 16.2.10 con
+ * Turbopack + Tailwind CSS v4.3.3): clases de utilidad NUEVAS basadas en
+ * colores custom (ya sea vía `@theme` o vía un `:root` plano referenciado
+ * con `bg-[var(--x)]`) NO se generan cuando se usan en archivos `.tsx`
+ * (confirmado con build limpio y con el dev server corriendo en caliente).
+ * El token en sí SÍ se registra correctamente — funciona con `@apply`
+ * dentro de un `.css`, o resuelto nativamente por el navegador si se usa
+ * fuera del pipeline de clases de Tailwind (`style={{ color: "var(--x)" }}`
+ * inline, `<svg fill="var(--x)">`, canvas/chart, etc.).
+ *
+ * Por eso: usar las clases nativas de Tailwind directamente (`bg-emerald-600`,
+ * `text-blue-900`, etc. — ver la tabla de mapeo en DESIGN.md §1.1), y el
+ * bloque `:root` de abajo únicamente para los contextos NO-Tailwind
+ * mencionados arriba, nunca esperando que genere utilidades `bg-*`/`text-*`.
+ * Si se necesita fidelidad exacta al hex de marca en una clase de Tailwind,
+ * usar el valor arbitrario literal `bg-[#059669]` (sí funciona, a diferencia
+ * de `bg-[var(--x)]`) — ver DESIGN.md §9.1.
+ */
+:root {
+  color-scheme: light dark;
+
+  /* Superficies — light */
+  --color-canvas: #ffffff;
+  --color-surface: #f3f4f6; /* gray-100 */
+
+  /* Semánticos — light (valores reales renderizados por Tailwind v4, ver DESIGN.md §9.1).
+     Solo para uso fuera de className (inline style, SVG, canvas/chart). */
+  --color-action: #009767; /* emerald-600 */
+  --color-action-text: #007956; /* emerald-700 */
+  --color-nav: #1c398e; /* blue-900 */
+  --color-warning: #dd7400; /* amber-600 */
+  --color-warning-text: #b75000; /* amber-700 */
+  --color-danger: #e40014; /* red-600 */
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* Superficies — dark (zinc, estilo shadcn: neutros sin tinte azul) */
+  --color-canvas: #09090b; /* zinc-950 */
+  --color-surface: #18181b; /* zinc-900 */
+
+  /* Semánticos — dark (contraste verificado sobre fondo oscuro) */
+  --color-action: #34d399; /* emerald-400 — brillante sobre dark */
+  --color-action-text: #6ee7b7; /* emerald-300 */
+  --color-nav: #60a5fa; /* blue-400 */
+  --color-warning: #fbbf24; /* amber-400 */
+  --color-warning-text: #fcd34d; /* amber-300 */
+  --color-danger: #f87171; /* red-400 */
+}
+
+

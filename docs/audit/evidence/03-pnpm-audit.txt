@@ -1,0 +1,64 @@
+$ pnpm audit (ejecutado el 2026-07-18T22:33:23-05:00)
+
+(node:88415) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+┌─────────────────────┬────────────────────────────────────────────────────────┐
+│ high                │ Serialize JavaScript is Vulnerable to RCE via          │
+│                     │ RegExp.flags and Date.prototype.toISOString()          │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Package             │ serialize-javascript                                   │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Vulnerable versions │ <=7.0.2                                                │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Patched versions    │ >=7.0.3                                                │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Paths               │ .>@ducanh2912/next-pwa>workbox-build>@rollup/plugin-   │
+│                     │ terser>serialize-javascript                            │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ More info           │ https://github.com/advisories/GHSA-5c6j-r48x-rmvq      │
+└─────────────────────┴────────────────────────────────────────────────────────┘
+┌─────────────────────┬────────────────────────────────────────────────────────┐
+│ moderate            │ @hono/node-server: Middleware bypass via repeated      │
+│                     │ slashes in serveStatic                                 │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Package             │ @hono/node-server                                      │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Vulnerable versions │ <1.19.13                                               │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Patched versions    │ >=1.19.13                                              │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Paths               │ .>prisma>@prisma/dev>@hono/node-server                 │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ More info           │ https://github.com/advisories/GHSA-92pp-h63x-v22m      │
+└─────────────────────┴────────────────────────────────────────────────────────┘
+┌─────────────────────┬────────────────────────────────────────────────────────┐
+│ moderate            │ PostCSS has XSS via Unescaped </style> in its CSS      │
+│                     │ Stringify Output                                       │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Package             │ postcss                                                │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Vulnerable versions │ <8.5.10                                                │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Patched versions    │ >=8.5.10                                               │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Paths               │ .>next>postcss                                         │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ More info           │ https://github.com/advisories/GHSA-qx2v-qp2m-jg93      │
+└─────────────────────┴────────────────────────────────────────────────────────┘
+┌─────────────────────┬────────────────────────────────────────────────────────┐
+│ moderate            │ Serialize JavaScript has CPU Exhaustion Denial of      │
+│                     │ Service via crafted array-like objects                 │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Package             │ serialize-javascript                                   │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Vulnerable versions │ >=5.0.0 <7.0.5                                         │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Patched versions    │ >=7.0.5                                                │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Paths               │ .>@ducanh2912/next-pwa>workbox-build>@rollup/plugin-   │
+│                     │ terser>serialize-javascript                            │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ More info           │ https://github.com/advisories/GHSA-qj8w-gfj5-8c6v      │
+└─────────────────────┴────────────────────────────────────────────────────────┘
+4 vulnerabilities found
+Severity: 3 moderate | 1 high

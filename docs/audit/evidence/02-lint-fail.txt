@@ -1,0 +1,37 @@
+$ pnpm lint  (ejecutado el 2026-07-18T22:33:12-05:00)
+--- Resultado: FALLA con TypeError (config de ESLint incompatible) ---
+
+
+> caja-rus@0.1.0 lint /home/pcrisostomo/Documentos/GitHub/caja-rus
+> eslint .
+
+
+Oops! Something went wrong! :(
+
+ESLint: 9.39.5
+
+TypeError: Converting circular structure to JSON
+    --> starting at object with constructor 'Object'
+    |     property 'configs' -> object with constructor 'Object'
+    |     property 'flat' -> object with constructor 'Object'
+    |     ...
+    |     property 'plugins' -> object with constructor 'Object'
+    --- property 'react' closes the circle
+Referenced from: 
+    at JSON.stringify (<anonymous>)
+    at file:///home/pcrisostomo/Documentos/GitHub/caja-rus/node_modules/.pnpm/@eslint+eslintrc@3.3.6/node_modules/@eslint/eslintrc/lib/shared/config-validator.js:308:45
+    at Array.map (<anonymous>)
+    at ConfigValidator.formatErrors (file:///home/pcrisostomo/Documentos/GitHub/caja-rus/node_modules/.pnpm/@eslint+eslintrc@3.3.6/node_modules/@eslint/eslintrc/lib/shared/config-validator.js:299:23)
+    at ConfigValidator.validateConfigSchema (file:///home/pcrisostomo/Documentos/GitHub/caja-rus/node_modules/.pnpm/@eslint+eslintrc@3.3.6/node_modules/@eslint/eslintrc/lib/shared/config-validator.js:330:84)
+    at ConfigArrayFactory._normalizeConfigData (file:///home/pcrisostomo/Documentos/GitHub/caja-rus/node_modules/.pnpm/@eslint+eslintrc@3.3.6/node_modules/@eslint/eslintrc/lib/config-array-factory.js:676:19)
+    at ConfigArrayFactory._loadConfigData (file:///home/pcrisostomo/Documentos/GitHub/caja-rus/node_modules/.pnpm/@eslint+eslintrc@3.3.6/node_modules/@eslint/eslintrc/lib/config-array-factory.js:641:21)
+    at ConfigArrayFactory._loadExtendedShareableConfig (file:///home/pcrisostomo/Documentos/GitHub/caja-rus/node_modules/.pnpm/@eslint+eslintrc@3.3.6/node_modules/@eslint/eslintrc/lib/config-array-factory.js:946:21)
+    at ConfigArrayFactory._loadExtends (file:///home/pcrisostomo/Documentos/GitHub/caja-rus/node_modules/.pnpm/@eslint+eslintrc@3.3.6/node_modules/@eslint/eslintrc/lib/config-array-factory.js:814:25)
+    at ConfigArrayFactory._normalizeObjectConfigDataBody (file:///home/pcrisostomo/Documentos/GitHub/caja-rus/node_modules/.pnpm/@eslint+eslintrc@3.3.6/node_modules/@eslint/eslintrc/lib/config-array-factory.js:752:25)
+ ELIFECYCLE  Command failed with exit code 2.
+--- versiones instaladas relevantes ---
+eslint:   "version": "9.39.5",
+eslint-config-next:   "version": "16.2.10",
+@eslint/eslintrc:   "version": "3.3.6",
+eslint-plugin-react: 
+eslint-plugin-react (real): eslint-plugin-react@7.37.5_eslint@9.39.5_jiti@2.7.0_

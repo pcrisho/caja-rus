@@ -1,0 +1,635 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ──────────────────────────────────────────
+// Enums
+// ──────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  CASHIER
+
+  @@map("user_role")
+}
+
+enum UnitType {
+  UNIT
+  KILOGRAM
+
+  @@map("unit_type")
+}
+
+enum PaymentMethod {
+  CASH
+  YAPE
+  PLIN
+  CARD
+  MIXED
+
+  @@map("payment_method")
+}
+
+enum SaleStatus {
+  COMPLETED
+  CANCELLED
+  REFUNDED
+
+  @@map("sale_status")
+}
+
+enum PurchaseStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+
+  @@map("purchase_status")
+}
+
+enum NrusPaymentStatus {
+  PENDING
+  PAID_ON_TIME
+  PAID_LATE
+  OVERDUE
+
+  @@map("nrus_payment_status")
+}
+
+enum WasteReason {
+  EXPIRED
+  DAMAGED
+  BROKEN
+  LOST
+  STOLEN
+  OTHER
+
+  @@map("waste_reason")
+}
+
+enum ReturnReason {
+  DEFECTIVE
+  WRONG_ITEM
+  CUSTOMER_CHANGED_MIND
+  OTHER
+
+  @@map("return_reason")
+}
+
+// ──────────────────────────────────────────
+// Auth (Auth.js)
+// ──────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(uuid()) @db.Uuid
+  userId            String  @map("user_id") @db.Uuid
+  type              String  @db.VarChar(50)
+  provider          String  @db.VarChar(50)
+  providerAccountId String  @map("provider_account_id") @db.VarChar(255)
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String? @db.Text
+  scope             String? @db.Text
+  id_token          String? @db.Text
+  session_state     String? @db.Text
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(uuid()) @db.Uuid
+  sessionToken String   @unique @map("session_token") @db.VarChar(255)
+  userId       String   @map("user_id") @db.Uuid
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// ──────────────────────────────────────────
+// Users
+// ──────────────────────────────────────────
+
+model User {
+  id           String     @id @default(uuid()) @db.Uuid
+  name         String     @db.VarChar(100)
+  email        String     @unique @db.VarChar(150)
+  emailVerified DateTime? @map("email_verified") @db.Timestamptz
+  image        String?    @db.VarChar(512)
+  passwordHash String?    @map("password_hash") @db.VarChar(255)
+  isActive     Boolean    @default(true) @map("is_active")
+  isFirstLogin Boolean    @default(true) @map("is_first_login")
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+
+  accounts         Account[]
+  sessions         Session[]
+  memberships      TenantMember[]
+  sales            Sale[]
+  purchases        Purchase[]
+  expenses         Expense[]
+  cashClosures     CashClosure[]
+  auditLogs        AuditLog[]
+  wasteAdjustments WasteAdjustment[]
+  processedReturns SaleReturn[]
+
+  @@map("users")
+}
+
+model Tenant {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(120)
+  slug      String   @unique @db.VarChar(120)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  members         TenantMember[]
+  categories      Category[]
+  products        Product[]
+  sales           Sale[]
+  saleItems       SaleItem[]
+  purchases       Purchase[]
+  purchaseItems   PurchaseItem[]
+  expenses        Expense[]
+  cashClosures    CashClosure[]
+  nrusSummaries   NrusMonthlySummary[]
+  nrusPayments    NrusPayment[]
+  auditLogs       AuditLog[]
+  wasteAdjustments WasteAdjustment[]
+  saleReturns      SaleReturn[]
+  saleReturnItems  SaleReturnItem[]
+  salePayments     SalePayment[]
+
+  @@map("tenants")
+}
+
+model TenantMember {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  role      UserRole
+  // Solo debe haber UNA fila con isPrimary=true por userId (es la bodega a
+  // la que se redirige por defecto en /pos y /tenants). Prisma no soporta
+  // índices únicos parciales (WHERE), así que esta invariante se refuerza
+  // con un índice único parcial agregado a mano al final de la migración
+  // (`tenant_members_one_primary_per_user`) — si editas este modelo y
+  // regeneras la migración, hay que volver a agregarlo manualmente. Ver
+  // comentario en la migración SQL.
+  isPrimary Boolean  @default(false) @map("is_primary")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Target de las FKs compuestas (tenant_id, <user>_id) que varias tablas
+  // operativas agregan a mano en la migración para garantizar, a nivel de
+  // BD, que el cashier/admin de una fila sea (o haya sido) miembro real de
+  // esa bodega — no solo "cualquier usuario válido". Ver migración SQL.
+  @@unique([tenantId, userId])
+  @@index([userId, isActive])
+  @@index([tenantId, isPrimary])
+  @@map("tenant_members")
+}
+
+// ──────────────────────────────────────────
+// Catalog & Inventory
+// ──────────────────────────────────────────
+
+model Category {
+  id       String    @id @default(uuid()) @db.Uuid
+  tenantId String    @map("tenant_id") @db.Uuid
+  name     String    @db.VarChar(100)
+  products Product[]
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+  @@index([tenantId, name])
+  @@map("categories")
+}
+
+model Product {
+  id           String         @id @default(uuid()) @db.Uuid
+  tenantId     String         @map("tenant_id") @db.Uuid
+  barcode      String?        @db.VarChar(50)
+  name         String         @db.VarChar(150)
+  description  String?        @db.Text
+  categoryId   String?        @map("category_id") @db.Uuid
+  costPrice    Decimal        @map("cost_price") @db.Decimal(12, 4)
+  sellingPrice Decimal        @map("selling_price") @db.Decimal(12, 4)
+  unitType     UnitType       @default(UNIT) @map("unit_type")
+  stock        Decimal        @default(0.000) @db.Decimal(10, 3)
+  minStock     Decimal        @default(5.000) @map("min_stock") @db.Decimal(10, 3)
+  imageUrl     String?        @map("image_url") @db.VarChar(512)
+  isActive     Boolean        @default(true) @map("is_active")
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime       @updatedAt @map("updated_at") @db.Timestamptz
+
+  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  category         Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  saleItems        SaleItem[]
+  purchaseItems    PurchaseItem[]
+  wasteAdjustments WasteAdjustment[]
+
+  // @@unique([tenantId, id]) es el target de las FKs compuestas que las
+  // tablas hijas (sale_items, purchase_items, waste_adjustments) usan para
+  // referenciar un producto, garantizando a nivel de BD que nunca se pueda
+  // vender/comprar/mermar un producto que pertenece a OTRA bodega — no solo
+  // que el productId exista en algún lado.
+  @@unique([tenantId, id])
+  @@unique([tenantId, barcode])
+  @@index([tenantId])
+  @@index([barcode])
+  @@index([name])
+  @@index([tenantId, name])
+  @@index([categoryId])
+  @@index([isActive, barcode])
+  @@map("products")
+}
+
+// ──────────────────────────────────────────
+// Inventory Adjustments (Waste / Spoilage)
+// ──────────────────────────────────────────
+
+model WasteAdjustment {
+  id          String       @id @default(uuid()) @db.Uuid
+  tenantId    String       @map("tenant_id") @db.Uuid
+  productId   String       @map("product_id") @db.Uuid
+  adminId     String       @map("admin_id") @db.Uuid
+  // Convención de signo: SIEMPRE positiva = "cantidad removida del stock".
+  // La lógica de aplicación (Server Action) es responsable de restarla de
+  // Product.stock; nunca almacenar un valor negativo aquí. Reforzado con
+  // CHECK (quantity > 0) a nivel de base de datos (ver migración).
+  quantity    Decimal      @db.Decimal(10, 3)
+  reason      WasteReason
+  description String?      @db.VarChar(200)
+  adjustedAt  DateTime     @default(now()) @map("adjusted_at") @db.Timestamptz
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  // Compuesta contra Product(tenantId, id): impide mermar un producto de
+  // otra bodega aunque el productId sea válido en otro tenant.
+  product Product @relation(fields: [tenantId, productId], references: [tenantId, id], onDelete: Restrict)
+  // admin: además de esta FK simple a User, la migración agrega a mano una
+  // FK compuesta (tenant_id, admin_id) -> tenant_members(tenant_id, user_id)
+  // para garantizar que quien ajusta el inventario sea (o haya sido) un
+  // miembro real de esa bodega.
+  admin   User    @relation(fields: [adminId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId])
+  @@index([productId])
+  @@index([tenantId, adminId, adjustedAt])
+  @@map("waste_adjustments")
+}
+
+// ──────────────────────────────────────────
+// Sales
+// ──────────────────────────────────────────
+
+model SalePayment {
+  id       String        @id @default(uuid()) @db.Uuid
+  tenantId String        @map("tenant_id") @db.Uuid
+  saleId   String        @map("sale_id") @db.Uuid
+  method   PaymentMethod
+  amount   Decimal       @db.Decimal(10, 2)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  sale   Sale   @relation(fields: [tenantId, saleId], references: [tenantId, id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([saleId])
+  @@map("sale_payments")
+}
+
+model Sale {
+  id            String        @id @default(uuid()) @db.Uuid
+  tenantId      String        @map("tenant_id") @db.Uuid
+  cashierId     String        @map("cashier_id") @db.Uuid
+  totalAmount   Decimal       @map("total_amount") @db.Decimal(10, 2)
+  paymentMethod PaymentMethod @default(CASH) @map("payment_method")
+  status        SaleStatus    @default(COMPLETED)
+  saleDate      DateTime      @default(now()) @map("sale_date") @db.Timestamptz
+  cancelledAt   DateTime?     @map("cancelled_at") @db.Timestamptz
+  cancelReason  String?       @map("cancel_reason") @db.VarChar(200)
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  // cashier: además de esta FK simple a User, la migración agrega a mano una
+  // FK compuesta (tenant_id, cashier_id) -> tenant_members(tenant_id,
+  // user_id) para garantizar que quien vendió sea (o haya sido) un miembro
+  // real de esa bodega.
+  cashier User     @relation(fields: [cashierId], references: [id], onDelete: Restrict)
+  items   SaleItem[]
+  returns SaleReturn[]
+  payments SalePayment[]
+
+  // Target de las FKs compuestas de sale_items y sale_returns.
+  @@unique([tenantId, id])
+  @@index([tenantId])
+  @@index([saleDate])
+  @@index([tenantId, saleDate])
+  @@index([tenantId, cashierId, saleDate])
+  @@map("sales")
+}
+
+model SaleItem {
+  id         String  @id @default(uuid()) @db.Uuid
+  tenantId   String  @map("tenant_id") @db.Uuid
+  saleId     String  @map("sale_id") @db.Uuid
+  productId  String  @map("product_id") @db.Uuid
+  quantity   Decimal @db.Decimal(10, 3)
+  // Decimal(12,4) para igualar la precisión de Product.sellingPrice y evitar
+  // pérdida de precisión al vender productos fraccionados (KILOGRAM). El
+  // redondeo a 2 decimales debe ocurrir solo al agregar en Sale.totalAmount.
+  unitPrice  Decimal @map("unit_price") @db.Decimal(12, 4)
+  totalPrice Decimal @map("total_price") @db.Decimal(12, 4)
+
+  tenant      Tenant           @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  // Compuestas contra Sale/Product (tenantId, id): impiden que un ítem de
+  // venta apunte a una venta o producto de otra bodega.
+  sale        Sale             @relation(fields: [tenantId, saleId], references: [tenantId, id], onDelete: Cascade)
+  product     Product          @relation(fields: [tenantId, productId], references: [tenantId, id], onDelete: Restrict)
+  returnItems SaleReturnItem[]
+
+  // Target de la FK compuesta de sale_return_items.
+  @@unique([tenantId, id])
+  @@index([tenantId])
+  @@index([saleId])
+  @@index([tenantId, productId])
+  @@map("sale_items")
+}
+
+// ──────────────────────────────────────────
+// Purchases & OCR
+// ──────────────────────────────────────────
+
+model Purchase {
+  id              String         @id @default(uuid()) @db.Uuid
+  tenantId        String         @map("tenant_id") @db.Uuid
+  adminId         String         @map("admin_id") @db.Uuid
+  supplierRuc     String?        @map("supplier_ruc") @db.Char(11)
+  supplierName    String?        @map("supplier_name") @db.VarChar(150)
+  invoiceNumber   String?        @map("invoice_number") @db.VarChar(50)
+  totalAmount     Decimal        @map("total_amount") @db.Decimal(10, 2)
+  baseAmount      Decimal?       @map("base_amount") @db.Decimal(10, 2)
+  igvAmount       Decimal?       @map("igv_amount") @db.Decimal(10, 2)
+  invoiceImageUrl String?        @map("invoice_image_url") @db.VarChar(512)
+  purchaseDate    DateTime       @default(now()) @map("purchase_date") @db.Timestamptz
+  status          PurchaseStatus @default(CONFIRMED)
+  ocrRawData      Json?          @map("ocr_raw_data")
+  createdAt       DateTime       @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  // admin: además de esta FK simple a User, la migración agrega a mano una
+  // FK compuesta (tenant_id, admin_id) -> tenant_members(tenant_id, user_id)
+  // para garantizar que quien registró la compra sea (o haya sido) un
+  // miembro real de esa bodega.
+  admin User         @relation(fields: [adminId], references: [id], onDelete: Restrict)
+  items PurchaseItem[]
+
+  // Target de la FK compuesta de purchase_items.
+  @@unique([tenantId, id])
+  @@index([tenantId])
+  @@index([purchaseDate])
+  @@index([tenantId, purchaseDate])
+  @@index([tenantId, adminId, purchaseDate])
+  @@index([supplierRuc])
+  @@map("purchases")
+}
+
+model PurchaseItem {
+  id         String  @id @default(uuid()) @db.Uuid
+  tenantId   String  @map("tenant_id") @db.Uuid
+  purchaseId String  @map("purchase_id") @db.Uuid
+  productId  String  @map("product_id") @db.Uuid
+  quantity   Decimal @db.Decimal(10, 3)
+  // Decimal(12,4): ver nota de precisión en SaleItem.
+  unitCost   Decimal @map("unit_cost") @db.Decimal(12, 4)
+  totalCost  Decimal @map("total_cost") @db.Decimal(12, 4)
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  // Compuestas contra Purchase/Product (tenantId, id): impiden que un ítem
+  // de compra apunte a una compra o producto de otra bodega.
+  purchase Purchase @relation(fields: [tenantId, purchaseId], references: [tenantId, id], onDelete: Cascade)
+  product  Product  @relation(fields: [tenantId, productId], references: [tenantId, id], onDelete: Restrict)
+
+  @@index([tenantId])
+  @@index([purchaseId])
+  @@index([tenantId, productId])
+  @@map("purchase_items")
+}
+
+// ──────────────────────────────────────────
+// Expenses (Operativos)
+// ──────────────────────────────────────────
+
+model Expense {
+  id          String   @id @default(uuid()) @db.Uuid
+  tenantId    String   @map("tenant_id") @db.Uuid
+  adminId     String   @map("admin_id") @db.Uuid
+  description String   @db.VarChar(200)
+  amount      Decimal  @db.Decimal(10, 2)
+  category    String   @db.VarChar(50)
+  expenseDate DateTime @default(now()) @map("expense_date") @db.Timestamptz
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  // admin: la migración agrega a mano una FK compuesta (tenant_id, admin_id)
+  // -> tenant_members(tenant_id, user_id) — ver nota en WasteAdjustment.
+  admin User @relation(fields: [adminId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId])
+  @@index([tenantId, adminId, expenseDate])
+  @@map("expenses")
+}
+
+// ──────────────────────────────────────────
+// Cash Management
+// ──────────────────────────────────────────
+
+model CashClosure {
+  id             String   @id @default(uuid()) @db.Uuid
+  tenantId       String   @map("tenant_id") @db.Uuid
+  cashierId      String   @map("cashier_id") @db.Uuid
+  expectedAmount Decimal  @map("expected_amount") @db.Decimal(10, 2)
+  countedAmount  Decimal  @map("counted_amount") @db.Decimal(10, 2)
+  difference     Decimal  @db.Decimal(10, 2)
+  closedAt       DateTime @default(now()) @map("closed_at") @db.Timestamptz
+  notes          String?  @db.Text
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  // cashier: la migración agrega a mano una FK compuesta (tenant_id,
+  // cashier_id) -> tenant_members(tenant_id, user_id) — ver nota en Sale.
+  cashier User @relation(fields: [cashierId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId])
+  @@index([tenantId, cashierId, closedAt])
+  @@map("cash_closures")
+}
+
+// ──────────────────────────────────────────
+// NRUS (SUNAT)
+// ──────────────────────────────────────────
+
+model NrusMonthlySummary {
+  id                String   @id @default(uuid()) @db.Uuid
+  tenantId          String   @map("tenant_id") @db.Uuid
+  year              Int
+  month             Int
+  totalSales        Decimal  @default(0.00) @map("total_sales") @db.Decimal(10, 2)
+  totalPurchases    Decimal  @default(0.00) @map("total_purchases") @db.Decimal(10, 2)
+  currentCategory   Int      @default(1) @map("current_category")
+  consecutiveExcess Int      @default(0) @map("consecutive_excess")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  // NOTA: este modelo tuvo antes un `userId` (resabio del diseño
+  // pre-multitenant, cuando el NRUS se llevaba "por usuario"). Se retiró
+  // porque el régimen NRUS es una obligación de la bodega/RUC (el
+  // `tenantId`), no de un usuario individual, y el `@@unique` de abajo ya
+  // era por [tenantId, year, month] sin incluir userId — es decir, el campo
+  // no participaba ni en la unicidad ni en ninguna lógica de negocio real.
+  tenant   Tenant        @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  payments NrusPayment[]
+
+  // Target de la FK compuesta de nrus_payments.
+  @@unique([tenantId, id])
+  @@unique([tenantId, year, month])
+  @@index([tenantId])
+  @@map("nrus_monthly_summaries")
+}
+
+model NrusPayment {
+  id        String            @id @default(uuid()) @db.Uuid
+  tenantId  String            @map("tenant_id") @db.Uuid
+  summaryId String            @map("summary_id") @db.Uuid
+  amount    Decimal           @db.Decimal(10, 2)
+  dueDate   DateTime          @map("due_date") @db.Date
+  paidAt    DateTime?         @map("paid_at") @db.Timestamptz
+  lateFee   Decimal?          @map("late_fee") @db.Decimal(10, 2)
+  status    NrusPaymentStatus @default(PENDING)
+  createdAt DateTime          @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant  Tenant             @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  // Compuesta contra NrusMonthlySummary(tenantId, id): impide que un pago
+  // apunte al resumen mensual de otra bodega.
+  summary NrusMonthlySummary @relation(fields: [tenantId, summaryId], references: [tenantId, id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([summaryId])
+  @@map("nrus_payments")
+}
+
+// ──────────────────────────────────────────
+// Audit
+// ──────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  action    String   @db.VarChar(100)
+  entity    String   @db.VarChar(50)
+  entityId  String   @map("entity_id") @db.Uuid
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  // user: la migración agrega a mano una FK compuesta (tenant_id, user_id)
+  // -> tenant_members(tenant_id, user_id) — ver nota en Sale.
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, userId, createdAt])
+  @@index([entity, entityId])
+  @@map("audit_logs")
+}
+
+// ──────────────────────────────────────────
+// Returns (Devoluciones)
+// ──────────────────────────────────────────
+//
+// Modelo antes inexistente: docs/05-flows.md ya describía un Server Action
+// `createReturn`, pero no había ninguna tabla que lo respaldara — solo
+// `SaleStatus.REFUNDED` a nivel de venta completa. SaleReturn permite
+// devoluciones parciales (uno o varios SaleItem de una misma Sale) sin
+// perder el detalle de qué se devolvió y por qué.
+
+model SaleReturn {
+  id            String       @id @default(uuid()) @db.Uuid
+  tenantId      String       @map("tenant_id") @db.Uuid
+  saleId        String       @map("sale_id") @db.Uuid
+  processedById String       @map("processed_by_id") @db.Uuid
+  reason        ReturnReason
+  totalAmount   Decimal      @map("total_amount") @db.Decimal(10, 2)
+  notes         String?      @db.VarChar(200)
+  returnedAt    DateTime     @default(now()) @map("returned_at") @db.Timestamptz
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  // Compuesta contra Sale(tenantId, id): impide devolver una venta de otra
+  // bodega.
+  sale  Sale             @relation(fields: [tenantId, saleId], references: [tenantId, id], onDelete: Restrict)
+  // processedBy: además de esta FK simple a User, la migración agrega a
+  // mano una FK compuesta (tenant_id, processed_by_id) -> tenant_members
+  // (tenant_id, user_id) — ver nota en Sale.
+  processedBy User             @relation(fields: [processedById], references: [id], onDelete: Restrict)
+  items       SaleReturnItem[]
+
+  // Target de la FK compuesta de sale_return_items.
+  @@unique([tenantId, id])
+  @@index([tenantId])
+  @@index([tenantId, saleId])
+  @@index([tenantId, processedById, returnedAt])
+  @@map("sale_returns")
+}
+
+model SaleReturnItem {
+  id          String  @id @default(uuid()) @db.Uuid
+  tenantId    String  @map("tenant_id") @db.Uuid
+  returnId    String  @map("return_id") @db.Uuid
+  saleItemId  String  @map("sale_item_id") @db.Uuid
+  quantity    Decimal @db.Decimal(10, 3)
+  totalAmount Decimal @map("total_amount") @db.Decimal(12, 4)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  // Compuestas contra SaleReturn/SaleItem (tenantId, id): impiden que un
+  // ítem devuelto apunte a una devolución o ítem de venta de otra bodega.
+  return   SaleReturn @relation(fields: [tenantId, returnId], references: [tenantId, id], onDelete: Cascade)
+  saleItem SaleItem   @relation(fields: [tenantId, saleItemId], references: [tenantId, id], onDelete: Restrict)
+
+  @@index([tenantId])
+  @@index([returnId])
+  @@index([tenantId, saleItemId])
+  @@map("sale_return_items")
+}
+
+// ──────────────────────────────────────────
+// Leads (Landing Page)
+// ──────────────────────────────────────────
+
+model Lead {
+  id            String   @id @default(uuid()) @db.Uuid
+  name          String   @db.VarChar(100)
+  bodegaName    String?  @map("bodega_name") @db.VarChar(150)
+  phone         String   @db.VarChar(30)
+  email         String   @db.VarChar(150)
+  currentSystem String?  @map("current_system") @db.VarChar(50)
+  notes         String?  @db.Text
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("leads")
+}
+

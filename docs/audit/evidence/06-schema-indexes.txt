@@ -1,0 +1,35 @@
+=== Índices explícitos por modelo (grep de @@index / @@unique en schema.prisma) ===
+
+78:model Account {
+90:  @@unique([provider, providerAccountId])
+94:model Session {
+109:model User {
+138:model Category {
+146:model Product {
+167:  @@index([barcode])
+168:  @@index([name])
+169:  @@index([categoryId])
+170:  @@index([isActive, barcode])
+178:model WasteAdjustment {
+191:  @@index([productId])
+192:  @@index([adminId, adjustedAt])
+200:model Sale {
+213:  @@index([saleDate])
+214:  @@index([cashierId, saleDate])
+218:model SaleItem {
+229:  @@index([productId])
+237:model Purchase {
+255:  @@index([purchaseDate])
+256:  @@index([adminId, purchaseDate])
+257:  @@index([supplierRuc])
+261:model PurchaseItem {
+279:model Expense {
+290:  @@index([adminId, expenseDate])
+298:model CashClosure {
+309:  @@index([cashierId, closedAt])
+317:model NrusMonthlySummary {
+332:  @@unique([userId, year, month])
+336:model NrusPayment {
+355:model AuditLog {
+366:  @@index([userId, createdAt])
+367:  @@index([entity, entityId])

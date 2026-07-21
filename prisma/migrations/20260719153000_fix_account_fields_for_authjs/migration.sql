@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "accounts" ADD COLUMN IF NOT EXISTS "token_type" TEXT,
+ADD COLUMN IF NOT EXISTS "scope" TEXT,
+ADD COLUMN IF NOT EXISTS "id_token" TEXT,
+ADD COLUMN IF NOT EXISTS "session_state" TEXT;
