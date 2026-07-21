@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { SessionProvider } from "next-auth/react";
+import { auth } from "@/lib/auth";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL;
@@ -18,22 +21,45 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#059669", // Verde Caja — docs/02-brandboard.md
+  themeColor: "#059669",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('cajarus-theme');
+                  if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (_) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
-        <SessionProvider>{children}</SessionProvider>
+        <ThemeProvider>
+          <SessionProvider session={session} refetchOnWindowFocus={false}>
+            {children}
+          </SessionProvider>
+          <Toaster position="top-center" richColors />
+        </ThemeProvider>
       </body>
     </html>
   );

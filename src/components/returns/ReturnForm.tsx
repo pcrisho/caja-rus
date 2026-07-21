@@ -145,7 +145,7 @@ export function ReturnForm({ tenantSlug }: Props) {
   return (
     <div className="flex flex-col gap-6">
       {msg && (
-        <div className={`p-4 rounded-xl border font-semibold ${msg.type === "ok" ? "bg-emerald-100 border-emerald-200 text-emerald-800" : "bg-red-100 border-red-200 text-red-800"}`}>
+        <div className={`p-4 rounded-xl border font-semibold ${msg.type === "ok" ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300" : "bg-red-100 dark:bg-red-900/30 border-red-200 dark:border-red-700 text-red-800 dark:text-red-300"}`}>
           {msg.text}
         </div>
       )}
@@ -153,13 +153,13 @@ export function ReturnForm({ tenantSlug }: Props) {
       {/* Buscar venta */}
       <form onSubmit={handleSearch} className="flex gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500" size={20} />
           <input
             type="text"
             placeholder="ID de la venta (ej. abcd123)"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900"
+            className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-50 placeholder:text-gray-400 dark:placeholder:text-zinc-500 focus-visible:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900"
           />
         </div>
         <button
@@ -173,18 +173,18 @@ export function ReturnForm({ tenantSlug }: Props) {
 
       {/* Lista de ventas encontradas */}
       {!selectedSale && sales.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl divide-y divide-gray-100 dark:divide-zinc-800 overflow-hidden">
           {sales.map((sale) => (
             <button
               key={sale.id}
               onClick={() => handleSelectSale(sale)}
-              className="w-full text-left p-4 hover:bg-gray-50 flex items-center justify-between"
+              className="w-full text-left p-4 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center justify-between"
             >
               <div>
-                <p className="font-semibold text-gray-900">Venta: ...{sale.id.slice(-6)}</p>
-                <p className="text-sm text-gray-500">{new Date(sale.saleDate).toLocaleString()}</p>
+                <p className="font-semibold text-gray-900 dark:text-zinc-50">Venta: ...{sale.id.slice(-6)}</p>
+                <p className="text-sm text-gray-500 dark:text-zinc-400">{new Date(sale.saleDate).toLocaleString()}</p>
               </div>
-              <p className="font-bold text-gray-900">S/ {Number(sale.totalAmount).toFixed(2)}</p>
+              <p className="font-bold text-gray-900 dark:text-zinc-50">S/ {Number(sale.totalAmount).toFixed(2)}</p>
             </button>
           ))}
         </div>
@@ -192,40 +192,40 @@ export function ReturnForm({ tenantSlug }: Props) {
 
       {/* Formulario de devolución */}
       {selectedSale && (
-        <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col gap-5 shadow-sm">
+        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl p-6 flex flex-col gap-5">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Detalle de Venta</h2>
-              <p className="text-sm text-gray-500">ID: {selectedSale.id}</p>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-zinc-50">Detalle de Venta</h2>
+              <p className="text-sm text-gray-500 dark:text-zinc-400">ID: {selectedSale.id}</p>
             </div>
-            <button onClick={() => setSelectedSale(null)} className="text-blue-900 text-sm font-semibold underline">
+            <button onClick={() => setSelectedSale(null)} className="text-blue-900 dark:text-blue-400 text-sm font-semibold underline">
               Cambiar venta
             </button>
           </div>
 
-          <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
+          <div className="border border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden divide-y divide-gray-100 dark:divide-zinc-800">
             {availableItems.length === 0 ? (
-              <p className="p-4 text-center text-gray-500">Todos los ítems de esta venta ya han sido devueltos.</p>
+              <p className="p-4 text-center text-gray-500 dark:text-zinc-400">Todos los ítems de esta venta ya han sido devueltos.</p>
             ) : (
               availableItems.map((item: any) => {
                 const isSelected = returnItems[item.id] !== undefined;
                 return (
-                  <div key={item.id} className="p-4 flex flex-col gap-2 bg-gray-50">
+                  <div key={item.id} className="p-4 flex flex-col gap-2 bg-gray-50 dark:bg-zinc-800">
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => toggleItem(item.id, item.available)}
-                        className="w-5 h-5 rounded border-gray-300 text-blue-900 focus:ring-blue-900"
+                        className="w-5 h-5 rounded border-gray-300 dark:border-zinc-700 text-blue-900 focus:ring-blue-900"
                       />
                       <div className="flex-1">
-                        <p className="font-semibold text-gray-900">{item.product.name}</p>
-                        <p className="text-sm text-gray-500">S/ {Number(item.unitPrice).toFixed(2)} c/u</p>
+                        <p className="font-semibold text-gray-900 dark:text-zinc-50">{item.product.name}</p>
+                        <p className="text-sm text-gray-500 dark:text-zinc-400">S/ {Number(item.unitPrice).toFixed(2)} c/u</p>
                       </div>
                     </label>
                     {isSelected && (
                       <div className="ml-8 flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-700">Cant:</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-zinc-300">Cant:</span>
                         <input
                           type="number"
                           min="0.001"
@@ -233,9 +233,9 @@ export function ReturnForm({ tenantSlug }: Props) {
                           step="any"
                           value={returnItems[item.id] || ""}
                           onChange={(e) => updateItemQty(item.id, e.target.value, item.available)}
-                          className="w-24 border-2 border-gray-300 rounded-lg p-2 text-sm focus:border-blue-900 focus:outline-none"
+                          className="w-24 border-2 border-gray-300 dark:border-zinc-700 rounded-xl p-2 text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-50 focus:border-blue-900 focus-visible:outline-none"
                         />
-                        <span className="text-sm text-gray-500">/ {item.available} disp.</span>
+                        <span className="text-sm text-gray-500 dark:text-zinc-400">/ {item.available} disp.</span>
                       </div>
                     )}
                   </div>
@@ -247,11 +247,11 @@ export function ReturnForm({ tenantSlug }: Props) {
           {availableItems.length > 0 && (
             <>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-gray-900">Motivo de devolución</label>
+                <label className="text-sm font-semibold text-gray-900 dark:text-zinc-50">Motivo de devolución</label>
                 <select
                   value={reason}
                   onChange={(e) => setReason(e.target.value as ReturnReason)}
-                  className="w-full border-2 border-gray-300 rounded-xl p-3 focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 bg-white"
+                  className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-xl p-3 focus-visible:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-50"
                 >
                   <option value="DEFECTIVE">Producto defectuoso</option>
                   <option value="WRONG_ITEM">Producto equivocado</option>
@@ -261,18 +261,18 @@ export function ReturnForm({ tenantSlug }: Props) {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-gray-900">Observaciones (Opcional)</label>
+                <label className="text-sm font-semibold text-gray-900 dark:text-zinc-50">Observaciones (Opcional)</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full border-2 border-gray-300 rounded-xl p-3 focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 resize-none h-24"
+                  className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-xl p-3 focus-visible:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-50 resize-none h-24"
                   placeholder="Detalles adicionales..."
                 />
               </div>
 
-              <div className="bg-gray-100 rounded-xl p-4 flex justify-between items-center mt-2">
-                <span className="font-bold text-gray-700">Total a reembolsar</span>
-                <span className="text-2xl font-bold text-red-600">S/ {totalRefund.toFixed(2)}</span>
+              <div className="bg-gray-100 dark:bg-zinc-800 rounded-xl p-4 flex justify-between items-center mt-2">
+                <span className="font-bold text-gray-700 dark:text-zinc-300">Total a reembolsar</span>
+                <span className="text-2xl font-bold text-red-600 dark:text-red-400">S/ {totalRefund.toFixed(2)}</span>
               </div>
 
               <button

@@ -4,8 +4,32 @@ import { prisma } from '@/lib/prisma';
 import { requireTenantAuth, requireTenantRole } from '@/lib/auth-helpers';
 import { Prisma } from '@/generated/prisma/client';
 
-type PurchaseItemData = {
-  productId: string;
+function serializePurchase(purchase: any) {
+  if (!purchase) return purchase;
+  return {
+    ...purchase,
+    totalAmount: purchase.totalAmount ? Number(purchase.totalAmount) : undefined,
+    baseAmount: purchase.baseAmount ? Number(purchase.baseAmount) : undefined,
+    igvAmount: purchase.igvAmount ? Number(purchase.igvAmount) : undefined,
+    items: purchase.items?.map((item: any) => ({
+      ...item,
+      quantity: Number(item.quantity),
+      unitCost: Number(item.unitCost),
+      totalCost: Number(item.totalCost),
+    })),
+  };
+}
+
+export type PurchaseItemInput = {
+  productId?: string;
+  isNewProduct?: boolean;
+  newProductData?: {
+    name: string;
+    barcode?: string;
+    sellingPrice: number;
+    unitType: 'UNIT' | 'KILOGRAM';
+    categoryId?: string;
+  };
   quantity: number;
   unitCost: number;
   totalCost: number;
@@ -60,18 +84,56 @@ async function upsertNrusSummary(tx: Prisma.TransactionClient, tenantId: string,
   });
 }
 
-export async function createPurchaseAction(tenantSlug: string, data: PurchaseData, items: PurchaseItemData[]) {
+export async function createPurchaseAction(tenantSlug: string, data: PurchaseData, items: PurchaseItemInput[]) {
   try {
     const auth = await requireTenantRole(tenantSlug, 'ADMIN');
     
     const result = await prisma.$transaction(async (tx) => {
-      const purchaseItemsToCreate = items.map(item => ({
-        tenantId: auth.tenantId,
-        productId: item.productId,
-        quantity: item.quantity,
-        unitCost: item.unitCost,
-        totalCost: item.totalCost
-      }));
+      const purchaseItemsToCreate: Array<{
+        productId: string;
+        quantity: number;
+        unitCost: number;
+        totalCost: number;
+      }> = [];
+
+      for (const item of items) {
+        let resolvedProductId: string;
+
+        if (item.isNewProduct && item.newProductData) {
+          const newProduct = await tx.product.create({
+            data: {
+              tenantId: auth.tenantId,
+              name: item.newProductData.name,
+              barcode: item.newProductData.barcode || undefined,
+              sellingPrice: item.newProductData.sellingPrice,
+              unitType: item.newProductData.unitType,
+              categoryId: item.newProductData.categoryId || undefined,
+              costPrice: item.unitCost,
+              stock: item.quantity,
+              minStock: 5,
+            }
+          });
+          resolvedProductId = newProduct.id;
+        } else if (item.productId) {
+          await tx.product.update({
+            where: { tenantId_id: { tenantId: auth.tenantId, id: item.productId } },
+            data: {
+              stock: { increment: item.quantity },
+              costPrice: item.unitCost,
+            }
+          });
+          resolvedProductId = item.productId;
+        } else {
+          throw new Error(`Ítem sin producto asociado (${item.newProductData?.name || 'sin nombre'})`);
+        }
+
+        purchaseItemsToCreate.push({
+          productId: resolvedProductId,
+          quantity: item.quantity,
+          unitCost: item.unitCost,
+          totalCost: item.totalCost,
+        });
+      }
 
       const purchase = await tx.purchase.create({
         data: {
@@ -84,13 +146,6 @@ export async function createPurchaseAction(tenantSlug: string, data: PurchaseDat
           }
         }
       });
-
-      for (const item of items) {
-        await tx.product.update({
-          where: { tenantId_id: { tenantId: auth.tenantId, id: item.productId } },
-          data: { stock: { increment: item.quantity } }
-        });
-      }
 
       const now = new Date();
       await upsertNrusSummary(tx, auth.tenantId, now.getFullYear(), now.getMonth() + 1, 0, data.totalAmount);
@@ -114,6 +169,37 @@ export async function createPurchaseAction(tenantSlug: string, data: PurchaseDat
   }
 }
 
+export async function getPastSuppliersAction(tenantSlug: string) {
+  try {
+    const auth = await requireTenantAuth(tenantSlug);
+    
+    const purchases = await prisma.purchase.findMany({
+      where: {
+        tenantId: auth.tenantId,
+        supplierRuc: { not: null }
+      },
+      select: {
+        supplierRuc: true,
+        supplierName: true,
+      },
+      distinct: ['supplierRuc'],
+      orderBy: { purchaseDate: 'desc' },
+      take: 50
+    });
+
+    const suppliers = purchases
+      .filter(p => p.supplierRuc)
+      .map(p => ({
+        ruc: p.supplierRuc as string,
+        name: p.supplierName || ''
+      }));
+
+    return { success: true, data: suppliers };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Error al obtener proveedores' };
+  }
+}
+
 export async function getPurchasesAction(tenantSlug: string, limit: number = 50) {
   try {
     const auth = await requireTenantAuth(tenantSlug);
@@ -132,7 +218,7 @@ export async function getPurchasesAction(tenantSlug: string, limit: number = 50)
       take: limit
     });
 
-    return { success: true, data: purchases };
+    return { success: true, data: purchases.map(serializePurchase) };
   } catch (error: any) {
     return { success: false, error: error.message || 'Error al obtener compras' };
   }
@@ -155,7 +241,7 @@ export async function getPurchaseByIdAction(tenantSlug: string, purchaseId: stri
 
     if (!purchase) throw new Error('Compra no encontrada');
 
-    return { success: true, data: purchase };
+    return { success: true, data: serializePurchase(purchase) };
   } catch (error: any) {
     return { success: false, error: error.message || 'Error al obtener detalles de la compra' };
   }

@@ -35,18 +35,18 @@ export function FaqSection() {
   ];
 
   return (
-    <section id="preguntas" className="py-16 sm:py-24 bg-white border-b-2 border-gray-300">
+    <section id="preguntas" className="py-16 sm:py-24 bg-white dark:bg-zinc-950 border-b-2 border-gray-300 dark:border-zinc-700">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="text-center mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-1.5 bg-gray-200 border border-gray-400 text-gray-900 rounded-md px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
-            <HelpCircle className="w-4 h-4 text-gray-900 stroke-[2.5]" />
+          <div className="inline-flex items-center gap-1.5 bg-gray-200 border border-gray-400 text-gray-900 dark:text-zinc-50 rounded-md px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
+            <HelpCircle className="w-4 h-4 text-gray-900 dark:text-zinc-50 stroke-[2.5]" />
             <span>RESPUESTAS OPERATIVAS</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-black text-gray-900 tracking-tight uppercase">
+          <h2 className="text-2xl sm:text-4xl font-black text-gray-900 dark:text-zinc-50 tracking-tight uppercase">
             PREGUNTAS FRECUENTES
           </h2>
-          <p className="text-base sm:text-lg text-gray-700 mt-2 font-medium">
+          <p className="text-base sm:text-lg text-gray-700 dark:text-zinc-300 mt-2 font-medium">
             Aclaraciones directas a las preguntas de dueños de bodega como tú.
           </p>
         </div>
@@ -58,7 +58,7 @@ export function FaqSection() {
             return (
               <div
                 key={index}
-                className="border-2 border-gray-300 rounded-lg overflow-hidden bg-white"
+                className="border-2 border-gray-300 dark:border-zinc-700 rounded-lg overflow-hidden bg-white dark:bg-zinc-950"
               >
                 <button
                   id={`faq-btn-${index}`}
@@ -66,11 +66,11 @@ export function FaqSection() {
                   aria-expanded={isOpen}
                   aria-controls={`faq-content-${index}`}
                   onClick={() => setOpenIndex(isOpen ? null : index)}
-                  className="w-full p-5 text-left flex items-center justify-between gap-4 bg-gray-50 hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 cursor-pointer touch-manipulation active:bg-gray-100"
+                  className="w-full p-5 text-left flex items-center justify-between gap-4 bg-gray-50 dark:bg-zinc-900 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 cursor-pointer touch-manipulation active:bg-gray-100 dark:active:bg-zinc-800"
                 >
-                  <span className="text-base font-bold text-gray-900">{faq.question}</span>
+                  <span className="text-base font-bold text-gray-900 dark:text-zinc-50">{faq.question}</span>
                   <ChevronDown
-                    className={`w-5 h-5 text-gray-900 shrink-0 stroke-[2.5] transition-transform duration-200 ${
+                    className={`w-5 h-5 text-gray-900 dark:text-zinc-50 shrink-0 stroke-[2.5] transition-transform duration-200 ${
                       isOpen ? "rotate-180" : ""
                     }`}
                   />
@@ -81,7 +81,7 @@ export function FaqSection() {
                     id={`faq-content-${index}`}
                     role="region"
                     aria-labelledby={`faq-btn-${index}`}
-                    className="p-5 bg-white border-t-2 border-gray-200 text-sm sm:text-base text-gray-800 leading-relaxed font-medium"
+                    className="p-5 bg-white dark:bg-zinc-950 border-t-2 border-gray-200 dark:border-zinc-800 text-sm sm:text-base text-gray-800 dark:text-zinc-100 leading-relaxed font-medium"
                   >
                     {faq.answer}
                   </div>

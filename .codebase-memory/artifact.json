@@ -1,11 +1,11 @@
 {
     "schema_version": 2,
-    "commit": "d6e7d62d3fb0a538c0453b4e49940c2b9d2a3fa6",
-    "indexed_at": "2026-07-19T06:36:43Z",
-    "project": "caja-rus",
-    "nodes": 5423,
-    "edges": 5673,
-    "original_size": 6619136,
-    "compressed_size": 874366,
+    "commit": "adf8d131bfa7dbc4c2dea4e5a5fd08ad2dc5f7f0",
+    "indexed_at": "2026-07-21T03:30:42Z",
+    "project": "home-pcrisostomo-Documentos-GitHub-caja-rus",
+    "nodes": 6483,
+    "edges": 7444,
+    "original_size": 11599872,
+    "compressed_size": 1408853,
     "compression_level": 3
 }

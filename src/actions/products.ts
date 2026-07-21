@@ -4,6 +4,18 @@ import { prisma } from '@/lib/prisma';
 import { UnitType, WasteReason } from '@/generated/prisma/enums';
 import { requireTenantAuth, requireTenantRole } from '@/lib/auth-helpers';
 import { Prisma } from '@/generated/prisma/client';
+import { revalidatePath } from 'next/cache';
+
+function serializeProduct(product: any) {
+  if (!product) return product;
+  return {
+    ...product,
+    costPrice: Number(product.costPrice),
+    sellingPrice: Number(product.sellingPrice),
+    stock: Number(product.stock),
+    minStock: Number(product.minStock),
+  };
+}
 
 type ProductData = {
   name: string;
@@ -66,7 +78,7 @@ export async function getProductsAction(tenantSlug: string, options?: { search?:
       prisma.product.count({ where })
     ]);
 
-    return { success: true, data: { products, total, page, limit } };
+    return { success: true, data: { products: products.map(serializeProduct), total, page, limit } };
   } catch (error: any) {
     return { success: false, error: error.message || 'Error al obtener productos' };
   }
@@ -84,7 +96,7 @@ export async function getProductByIdAction(tenantSlug: string, productId: string
       throw new Error('Producto no encontrado');
     }
 
-    return { success: true, data: product };
+    return { success: true, data: serializeProduct(product) };
   } catch (error: any) {
     return { success: false, error: error.message || 'Error al obtener el producto' };
   }
@@ -114,7 +126,8 @@ export async function createProductAction(tenantSlug: string, data: ProductData)
       return product;
     });
 
-    return { success: true, data: result };
+    revalidatePath(`/t/${tenantSlug}/inventory`);
+    return { success: true, data: serializeProduct(result) };
   } catch (error: any) {
     return { success: false, error: error.message || 'Error al crear el producto' };
   }
@@ -143,7 +156,8 @@ export async function updateProductAction(tenantSlug: string, productId: string,
       return product;
     });
 
-    return { success: true, data: result };
+    revalidatePath(`/t/${tenantSlug}/inventory`);
+    return { success: true, data: serializeProduct(result) };
   } catch (error: any) {
     return { success: false, error: error.message || 'Error al actualizar el producto' };
   }
@@ -171,7 +185,8 @@ export async function deleteProductAction(tenantSlug: string, productId: string)
       return product;
     });
 
-    return { success: true, data: result };
+    revalidatePath(`/t/${tenantSlug}/inventory`);
+    return { success: true, data: serializeProduct(result) };
   } catch (error: any) {
     return { success: false, error: error.message || 'Error al eliminar el producto' };
   }
@@ -219,6 +234,7 @@ export async function adjustWasteAction(tenantSlug: string, productId: string, q
       return adjustment;
     }, { isolationLevel: 'Serializable' });
 
+    revalidatePath(`/t/${tenantSlug}/inventory`);
     return { success: true, data: result };
   } catch (error: any) {
     return { success: false, error: error.message || 'Error al ajustar merma' };
@@ -262,6 +278,7 @@ export async function importProductsCsvAction(tenantSlug: string, rows: ProductI
       }
     });
 
+    revalidatePath(`/t/${tenantSlug}/inventory`);
     return { success: true, data: { created, updated, errors } };
   } catch (error: any) {
     return { success: false, error: error.message || 'Error al importar productos' };

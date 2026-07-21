@@ -33,16 +33,16 @@ export function WeightKeypad() {
   const isValid = qty > 0 && qty <= activeKgProduct.stock;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white">
+    <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-zinc-900">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-4">
-        <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
+      <div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 py-4">
+        <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
           Peso en kilogramos
         </p>
-        <p className="mt-1 text-lg font-bold text-gray-900 truncate">
+        <p className="mt-1 text-lg font-bold text-gray-900 dark:text-zinc-50 truncate">
           {activeKgProduct.name}
         </p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-zinc-400">
           Stock disponible: {activeKgProduct.stock.toFixed(3)} kg
         </p>
       </div>
@@ -50,17 +50,17 @@ export function WeightKeypad() {
       {/* Display */}
       <div className="flex-1 flex items-center justify-center px-6">
         <div className="text-center">
-          <p className="text-6xl font-bold text-gray-900 tracking-tight">
+          <p className="text-6xl font-bold text-gray-900 dark:text-zinc-50 tracking-tight">
             {weightInput || "0"}
           </p>
-          <p className="text-2xl text-gray-500 mt-2">kg</p>
+          <p className="text-2xl text-gray-500 dark:text-zinc-400 mt-2">kg</p>
           {weightInput && (
-            <p className="text-base text-emerald-700 mt-2 font-semibold">
+            <p className="text-base text-emerald-700 dark:text-emerald-400 mt-2 font-semibold">
               S/ {(activeKgProduct.sellingPrice * qty).toFixed(2)}
             </p>
           )}
           {qty > activeKgProduct.stock && (
-            <p className="text-sm text-red-600 mt-2">
+            <p className="text-sm text-red-600 dark:text-red-400 mt-2">
               ⚠ Excede el stock disponible
             </p>
           )}
@@ -73,7 +73,7 @@ export function WeightKeypad() {
           <button
             key={k}
             onClick={() => (k === "⌫" ? handleBackspace() : handleKey(k))}
-            className="h-16 rounded-xl bg-gray-100 text-2xl font-semibold text-gray-900 active:scale-95 transition-transform flex items-center justify-center"
+            className="h-16 rounded-xl bg-gray-100 dark:bg-zinc-800 text-2xl font-semibold text-gray-900 dark:text-zinc-50 active:scale-95 transition-transform flex items-center justify-center"
           >
             {k === "⌫" ? <Delete size={24} /> : k}
           </button>
@@ -84,7 +84,7 @@ export function WeightKeypad() {
       <div className="flex gap-3 p-4 pt-0">
         <button
           onClick={() => setActiveKgProduct(null)}
-          className="flex-1 bg-white border-2 border-gray-300 rounded-xl py-4 text-lg font-semibold text-gray-700 active:scale-95 transition-transform"
+          className="flex-1 bg-white dark:bg-zinc-900 border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-4 text-lg font-semibold text-gray-700 dark:text-zinc-300 active:scale-95 transition-transform"
         >
           Cancelar
         </button>

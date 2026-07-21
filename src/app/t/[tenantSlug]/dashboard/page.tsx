@@ -3,6 +3,7 @@ import { getDashboardDataAction, getExpensesAction } from "@/actions/dashboard";
 import { NrusSummaryCard } from "@/components/dashboard/NrusSummaryCard";
 import { SalesSummaryChart } from "@/components/dashboard/SalesSummaryChart";
 import { ExpenseList } from "@/components/dashboard/ExpenseList";
+import { PageHeader } from "@/components/ui/page-header";
 import { getTenantHubPath } from "@/lib/tenancy";
 import { redirect } from "next/navigation";
 
@@ -56,16 +57,12 @@ export default async function DashboardPage({
   }
 
   return (
-    <main className="min-h-dvh bg-gray-50 px-4 py-6 pb-24">
-      <div className="mx-auto flex w-full max-w-sm flex-col gap-6">
-        <header className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-wide text-blue-900">
-            Resumen del negocio
-          </p>
-          <h1 className="mt-1 text-2xl font-bold text-gray-900">
-            {authResult.tenantName}
-          </h1>
-        </header>
+    <main className="min-h-dvh bg-gray-50 dark:bg-zinc-950 px-4 py-6 pb-24">
+      <div className="mx-auto flex w-full max-w-md flex-col gap-6">
+        <PageHeader
+          categoryTag="Resumen del negocio"
+          title={authResult.tenantName}
+        />
 
         <NrusSummaryCard
           totalSales={Number(data.nrusSummary?.totalSales || 0)}

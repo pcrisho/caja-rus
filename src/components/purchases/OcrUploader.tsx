@@ -6,9 +6,17 @@ import { PurchaseReviewForm } from './PurchaseReviewForm';
 
 type OcrUploaderProps = {
   tenantSlug: string;
+  catalogProducts?: any[];
+  categories?: any[];
+  suppliers?: Array<{ ruc: string; name: string }>;
 };
 
-export function OcrUploader({ tenantSlug }: OcrUploaderProps) {
+export function OcrUploader({
+  tenantSlug,
+  catalogProducts = [],
+  categories = [],
+  suppliers = [],
+}: OcrUploaderProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [ocrData, setOcrData] = useState<any | null>(null);
@@ -78,18 +86,28 @@ export function OcrUploader({ tenantSlug }: OcrUploaderProps) {
   };
 
   if (ocrData) {
-    return <PurchaseReviewForm tenantSlug={tenantSlug} ocrData={ocrData} imageUrl={imageUrl} onCancel={() => setOcrData(null)} />;
+    return (
+      <PurchaseReviewForm
+        tenantSlug={tenantSlug}
+        ocrData={ocrData}
+        imageUrl={imageUrl}
+        catalogProducts={catalogProducts}
+        categories={categories}
+        suppliers={suppliers}
+        onCancel={() => setOcrData(null)}
+      />
+    );
   }
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-sm mx-auto">
+    <div className="flex flex-col gap-6 w-full max-w-md mx-auto">
       {error && (
-        <div className="bg-red-100 border border-red-200 text-red-700 p-4 rounded-xl text-base">
+        <div className="bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-400 p-4 rounded-xl text-base">
           {error}
         </div>
       )}
 
-      <div className="bg-gray-100 rounded-xl p-8 flex flex-col items-center justify-center gap-6 text-center border-2 border-dashed border-gray-300 relative">
+      <div className="bg-white dark:bg-zinc-900 rounded-xl p-8 flex flex-col items-center justify-center gap-6 text-center border-2 border-dashed border-gray-300 dark:border-zinc-700 relative">
         <input 
           type="file" 
           accept="image/*"
@@ -104,20 +122,20 @@ export function OcrUploader({ tenantSlug }: OcrUploaderProps) {
           <div className="flex flex-col items-center gap-4 animate-pulse">
             <div className="w-16 h-16 border-4 border-blue-900 border-t-transparent rounded-full animate-spin"></div>
             <div className="flex flex-col">
-              <h3 className="text-gray-900 font-bold text-lg">Analizando comprobante...</h3>
-              <p className="text-gray-500 text-sm mt-1">Nuestra IA está extrayendo los datos</p>
+              <h3 className="text-gray-900 dark:text-zinc-50 font-bold text-lg">Analizando comprobante...</h3>
+              <p className="text-gray-500 dark:text-zinc-400 text-sm mt-1">Nuestra IA está extrayendo los datos</p>
             </div>
           </div>
         ) : (
           <>
             <div className="flex gap-4">
-              <div className="bg-blue-100 p-4 rounded-full text-blue-900">
+              <div className="bg-blue-100 dark:bg-blue-900/30 p-4 rounded-full text-blue-900 dark:text-blue-400">
                 <Camera size={40} />
               </div>
             </div>
             <div>
-              <h3 className="text-gray-900 font-bold text-lg">Escanear Factura / Boleta</h3>
-              <p className="text-gray-500 text-sm mt-2">Toca aquí para tomar una foto del comprobante físico o subir una imagen de tu galería.</p>
+              <h3 className="text-gray-900 dark:text-zinc-50 font-bold text-lg">Escanear Factura / Boleta</h3>
+              <p className="text-gray-500 dark:text-zinc-400 text-sm mt-2">Toca aquí para tomar una foto del comprobante físico o subir una imagen de tu galería.</p>
             </div>
           </>
         )}
@@ -125,16 +143,16 @@ export function OcrUploader({ tenantSlug }: OcrUploaderProps) {
 
       {!loading && (
         <div className="flex items-center gap-4">
-          <div className="h-px bg-gray-200 flex-1"></div>
-          <span className="text-gray-400 text-sm font-medium">O</span>
-          <div className="h-px bg-gray-200 flex-1"></div>
+          <div className="h-px bg-gray-200 dark:bg-zinc-700 flex-1"></div>
+          <span className="text-gray-400 dark:text-zinc-500 text-sm font-medium">O</span>
+          <div className="h-px bg-gray-200 dark:bg-zinc-700 flex-1"></div>
         </div>
       )}
 
       {!loading && (
         <button
           onClick={() => setOcrData({ items: [], totalAmount: 0 })}
-          className="w-full bg-white border-2 border-gray-300 rounded-xl py-4 px-6 text-lg font-semibold text-gray-900 hover:bg-gray-50 active:scale-95 transition-transform cursor-pointer"
+          className="w-full bg-white dark:bg-zinc-900 border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-4 px-6 text-lg font-semibold text-gray-900 dark:text-zinc-50 hover:bg-gray-50 dark:hover:bg-zinc-800 active:scale-95 transition-transform cursor-pointer"
         >
           INGRESO MANUAL
         </button>

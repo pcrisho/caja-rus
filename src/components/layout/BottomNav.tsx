@@ -15,7 +15,8 @@ export function BottomNav({ tenantSlug }: { tenantSlug: string }) {
   const pathname = usePathname();
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50"
+      aria-label="Navegación principal"
+      className="fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-950 border-t border-gray-200 dark:border-zinc-800 z-50"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="flex items-center justify-around h-16">
@@ -27,7 +28,9 @@ export function BottomNav({ tenantSlug }: { tenantSlug: string }) {
               key={path}
               href={href}
               className={`flex flex-col items-center gap-1 min-w-[44px] min-h-[44px] justify-center px-2 ${
-                isActive ? "text-emerald-700 font-semibold" : "text-gray-500"
+                isActive
+                  ? "text-emerald-700 dark:text-emerald-400 font-semibold"
+                  : "text-gray-500 dark:text-zinc-400"
               }`}
             >
               <Icon size={24} />

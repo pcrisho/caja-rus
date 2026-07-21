@@ -5,6 +5,29 @@ import { PaymentMethod, SaleStatus } from '@/generated/prisma/enums';
 import { requireTenantAuth, requireTenantRole } from '@/lib/auth-helpers';
 import { Prisma } from '@/generated/prisma/client';
 
+function serializeProduct(product: any) {
+  if (!product) return product;
+  return {
+    ...product,
+    sellingPrice: product.sellingPrice ? Number(product.sellingPrice) : undefined,
+    stock: product.stock ? Number(product.stock) : undefined,
+  };
+}
+
+function serializeSale(sale: any) {
+  if (!sale) return sale;
+  return {
+    ...sale,
+    totalAmount: sale.totalAmount ? Number(sale.totalAmount) : undefined,
+    items: sale.items?.map((item: any) => ({
+      ...item,
+      quantity: Number(item.quantity),
+      unitPrice: Number(item.unitPrice),
+      totalPrice: Number(item.totalPrice),
+    })),
+  };
+}
+
 type SaleItemData = {
   productId: string;
   quantity: number;
@@ -84,7 +107,6 @@ export async function createSaleAction(tenantSlug: string, items: SaleItemData[]
 
         totalAmount += item.totalPrice;
         saleItemsToCreate.push({
-          tenantId: auth.tenantId,
           productId: item.productId,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
@@ -151,7 +173,7 @@ export async function searchProductsAction(tenantSlug: string, query: string) {
       take: 20
     });
 
-    return { success: true, data: products };
+    return { success: true, data: products.map(serializeProduct) };
   } catch (error: any) {
     return { success: false, error: 'Ocurrió un error al buscar productos' };
   }
@@ -168,10 +190,18 @@ export async function getProductByBarcodeAction(tenantSlug: string, barcode: str
           barcode
         },
         isActive: true
+      },
+      select: {
+        id: true,
+        name: true,
+        barcode: true,
+        sellingPrice: true,
+        stock: true,
+        unitType: true
       }
     });
 
-    return { success: true, data: product };
+    return { success: true, data: product ? serializeProduct(product) : undefined };
   } catch (error: any) {
     return { success: false, error: 'Error al buscar el producto' };
   }
@@ -194,7 +224,7 @@ export async function getSaleHistoryAction(tenantSlug: string, limit: number = 5
       take: limit
     });
 
-    return { success: true, data: sales };
+    return { success: true, data: sales.map(serializeSale) };
   } catch (error: any) {
     return { success: false, error: 'Error al obtener historial de ventas' };
   }

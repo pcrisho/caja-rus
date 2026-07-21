@@ -2,6 +2,7 @@ import { requireTenantAuth } from '@/lib/auth-helpers';
 import { getProductsAction } from '@/actions/products';
 import { getCategoriesAction } from '@/actions/categories';
 import { ProductCard } from '@/components/inventory/ProductCard';
+import { PageHeader } from '@/components/ui/page-header';
 import Link from 'next/link';
 import { Plus, UploadCloud, Search, AlertTriangle } from 'lucide-react';
 import { redirect } from 'next/navigation';
@@ -33,19 +34,15 @@ export default async function InventoryPage({
   const { products, total } = productsRes.data as any;
   const categories = categoriesRes.success ? (categoriesRes.data as any[]) : [];
 
-  // Count low stock overall to show banner (we could fetch a separate count, but doing it in memory if loaded or just a general query would be better. For simplicity, we just use the current loaded products if alert is on, otherwise we don't have the exact number globally without another query).
-  // Actually, let's just make the "Ver alertas" button filter it.
-
   return (
-    <div className="flex flex-col min-h-dvh bg-white pb-[env(safe-area-inset-bottom)]">
-      {/* Header */}
-      <header className="bg-blue-900 text-white p-6 pb-8 sticky top-0 z-10 shadow-sm">
-        <h1 className="text-3xl font-bold">Inventario</h1>
-        <p className="text-blue-200 mt-1">{total} productos registrados</p>
-      </header>
+    <main className="min-h-dvh bg-gray-50 dark:bg-zinc-950 px-4 py-6 pb-24">
+      <div className="mx-auto flex w-full max-w-md flex-col gap-6">
+        <PageHeader
+          categoryTag="Inventario"
+          title="Inventario"
+          subtitle={`${total} productos registrados`}
+        />
 
-      {/* Main Content */}
-      <main className="flex-1 p-4 -mt-4 flex flex-col gap-6 max-w-sm mx-auto w-full">
         {/* Actions */}
         <div className="flex gap-3">
           <Link
@@ -57,7 +54,7 @@ export default async function InventoryPage({
           </Link>
           <Link
             href={`/t/${tenantSlug}/inventory/import`}
-            className="flex-1 bg-white border-2 border-gray-300 text-gray-900 rounded-xl py-4 flex flex-col items-center justify-center gap-1 hover:bg-gray-50 active:scale-95 transition-transform font-bold"
+            className="flex-1 bg-white dark:bg-zinc-900 border-2 border-gray-300 dark:border-zinc-700 text-gray-900 dark:text-zinc-50 rounded-xl py-4 flex flex-col items-center justify-center gap-1 hover:bg-gray-50 dark:hover:bg-zinc-800 active:scale-95 transition-transform font-bold"
           >
             <UploadCloud size={24} />
             <span>CSV</span>
@@ -65,28 +62,28 @@ export default async function InventoryPage({
         </div>
 
         {/* Filters Form */}
-        <form className="flex flex-col gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
+        <form className="flex flex-col gap-3 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-zinc-800">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500" size={20} />
             <input
               type="text"
               name="q"
               defaultValue={q}
               placeholder="Buscar por nombre o código..."
-              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 focus-visible:border-blue-900"
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-950 border-2 border-gray-300 dark:border-zinc-700 text-gray-900 dark:text-zinc-50 placeholder:text-gray-400 dark:placeholder:text-zinc-500 rounded-xl text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 focus-visible:border-blue-900"
             />
           </div>
           
           <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
             <Link
               href={`/t/${tenantSlug}/inventory`}
-              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border ${!category && !alert ? 'bg-blue-900 text-white border-blue-900' : 'bg-white border-gray-300 text-gray-700'}`}
+              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border ${!category && !alert ? 'bg-blue-900 text-white border-blue-900' : 'bg-white dark:bg-zinc-950 border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300'}`}
             >
               Todos
             </Link>
             <Link
               href={`/t/${tenantSlug}/inventory?alert=true`}
-              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border flex items-center gap-1 ${alert === 'true' ? 'bg-amber-600 text-white border-amber-600' : 'bg-white border-amber-300 text-amber-700'}`}
+              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border flex items-center gap-1 ${alert === 'true' ? 'bg-amber-600 text-white border-amber-600' : 'bg-white dark:bg-zinc-950 border-amber-300 dark:border-amber-700/50 text-amber-700 dark:text-amber-400'}`}
             >
               <AlertTriangle size={14} /> Stock bajo
             </Link>
@@ -94,7 +91,7 @@ export default async function InventoryPage({
               <Link
                 key={c.id}
                 href={`/t/${tenantSlug}/inventory?category=${c.id}`}
-                className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border ${category === c.id ? 'bg-blue-900 text-white border-blue-900' : 'bg-white border-gray-300 text-gray-700'}`}
+                className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border ${category === c.id ? 'bg-blue-900 text-white border-blue-900' : 'bg-white dark:bg-zinc-950 border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300'}`}
               >
                 {c.name}
               </Link>
@@ -103,10 +100,10 @@ export default async function InventoryPage({
         </form>
 
         {/* Product List */}
-        <div className="flex flex-col gap-4 pb-20">
+        <div className="flex flex-col gap-4">
           {products.length === 0 ? (
             <div className="text-center py-10">
-              <p className="text-gray-500 text-lg">No se encontraron productos.</p>
+              <p className="text-gray-500 dark:text-zinc-400 text-lg">No se encontraron productos.</p>
             </div>
           ) : (
             products.map((product: any) => (
@@ -114,7 +111,8 @@ export default async function InventoryPage({
             ))
           )}
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
+
