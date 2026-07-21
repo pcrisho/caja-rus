@@ -27,7 +27,7 @@ export function DsSelect({
       <div className="relative">
         <select
           id={selectId}
-          className={`w-full appearance-none border-b border-gray-200 dark:border-zinc-700 py-3 pr-8 text-base text-gray-900 dark:text-zinc-50 bg-transparent focus-visible:outline-none focus-visible:border-blue-900 transition-colors ${
+          className={`w-full appearance-none bg-transparent border-b border-gray-200 dark:border-zinc-700 py-3 pr-8 text-base text-gray-900 dark:text-zinc-50 focus-visible:outline-none focus-visible:border-blue-900 transition-colors ${
             error ? "border-red-600" : ""
           } ${className}`}
           {...props}

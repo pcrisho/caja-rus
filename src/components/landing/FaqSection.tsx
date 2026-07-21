@@ -39,7 +39,7 @@ export function FaqSection() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="text-center mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-1.5 bg-gray-200 border border-gray-400 text-gray-900 dark:text-zinc-50 rounded-md px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
+          <div className="inline-flex items-center gap-1.5 bg-gray-200 dark:bg-zinc-800 text-gray-900 dark:text-zinc-50  px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
             <HelpCircle className="w-4 h-4 text-gray-900 dark:text-zinc-50 stroke-[2.5]" />
             <span>RESPUESTAS OPERATIVAS</span>
           </div>
@@ -58,7 +58,7 @@ export function FaqSection() {
             return (
               <div
                 key={index}
-                className="border-2 border-gray-300 dark:border-zinc-700 rounded-lg overflow-hidden bg-white dark:bg-zinc-950"
+                className="  overflow-hidden bg-white dark:bg-zinc-950"
               >
                 <button
                   id={`faq-btn-${index}`}

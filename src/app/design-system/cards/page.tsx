@@ -31,14 +31,14 @@ export default function CardsPage() {
         {/* Hero card */}
         <section className="flex flex-col gap-3">
           <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
-            Card Hero (rounded-2xl)
+            Card Hero (rounded-none)
           </h2>
           <DsCard variant="hero" padding="lg">
             <div className="flex flex-col gap-3">
               <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
                 NRUS — Junio 2026
               </p>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-zinc-50">
+              <h3 className="text-xl font-bold text-gray-900 tabular-nums dark:text-zinc-50">
                 Categoría 1
               </h3>
               <DsProgressBar value={65} color="emerald" label="Progreso del mes" />
@@ -51,7 +51,7 @@ export default function CardsPage() {
           <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
             Card Bordered (con borde)
           </h2>
-          <DsCard variant="bordered">
+          <DsCard variant="default">
             <p className="text-base text-gray-700 dark:text-zinc-300">
               Card con borde de 1px. Útil cuando la card está sobre fondo blanco.
             </p>
@@ -99,7 +99,7 @@ export default function CardsPage() {
                 <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
                   Total del día
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-zinc-50">
+                <p className="text-2xl font-bold text-gray-900 tabular-nums dark:text-zinc-50">
                   S/ 1,250.00
                 </p>
               </div>
@@ -119,7 +119,7 @@ export default function CardsPage() {
           <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
             Card de Alerta
           </h2>
-          <DsCard className="bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700">
+          <DsCard className="bg-amber-100 dark:bg-amber-900/30">
             <div className="flex items-start gap-3">
               <AlertTriangle size={20} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
               <p className="text-amber-700 dark:text-amber-400 text-sm font-semibold">

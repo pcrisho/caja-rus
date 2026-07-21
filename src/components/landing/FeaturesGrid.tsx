@@ -65,9 +65,9 @@ export function FeaturesGrid() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-1.5 bg-gray-200 border border-gray-400 text-gray-900 dark:text-zinc-50 rounded-md px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
-            <Zap className="w-4 h-4 text-gray-900 dark:text-zinc-50 stroke-[2.5]" />
-            <span>ARQUITECTURA DE MÓDULOS POS</span>
+          <div className="inline-flex items-center gap-1.5 bg-gray-200 dark:bg-emerald-900/30 text-emerald-500 dark:text-zinc-50  px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
+            <Zap className="w-4 h-4 text-emerald-500 dark:text-emerald-500 stroke-[2.5]" />
+            <span className="text-emerald-500 dark:text-emerald-500">ARQUITECTURA DE MÓDULOS POS</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-black text-gray-900 dark:text-zinc-50 tracking-tight uppercase">
             TODO LO QUE TU BODEGA NECESITA EN TU CELULAR
@@ -84,14 +84,14 @@ export function FeaturesGrid() {
             return (
               <div
                 key={index}
-                className="bg-white dark:bg-zinc-950 rounded-xl p-6 border-2 border-gray-300 dark:border-zinc-700 hover:border-gray-900 transition-colors flex flex-col justify-between"
+                className="bg-white dark:bg-zinc-950  p-6 hover:border-gray-900 transition-colors flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`w-11 h-11 rounded-lg ${item.color} flex items-center justify-center border border-gray-900`}>
+                    <div className={`w-11 h-11  ${item.color} flex items-center justify-center`}>
                       <IconComponent className="w-5 h-5 stroke-[2.5]" />
                     </div>
-                    <span className="text-[10px] font-mono font-bold bg-gray-100 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 text-gray-800 dark:text-zinc-100 px-2.5 py-1 rounded uppercase tracking-wider">
+                    <span className="text-[10px] font-mono font-bold bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-zinc-100 px-2.5 py-1  uppercase tracking-wider">
                       {item.badge}
                     </span>
                   </div>

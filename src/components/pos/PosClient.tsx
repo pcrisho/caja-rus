@@ -1,18 +1,22 @@
 "use client";
 import { useState, useCallback, useTransition } from "react";
-import { Search, ScanLine, Camera, ShoppingCart, X } from "lucide-react";
+import { Search, Camera, X, ShoppingCart, ScanLine } from "lucide-react";
 import { Scanner } from "@/components/scanner/Scanner";
 import { CartProduct, usePosStore, cartTotal } from "@/store/usePosStore";
 import { CartItem } from "@/components/pos/CartItem";
 import { PaymentSelector } from "@/components/pos/PaymentSelector";
 import { WeightKeypad } from "@/components/pos/WeightKeypad";
+import { DsInputGroup } from "@/components/design-system/DsInputGroup";
+import { DsButton } from "@/components/design-system/DsButton";
+import { DsAlert } from "@/components/design-system/DsAlert";
+import { DsCard } from "@/components/design-system/DsCard";
+import { DsEmptyState } from "@/components/design-system/DsEmptyState";
 
 type Props = {
   tenantSlug: string;
   initialProducts: CartProduct[];
 };
 
-// Importar Server Actions — se resuelven en runtime
 let searchProductsAction: (
   tenantSlug: string,
   query: string
@@ -28,7 +32,6 @@ let getProductByBarcodeAction: (
   barcode: string
 ) => Promise<{ success: boolean; data?: CartProduct; error?: string }>;
 
-// Importación dinámica en cliente
 import("@/actions/sales").then((m) => {
   searchProductsAction = m.searchProductsAction as typeof searchProductsAction;
   createSaleAction = m.createSaleAction as typeof createSaleAction;
@@ -40,7 +43,6 @@ export function PosClient({ tenantSlug, initialProducts }: Props) {
     items,
     paymentMethod,
     payments,
-    activeKgProduct,
     clearCart,
     addItem,
   } = usePosStore();
@@ -110,7 +112,6 @@ export function PosClient({ tenantSlug, initialProducts }: Props) {
         paymentMethod === "MIXED" ? payments : undefined
       );
       if (res.success) {
-        // Vibración háptica en dispositivos compatibles
         if (typeof navigator !== "undefined" && "vibrate" in navigator) {
           navigator.vibrate([50, 30, 50]);
         }
@@ -127,7 +128,6 @@ export function PosClient({ tenantSlug, initialProducts }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Escáner de código de barras (modal fullscreen) */}
       {showScanner && (
         <Scanner
           onScan={handleBarcodeScanned}
@@ -135,63 +135,51 @@ export function PosClient({ tenantSlug, initialProducts }: Props) {
         />
       )}
 
-      {/* Keypad de peso (modal fullscreen) */}
       <WeightKeypad />
 
-      {/* Toast de feedback */}
       {toast && (
-        <div
-          className={`fixed top-4 left-4 right-4 z-40 rounded-xl p-4 text-base font-semibold ${
-            toast.type === "ok"
-              ? "bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400"
-              : "bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-400"
-          }`}
-        >
-          {toast.msg}
+        <div className="fixed top-4 left-4 right-4 z-40">
+          <DsAlert
+            variant={toast.type === "ok" ? "success" : "error"}
+            message={toast.msg}
+          />
         </div>
       )}
 
-      {/* Buscador */}
-      <div className="relative">
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500">
-          <Search size={20} />
-        </div>
-        <input
-          type="text"
-          id="pos-search"
-          placeholder="Busca por nombre o código de barra..."
-          value={query}
-          onChange={(e) => handleSearch(e.target.value)}
-          onFocus={() => setShowResults(true)}
-          className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-4 pl-11 pr-20 text-base bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-50 placeholder:text-gray-400 dark:placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 focus-visible:border-blue-900"
-        />
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-          <button
-            onClick={() => setShowScanner(true)}
-            className="text-blue-900 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg p-2 transition-colors"
-            aria-label="Escanear código de barras"
-          >
-            <Camera size={20} />
-          </button>
-          {query && (
+      <DsInputGroup
+        leftIcon={<Search size={20} />}
+        placeholder="Busca por nombre o código de barra..."
+        value={query}
+        onChange={(e) => handleSearch(e.target.value)}
+        onFocus={() => setShowResults(true)}
+        rightAction={
+          <div className="flex items-center gap-1">
             <button
-              onClick={() => {
-                setQuery("");
-                setResults(initialProducts);
-                setShowResults(false);
-              }}
-              className="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 rounded-lg p-2 transition-colors"
-              aria-label="Limpiar búsqueda"
+              onClick={() => setShowScanner(true)}
+              className="text-blue-900 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 p-2 transition-colors"
+              aria-label="Escanear código de barras"
             >
-              <X size={20} />
+              <Camera size={20} />
             </button>
-          )}
-        </div>
-      </div>
+            {query && (
+              <button
+                onClick={() => {
+                  setQuery("");
+                  setResults(initialProducts);
+                  setShowResults(false);
+                }}
+                className="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 p-2 transition-colors"
+                aria-label="Limpiar búsqueda"
+              >
+                <X size={20} />
+              </button>
+            )}
+          </div>
+        }
+      />
 
-      {/* Resultados de búsqueda */}
       {showResults && results.length > 0 && (
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm">
+        <DsCard variant="flat" padding="sm">
           {results.slice(0, 8).map((product) => (
             <button
               key={product.id}
@@ -203,7 +191,7 @@ export function PosClient({ tenantSlug, initialProducts }: Props) {
                   setResults(initialProducts);
                 }
               }}
-              className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-zinc-700 active:bg-gray-100 dark:active:bg-zinc-700 dark:bg-zinc-800 border-b border-gray-100 dark:border-zinc-800 last:border-0 text-left"
+              className="w-full flex items-center justify-between px-4 py-3 hover:bg-white dark:hover:bg-zinc-700 active:bg-white dark:active:bg-zinc-700 border-b border-gray-100 dark:border-zinc-800 last:border-0 text-left"
             >
               <div className="flex-1 min-w-0">
                 <p className="text-base font-semibold text-gray-900 dark:text-zinc-50 truncate">
@@ -214,7 +202,7 @@ export function PosClient({ tenantSlug, initialProducts }: Props) {
                 )}
               </div>
               <div className="text-right ml-4">
-                <p className="text-base font-bold text-emerald-700 dark:text-emerald-400">
+                <p className="text-base font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">
                   S/ {product.sellingPrice.toFixed(2)}
                 </p>
                 <p
@@ -233,18 +221,13 @@ export function PosClient({ tenantSlug, initialProducts }: Props) {
               </div>
             </button>
           ))}
-        </div>
+        </DsCard>
       )}
 
       {results.length === 0 && query && (
-        <div className="bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-xl p-4">
-          <p className="text-amber-700 dark:text-amber-400 text-base">
-            No encontramos &ldquo;{query}&rdquo;. Revisa el nombre o el código de barra.
-          </p>
-        </div>
+        <DsAlert variant="warning" message={`No encontramos "${query}". Revisa el nombre o el código de barra.`} />
       )}
 
-      {/* Carrito */}
       {items.length > 0 ? (
         <section className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
@@ -263,45 +246,45 @@ export function PosClient({ tenantSlug, initialProducts }: Props) {
             <CartItem key={item.product.id} item={item} />
           ))}
 
-          {/* Total */}
-          <div className="bg-gray-100 dark:bg-zinc-800 rounded-xl p-4 flex items-center justify-between">
-            <p className="text-xl font-bold text-gray-900 dark:text-zinc-50">Total</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-zinc-50">
-              S/ {total.toFixed(2)}
-            </p>
-          </div>
+          <DsCard variant="flat" padding="sm">
+            <div className="flex items-center justify-between p-1">
+              <p className="text-xl font-bold text-gray-900 dark:text-zinc-50">Total</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-zinc-50 tabular-nums">
+                S/ {total.toFixed(2)}
+              </p>
+            </div>
+          </DsCard>
 
-          {/* Método de pago */}
           <PaymentSelector total={total} />
 
-          {/* Botón CONFIRMAR */}
-          <button
+          <DsButton
             onClick={handleConfirmSale}
             disabled={isSubmitting || (paymentMethod === "MIXED" && Math.abs(payments.reduce((s,p) => s+p.amount,0) - total) > 0.01)}
-            className="w-full bg-emerald-600 text-white rounded-xl py-5 text-xl font-bold hover:bg-emerald-700 active:scale-95 transition-transform disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
+            icon={<ScanLine size={24} />}
           >
-            {isSubmitting ? (
-              "Registrando..."
-            ) : (
-              <>
-                <ScanLine size={24} />
-                Cobrar S/ {total.toFixed(2)}
-              </>
-            )}
-          </button>
+            {isSubmitting ? "Registrando..." : `Cobrar S/ ${total.toFixed(2)}`}
+          </DsButton>
         </section>
       ) : (
         !showResults && (
-          <div className="bg-gray-100 dark:bg-zinc-800 rounded-xl p-8 text-center border border-gray-200 dark:border-zinc-800">
-            <ShoppingCart size={48} className="mx-auto mb-3 text-gray-400 dark:text-zinc-500" />
-            <p className="text-base font-semibold text-gray-700 dark:text-zinc-300">
-              El carrito está vacío
-            </p>
-            <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">
-              Busca un producto arriba para agregarlo
-            </p>
-          </div>
+          <DsCard variant="flat" padding="lg">
+            <DsEmptyState
+              icon={<ShoppingCart size={48} className="text-gray-400 dark:text-zinc-500" />}
+              title="El carrito está vacío"
+              description="Busca un producto arriba para agregarlo"
+            />
+          </DsCard>
         )
+      )}
+
+      {items.length === 0 && (
+        <button
+          onClick={() => setShowScanner(true)}
+          className="fixed bottom-24 right-4 z-30 w-14 h-14 bg-emerald-600 text-white flex items-center justify-center active:scale-95 transition-transform"
+          aria-label="Escanear código de barras"
+        >
+          <Camera size={24} />
+        </button>
       )}
     </div>
   );

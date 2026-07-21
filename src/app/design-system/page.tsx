@@ -62,34 +62,34 @@ export default function DesignSystemPage() {
         </header>
 
         {/* Color palette quick reference */}
-        <section className="bg-white dark:bg-zinc-900 rounded-2xl p-6">
+        <section className="bg-white dark:bg-zinc-900 rounded-none p-6">
           <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 mb-4">
             Paleta de Colores
           </h2>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-600" />
+              <div className="w-10 h-10 rounded-none bg-emerald-600" />
               <div>
                 <p className="text-sm font-bold text-gray-900 dark:text-zinc-50">Primario</p>
                 <p className="text-xs text-gray-500 dark:text-zinc-400">emerald-600</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-900" />
+              <div className="w-10 h-10 rounded-none bg-blue-900" />
               <div>
                 <p className="text-sm font-bold text-gray-900 dark:text-zinc-50">Navegación</p>
                 <p className="text-xs text-gray-500 dark:text-zinc-400">blue-900</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-600" />
+              <div className="w-10 h-10 rounded-none bg-amber-600" />
               <div>
                 <p className="text-sm font-bold text-gray-900 dark:text-zinc-50">Advertencia</p>
                 <p className="text-xs text-gray-500 dark:text-zinc-400">amber-600</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-red-600" />
+              <div className="w-10 h-10 rounded-none bg-red-600" />
               <div>
                 <p className="text-sm font-bold text-gray-900 dark:text-zinc-50">Peligro</p>
                 <p className="text-xs text-gray-500 dark:text-zinc-400">red-600</p>
@@ -114,7 +114,7 @@ export default function DesignSystemPage() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-zinc-800 active:scale-95 transition-transform"
+                  className="bg-white dark:bg-zinc-900"
                 >
                   <span className="text-base font-semibold text-gray-900 dark:text-zinc-50">
                     {item.label}

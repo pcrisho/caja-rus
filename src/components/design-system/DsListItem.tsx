@@ -34,7 +34,7 @@ export function DsListItem({
       } ${className}`}
     >
       {icon && (
-        <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-600 dark:text-zinc-400 shrink-0">
+        <div className="w-10 h-10 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-600 dark:text-zinc-400 shrink-0">
           {icon}
         </div>
       )}

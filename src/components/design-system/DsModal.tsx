@@ -48,7 +48,7 @@ export function DsModal({
 
       {/* Modal */}
       <div
-        className={`relative bg-white dark:bg-zinc-900 rounded-2xl w-full ${sizeStyles[size]} max-h-[85vh] overflow-y-auto`}
+        className={`relative bg-white dark:bg-zinc-900 w-full ${sizeStyles[size]} max-h-[85vh] overflow-y-auto`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
@@ -70,7 +70,7 @@ export function DsModal({
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
+            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
             aria-label="Cerrar"
           >
             <X size={20} />

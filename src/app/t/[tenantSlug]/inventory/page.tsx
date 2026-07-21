@@ -43,47 +43,53 @@ export default async function InventoryPage({
           subtitle={`${total} productos registrados`}
         />
 
-        {/* Actions */}
         <div className="flex gap-3">
           <Link
             href={`/t/${tenantSlug}/inventory/new`}
-            className="flex-1 bg-emerald-600 text-white rounded-xl py-4 flex flex-col items-center justify-center gap-1 hover:bg-emerald-700 active:scale-95 transition-transform font-bold"
+            className="flex-1 bg-emerald-600 text-white py-4 flex flex-col items-center justify-center gap-1 hover:bg-emerald-700 active:scale-95 transition-transform font-bold font-sans"
           >
             <Plus size={24} />
             <span>NUEVO</span>
           </Link>
           <Link
             href={`/t/${tenantSlug}/inventory/import`}
-            className="flex-1 bg-white dark:bg-zinc-900 border-2 border-gray-300 dark:border-zinc-700 text-gray-900 dark:text-zinc-50 rounded-xl py-4 flex flex-col items-center justify-center gap-1 hover:bg-gray-50 dark:hover:bg-zinc-800 active:scale-95 transition-transform font-bold"
+            className="flex-1 bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-zinc-50 py-4 flex flex-col items-center justify-center gap-1 hover:bg-gray-200 dark:hover:bg-zinc-700 active:scale-95 transition-transform font-bold font-sans"
           >
             <UploadCloud size={24} />
             <span>CSV</span>
           </Link>
         </div>
 
-        {/* Filters Form */}
-        <form className="flex flex-col gap-3 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-zinc-800">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500" size={20} />
+        <form className="flex flex-col gap-3 bg-white dark:bg-zinc-900 p-4">
+          <div className="flex items-center gap-3 border-b border-gray-200 dark:border-zinc-700 focus-within:border-blue-900 transition-colors">
+            <Search size={20} className="text-gray-400 dark:text-zinc-500 shrink-0" />
             <input
               type="text"
               name="q"
               defaultValue={q}
               placeholder="Buscar por nombre o código..."
-              className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-950 border-2 border-gray-300 dark:border-zinc-700 text-gray-900 dark:text-zinc-50 placeholder:text-gray-400 dark:placeholder:text-zinc-500 rounded-xl text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 focus-visible:border-blue-900"
+              className="flex-1 bg-transparent py-3 text-base text-gray-900 dark:text-zinc-50 placeholder:text-gray-400 dark:placeholder:text-zinc-500 focus-visible:outline-none min-w-0"
             />
           </div>
           
           <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
             <Link
               href={`/t/${tenantSlug}/inventory`}
-              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border ${!category && !alert ? 'bg-blue-900 text-white border-blue-900' : 'bg-white dark:bg-zinc-950 border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300'}`}
+              className={`whitespace-nowrap px-4 py-2 text-sm font-medium ${
+                !category && !alert
+                  ? 'bg-blue-900 text-white'
+                  : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
+              }`}
             >
               Todos
             </Link>
             <Link
               href={`/t/${tenantSlug}/inventory?alert=true`}
-              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border flex items-center gap-1 ${alert === 'true' ? 'bg-amber-600 text-white border-amber-600' : 'bg-white dark:bg-zinc-950 border-amber-300 dark:border-amber-700/50 text-amber-700 dark:text-amber-400'}`}
+              className={`whitespace-nowrap px-4 py-2 text-sm font-medium flex items-center gap-1 ${
+                alert === 'true'
+                  ? 'bg-amber-600 text-white'
+                  : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
+              }`}
             >
               <AlertTriangle size={14} /> Stock bajo
             </Link>
@@ -91,7 +97,11 @@ export default async function InventoryPage({
               <Link
                 key={c.id}
                 href={`/t/${tenantSlug}/inventory?category=${c.id}`}
-                className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border ${category === c.id ? 'bg-blue-900 text-white border-blue-900' : 'bg-white dark:bg-zinc-950 border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300'}`}
+                className={`whitespace-nowrap px-4 py-2 text-sm font-medium ${
+                  category === c.id
+                    ? 'bg-blue-900 text-white'
+                    : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
+                }`}
               >
                 {c.name}
               </Link>
@@ -99,12 +109,11 @@ export default async function InventoryPage({
           </div>
         </form>
 
-        {/* Product List */}
         <div className="flex flex-col gap-4">
           {products.length === 0 ? (
-            <div className="text-center py-10">
-              <p className="text-gray-500 dark:text-zinc-400 text-lg">No se encontraron productos.</p>
-            </div>
+            <p className="text-center py-10 text-gray-500 dark:text-zinc-400 text-lg">
+              No se encontraron productos.
+            </p>
           ) : (
             products.map((product: any) => (
               <ProductCard key={product.id} product={product} tenantSlug={tenantSlug} />
@@ -115,4 +124,3 @@ export default async function InventoryPage({
     </main>
   );
 }
-

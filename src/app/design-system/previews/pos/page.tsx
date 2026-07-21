@@ -41,9 +41,9 @@ export default function PosPreview() {
           <input
             type="text"
             placeholder="Buscar producto..."
-            className="w-full pl-10 pr-12 py-3 bg-white dark:bg-zinc-900 rounded-xl text-base text-gray-900 dark:text-zinc-50 placeholder:text-gray-400 dark:placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900"
+            className="w-full pl-10 pr-12 py-3 bg-white dark:bg-zinc-900 rounded-none text-base text-gray-900 dark:text-zinc-50 placeholder:text-gray-400 dark:placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900"
           />
-          <button className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-500 dark:text-zinc-400">
+          <button className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-none bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-500 dark:text-zinc-400">
             <ScanLine size={20} />
           </button>
         </div>
@@ -76,7 +76,7 @@ export default function PosPreview() {
               <div
                 key={i}
                 className={`flex items-center gap-3 py-3 ${
-                  i < arr.length - 1 ? "border-b border-gray-100 dark:border-zinc-800" : ""
+                  i < arr.length - 1 ? "border-b" : ""
                 }`}
               >
                 <div className="flex-1 min-w-0">
@@ -88,13 +88,13 @@ export default function PosPreview() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-500 dark:text-zinc-400">
+                  <button className="w-8 h-8 rounded-none bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-500 dark:text-zinc-400">
                     <Minus size={16} />
                   </button>
                   <span className="w-8 text-center text-sm font-bold text-gray-900 dark:text-zinc-50">
                     {item.qty}
                   </span>
-                  <button className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-500 dark:text-zinc-400">
+                  <button className="w-8 h-8 rounded-none bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-500 dark:text-zinc-400">
                     <Plus size={16} />
                   </button>
                 </div>
@@ -105,10 +105,10 @@ export default function PosPreview() {
             ))}
           </div>
 
-          <div className="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800">
+          <div className="mt-4 pt-4">
             <div className="flex justify-between items-center">
-              <p className="text-lg font-bold text-gray-900 dark:text-zinc-50">TOTAL</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-zinc-50">
+              <p className="text-lg font-bold text-gray-900 tabular-nums dark:text-zinc-50">TOTAL</p>
+              <p className="text-2xl font-bold text-gray-900 tabular-nums dark:text-zinc-50">
                 S/ {total.toFixed(2)}
               </p>
             </div>
@@ -147,7 +147,7 @@ export default function PosPreview() {
           subtitle="Verifica los datos antes de confirmar"
         >
           <div className="flex flex-col gap-4">
-            <div className="bg-gray-50 dark:bg-zinc-800 rounded-xl p-4 text-center">
+            <div className="bg-gray-50 dark:bg-zinc-800 rounded-none p-4 text-center">
               <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 mb-1">
                 Total a cobrar
               </p>
@@ -161,7 +161,7 @@ export default function PosPreview() {
                 <span className="text-gray-500 dark:text-zinc-400">Método</span>
                 <span className="font-bold text-gray-900 dark:text-zinc-50 capitalize">{paymentMethod}</span>
               </div>
-              <div className="border-t border-gray-100 dark:border-zinc-800" />
+              <div className="border-t" />
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500 dark:text-zinc-400">Items</span>
                 <span className="font-bold text-gray-900 dark:text-zinc-50">{cartItems.length} productos</span>

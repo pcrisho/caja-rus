@@ -152,7 +152,7 @@ export default function ModalsPage() {
               ]}
             />
 
-            <DsCard variant="bordered">
+            <DsCard variant="default">
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500 dark:text-zinc-400">Llegada estimada</span>

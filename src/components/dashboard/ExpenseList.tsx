@@ -1,6 +1,10 @@
 "use client";
 import { useState, useTransition } from "react";
 import { Plus, X } from "lucide-react";
+import { DsInput } from "@/components/design-system/DsInput";
+import { DsSelect } from "@/components/design-system/DsSelect";
+import { DsButton } from "@/components/design-system/DsButton";
+import { DsAlert } from "@/components/design-system/DsAlert";
 
 type Expense = {
   id: string;
@@ -78,98 +82,64 @@ export function ExpenseList({ expenses: initial, tenantSlug }: Props) {
   };
 
   return (
-    <div className="bg-gray-100 dark:bg-zinc-800 rounded-xl p-4 flex flex-col gap-3">
+    <div className="bg-gray-100 dark:bg-zinc-800 p-4 flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
             Gastos operativos
           </p>
-          <p className="text-xl font-bold text-gray-900 dark:text-zinc-50 mt-1">
+          <p className="text-xl font-bold text-gray-900 dark:text-zinc-50 mt-1 tabular-nums">
             S/ {total.toFixed(2)}
           </p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center active:scale-95 transition-transform"
+          className="w-10 h-10 bg-emerald-600 text-white flex items-center justify-center active:scale-95 transition-transform"
           aria-label="Agregar gasto"
         >
           {showForm ? <X size={20} /> : <Plus size={20} />}
         </button>
       </div>
 
-      {/* Formulario inline */}
       {showForm && (
-        <div className="bg-white dark:bg-zinc-900 rounded-xl p-4 flex flex-col gap-3 border border-gray-200 dark:border-zinc-800">
-          <div>
-            <label htmlFor="expense-desc" className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-zinc-300 mb-1">
-              Descripción
-            </label>
-            <input
-              id="expense-desc"
-              type="text"
-              placeholder="Ej: Alquiler del mes"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-3 px-4 text-base bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 focus-visible:border-blue-900"
+        <div className="bg-white dark:bg-zinc-900 p-4 flex flex-col gap-3">
+          <DsInput
+            label="Descripción"
+            placeholder="Ej: Alquiler del mes"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <DsInput
+              label="Monto (S/)"
+              type="number"
+              inputMode="decimal"
+              min="0"
+              step="0.50"
+              placeholder="0.00"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+            <DsSelect
+              label="Categoría"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              options={EXPENSE_CATEGORIES.map((c) => ({ value: c, label: c }))}
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label htmlFor="expense-amount" className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-zinc-300 mb-1">
-                Monto (S/)
-              </label>
-              <input
-                id="expense-amount"
-                type="number"
-                inputMode="decimal"
-                min="0"
-                step="0.50"
-                placeholder="0.00"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-3 px-4 text-base bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 focus-visible:border-blue-900"
-              />
-            </div>
-            <div>
-              <label htmlFor="expense-cat" className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-zinc-300 mb-1">
-                Categoría
-              </label>
-              <select
-                id="expense-cat"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-3 px-4 text-base bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 focus-visible:border-blue-900"
-              >
-                {EXPENSE_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          {error && (
-            <p className="text-red-600 dark:text-red-400 text-sm" role="alert">
-              {error}
-            </p>
-          )}
-          <button
-            onClick={handleAdd}
-            disabled={isPending}
-            className="w-full bg-emerald-600 text-white rounded-xl py-4 text-lg font-semibold active:scale-95 transition-transform disabled:opacity-50"
-          >
+          {error && <DsAlert variant="error" message={error} />}
+          <DsButton onClick={handleAdd} disabled={isPending}>
             {isPending ? "Guardando..." : "Registrar gasto"}
-          </button>
+          </DsButton>
         </div>
       )}
 
-      {/* Lista */}
       {expenses.length > 0 ? (
         <div className="flex flex-col gap-2">
           {expenses.map((e) => (
             <div
               key={e.id}
-              className="bg-white dark:bg-zinc-900 rounded-xl p-3 flex items-center justify-between"
+              className="bg-white dark:bg-zinc-900 p-3 flex items-center justify-between"
             >
               <div>
                 <p className="text-base font-semibold text-gray-900 dark:text-zinc-50">
@@ -177,7 +147,7 @@ export function ExpenseList({ expenses: initial, tenantSlug }: Props) {
                 </p>
                 <p className="text-sm text-gray-500 dark:text-zinc-400">{e.category}</p>
               </div>
-              <p className="text-base font-bold text-gray-900 dark:text-zinc-50">
+              <p className="text-base font-bold text-gray-900 dark:text-zinc-50 tabular-nums">
                 S/ {e.amount.toFixed(2)}
               </p>
             </div>

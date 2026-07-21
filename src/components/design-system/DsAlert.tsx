@@ -27,7 +27,7 @@ const defaultIcons = {
 export function DsAlert({ variant, message, icon }: DsAlertProps) {
   return (
     <div
-      className={`flex items-start gap-3 p-4 rounded-xl ${variantStyles[variant]}`}
+      className={`flex items-start gap-3 p-4 ${variantStyles[variant]}`}
       role="alert"
     >
       <span className="shrink-0 mt-0.5">{icon || defaultIcons[variant]}</span>
