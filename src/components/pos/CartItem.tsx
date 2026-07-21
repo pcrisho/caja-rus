@@ -9,7 +9,7 @@ export function CartItem({ item }: { item: CartItemType }) {
   const lineTotal = (product.sellingPrice * quantity).toFixed(2);
 
   return (
-    <div className="flex items-center gap-3 bg-white dark:bg-zinc-900 rounded-xl p-3 border border-gray-200 dark:border-zinc-800">
+    <div className="flex items-center gap-3 bg-white dark:bg-zinc-900 p-3">
       <div className="flex-1 min-w-0">
         <p className="text-base font-semibold text-gray-900 dark:text-zinc-50 truncate">
           {product.name}
@@ -28,7 +28,7 @@ export function CartItem({ item }: { item: CartItemType }) {
           <>
             <button
               onClick={() => updateQuantity(product.id, quantity - 1)}
-              className="w-8 h-8 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center active:scale-95 transition-transform"
+              className="w-8 h-8 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center active:scale-95 transition-transform"
               aria-label={`Quitar un ${product.name}`}
             >
               <Minus size={16} className="text-gray-700 dark:text-zinc-300" />
@@ -43,7 +43,7 @@ export function CartItem({ item }: { item: CartItemType }) {
                 }
               }}
               disabled={quantity >= product.stock}
-              className="w-8 h-8 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40"
+              className="w-8 h-8 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40"
               aria-label={`Agregar un ${product.name}`}
             >
               <Plus size={16} className="text-gray-700 dark:text-zinc-300" />

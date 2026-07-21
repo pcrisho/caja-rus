@@ -35,13 +35,12 @@ export function PageHeader({
 
   return (
     <header className="flex flex-col gap-3 py-2 mb-2">
-      {/* Navigation bar: Back button + Native-feeling Breadcrumbs */}
       {hasNav && (
         <nav className="flex items-center gap-2 overflow-x-auto no-scrollbar" aria-label="Breadcrumbs">
           {backHref && (
             <Link
               href={backHref}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 shadow-sm border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 active:scale-95 transition-all shrink-0 mr-1"
+              className="w-8 h-8 flex items-center justify-center text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 active:scale-95 transition-all shrink-0 mr-1"
               aria-label="Volver"
             >
               <ArrowLeft size={18} className="stroke-[2.5]" />
@@ -81,12 +80,11 @@ export function PageHeader({
         </nav>
       )}
 
-      {/* Title area */}
       <div className="flex flex-col gap-1.5">
         {categoryTag && (
           <div className="flex">
             <span
-              className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md ${tagColors[categoryTagColor]}`}
+              className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 ${tagColors[categoryTagColor]}`}
             >
               {categoryTag}
             </span>

@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Papa from 'papaparse';
 import { importProductsCsvAction } from '@/actions/products';
 import { UploadCloud, CheckCircle, AlertTriangle } from 'lucide-react';
+import { DsAlert } from '@/components/design-system/DsAlert';
+import { DsButton } from '@/components/design-system/DsButton';
 
 type CsvImportProps = {
   tenantSlug: string;
@@ -33,7 +35,6 @@ export function CsvImport({ tenantSlug }: CsvImportProps) {
           return;
         }
         
-        // Map and validate rows
         const mapped = results.data.map((row: any) => ({
           name: row.name || row.nombre || '',
           barcode: row.barcode || row.codigo || undefined,
@@ -42,7 +43,7 @@ export function CsvImport({ tenantSlug }: CsvImportProps) {
           stock: Number(row.stock || 0),
           minStock: Number(row.minStock || 5),
           unitType: (row.unitType === 'KILOGRAM' || row.unidad === 'KG') ? 'KILOGRAM' : 'UNIT',
-          categoryId: undefined, // We won't map categories directly by name in this simple version
+          categoryId: undefined,
         })).filter((r) => r.name && r.sellingPrice > 0);
 
         setPreviewData(mapped);
@@ -87,19 +88,14 @@ export function CsvImport({ tenantSlug }: CsvImportProps) {
   return (
     <div className="flex flex-col gap-6 w-full max-w-sm mx-auto">
       {error && (
-        <div className="bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-400 p-4 rounded-xl text-base whitespace-pre-line">
-          {error}
-        </div>
+        <DsAlert variant="error" message={error} />
       )}
       
       {success && (
-        <div className="bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400 p-4 rounded-xl text-base flex items-start gap-2">
-          <CheckCircle className="shrink-0 mt-0.5" size={20} />
-          <span>{success}</span>
-        </div>
+        <DsAlert variant="success" message={success} />
       )}
 
-      <div className="bg-gray-100 dark:bg-zinc-800 rounded-xl p-6 flex flex-col items-center justify-center gap-4 text-center border-2 border-dashed border-gray-300 dark:border-zinc-700 relative">
+      <div className="bg-gray-100 dark:bg-zinc-800 p-6 flex flex-col items-center justify-center gap-4 text-center border-2 border-dashed border-gray-300 dark:border-zinc-700 relative">
         <input 
           type="file" 
           accept=".csv" 
@@ -116,21 +112,16 @@ export function CsvImport({ tenantSlug }: CsvImportProps) {
 
       {previewData.length > 0 && (
         <div className="flex flex-col gap-4">
-          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-4 flex gap-3">
-            <AlertTriangle className="text-amber-700 dark:text-amber-400 shrink-0" />
-            <div className="text-amber-700 dark:text-amber-400 text-sm">
-              Se encontraron <strong>{previewData.length} productos</strong> válidos. Revisa una muestra antes de importar.
-            </div>
-          </div>
+          <DsAlert variant="warning" message={`Se encontraron ${previewData.length} productos válidos. Revisa una muestra antes de importar.`} />
 
-          <div className="bg-gray-100 dark:bg-zinc-800 rounded-xl p-4 flex flex-col gap-3 max-h-60 overflow-y-auto">
+          <div className="bg-gray-100 dark:bg-zinc-800 p-4 flex flex-col gap-3 max-h-60 overflow-y-auto">
             {previewData.slice(0, 5).map((p, i) => (
-              <div key={i} className="flex justify-between items-center bg-white dark:bg-zinc-900 p-3 rounded-lg border border-gray-200 dark:border-zinc-800">
+              <div key={i} className="flex justify-between items-center bg-white dark:bg-zinc-900 p-3">
                 <div className="flex flex-col">
                   <span className="font-bold text-gray-900 dark:text-zinc-50 text-sm">{p.name}</span>
                   <span className="text-gray-500 dark:text-zinc-400 text-xs">Stock: {p.stock} {p.unitType === 'UNIT' ? 'UN' : 'KG'}</span>
                 </div>
-                <span className="text-emerald-700 dark:text-emerald-400 font-bold">S/ {p.sellingPrice.toFixed(2)}</span>
+                <span className="text-emerald-700 dark:text-emerald-400 font-bold tabular-nums">S/ {p.sellingPrice.toFixed(2)}</span>
               </div>
             ))}
             {previewData.length > 5 && (
@@ -138,13 +129,12 @@ export function CsvImport({ tenantSlug }: CsvImportProps) {
             )}
           </div>
 
-          <button
+          <DsButton
             onClick={handleImport}
             disabled={loading}
-            className="w-full bg-emerald-600 text-white rounded-xl py-4 px-6 text-lg font-semibold hover:bg-emerald-700 active:scale-95 transition-transform flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
           >
             {loading ? 'IMPORTANDO...' : `IMPORTAR ${previewData.length} PRODUCTOS`}
-          </button>
+          </DsButton>
         </div>
       )}
     </div>

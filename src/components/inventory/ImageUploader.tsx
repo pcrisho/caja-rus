@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Camera, Loader2, Trash2, Upload, ImageIcon } from "lucide-react";
 import { uploadProductImageAction } from "@/actions/upload";
+import { DsButton } from "@/components/design-system/DsButton";
 
 const MAX_WIDTH = 800;
 const WEBP_QUALITY = 0.8;
@@ -84,7 +85,7 @@ export function ImageUploader({ tenantSlug, initialUrl, onChange }: Props) {
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-gray-900 dark:text-zinc-50 font-bold text-xs tracking-wider uppercase">
+      <label className="text-xs font-bold uppercase tracking-wider text-gray-800 dark:text-zinc-200">
         Foto del Producto
       </label>
 
@@ -98,12 +99,12 @@ export function ImageUploader({ tenantSlug, initialUrl, onChange }: Props) {
       />
 
       {error && (
-        <p className="text-red-700 dark:text-red-400 text-sm font-medium">{error}</p>
+        <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
       )}
 
       {preview ? (
         <div className="flex flex-col gap-2">
-          <div className="relative w-full aspect-square max-h-56 rounded-xl overflow-hidden border-2 border-gray-200 dark:border-zinc-800 bg-gray-100 dark:bg-zinc-800">
+          <div className="relative w-full aspect-square max-h-56 bg-gray-100 dark:bg-zinc-800">
             <img
               src={preview}
               alt="Vista previa"
@@ -113,38 +114,37 @@ export function ImageUploader({ tenantSlug, initialUrl, onChange }: Props) {
 
           <div className="flex gap-2">
             {localFile && (
-              <button
+              <DsButton
                 type="button"
                 onClick={handleUpload}
                 disabled={uploading}
-                className="flex-1 bg-emerald-600 text-white rounded-xl py-3 text-sm font-semibold hover:bg-emerald-700 active:scale-95 transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
+                size="md"
+                icon={uploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
               >
-                {uploading ? (
-                  <Loader2 size={18} className="animate-spin" />
-                ) : (
-                  <Upload size={18} />
-                )}
                 {uploading ? "SUBENDO..." : "SUBIR FOTO"}
-              </button>
+              </DsButton>
             )}
 
-            <button
+            <DsButton
               type="button"
+              variant="secondary"
               onClick={() => inputRef.current?.click()}
-              className={localFile ? "flex-1 bg-white dark:bg-zinc-900 border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-3 text-sm font-semibold text-gray-900 dark:text-zinc-50 hover:bg-gray-50 dark:hover:bg-zinc-800 active:scale-95 transition-transform flex items-center justify-center gap-2" : "flex-1 bg-white dark:bg-zinc-900 border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-3 text-sm font-semibold text-gray-900 dark:text-zinc-50 hover:bg-gray-50 dark:hover:bg-zinc-800 active:scale-95 transition-transform flex items-center justify-center gap-2"}
+              size="md"
+              icon={<Camera size={18} />}
             >
-              <Camera size={18} />
               {localFile ? "OTRA" : "SELECCIONAR"}
-            </button>
+            </DsButton>
 
             {!localFile && (
-              <button
+              <DsButton
                 type="button"
+                variant="destructive"
                 onClick={handleRemove}
-                className="bg-red-600 text-white rounded-xl py-3 px-4 text-sm font-semibold hover:bg-red-700 active:scale-95 transition-transform flex items-center justify-center"
+                size="md"
+                icon={<Trash2 size={18} />}
               >
-                <Trash2 size={18} />
-              </button>
+                ELIMINAR
+              </DsButton>
             )}
           </div>
         </div>
@@ -152,7 +152,7 @@ export function ImageUploader({ tenantSlug, initialUrl, onChange }: Props) {
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex flex-col items-center justify-center gap-2 w-full aspect-video max-h-40 rounded-xl border-2 border-dashed border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900 text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 active:scale-[0.99] transition-all"
+          className="flex flex-col items-center justify-center gap-2 w-full aspect-video max-h-40 border-2 border-dashed border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900 text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 active:scale-[0.99] transition-all"
         >
           <ImageIcon size={32} />
           <p className="text-sm font-medium">Tocar para subir foto</p>
