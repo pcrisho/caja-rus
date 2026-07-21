@@ -327,6 +327,82 @@ Modal full-height con backdrop negro semitransparente, sin border-radius.
 <div className="animate-pulse bg-gray-200 dark:bg-zinc-700 h-4 w-full" />
 ```
 
+### DsTextarea
+```tsx
+<div className="flex flex-col gap-2">
+  <label className="text-xs font-bold uppercase tracking-wider
+    text-gray-800 dark:text-zinc-200">
+    Observaciones
+  </label>
+  <textarea className="w-full bg-transparent border-b border-gray-200
+    dark:border-zinc-700 py-3 text-base text-gray-900 dark:text-zinc-50
+    placeholder:text-gray-400 dark:placeholder:text-zinc-500
+    focus-visible:outline-none focus-visible:border-blue-900
+    transition-colors resize-none field-sizing-content" rows={4} />
+  {error && <p className="text-sm text-red-600 dark:text-red-400 font-medium"
+    role="alert">{error}</p>}
+</div>
+```
+
+### DsCheckbox
+```tsx
+<label className="flex items-start gap-3 cursor-pointer group">
+  <div className="relative shrink-0 mt-0.5">
+    <input type="checkbox" className="peer sr-only"
+      checked={checked} onChange={onChange} />
+    <div className="w-5 h-5 flex items-center justify-center border
+      transition-colors
+      checked:bg-blue-900 checked:border-blue-900
+      unchecked:border-gray-300 dark:unchecked:border-zinc-600
+      peer-focus-visible:ring-2 peer-focus-visible:ring-blue-900
+      peer-focus-visible:ring-offset-2">
+      {checked && <Check size={14} className="text-white stroke-[3]" />}
+    </div>
+  </div>
+  <div className="flex-1 min-w-0">
+    <span className="text-sm font-bold uppercase tracking-wider
+      text-gray-800 dark:text-zinc-200">Label</span>
+    <p className="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">
+      Descripción
+    </p>
+  </div>
+</label>
+```
+
+### DsRadioGroup
+```tsx
+<div className="flex flex-col gap-2">
+  <p className="text-xs font-bold uppercase tracking-wider
+    text-gray-800 dark:text-zinc-200">Unidad de medida</p>
+  <div className="flex gap-2">
+    <button type="button" role="radio" aria-checked={isSelected}
+      className="flex-1 px-4 py-3 text-sm font-bold uppercase
+        tracking-wider transition-colors
+        data-checked:bg-blue-900 data-checked:text-white
+        data-unchecked:bg-transparent data-unchecked:border
+        data-unchecked:border-gray-200 dark:data-unchecked:border-zinc-700
+        data-unchecked:text-gray-700 dark:data-unchecked:text-zinc-300
+        hover:bg-gray-50 dark:hover:bg-zinc-800
+        focus-visible:outline-none focus-visible:ring-2
+        focus-visible:ring-blue-900">
+      Unidad
+    </button>
+  </div>
+</div>
+```
+
+### DsInputGroup
+```tsx
+<div className="flex items-center gap-3 border-b border-gray-200
+  dark:border-zinc-700 focus-within:border-blue-900 transition-colors">
+  {leftIcon && <div className="text-gray-400 dark:text-zinc-500">{icon}</div>}
+  <input className="flex-1 bg-transparent py-3 text-base
+    text-gray-900 dark:text-zinc-50 placeholder:text-gray-400
+    dark:placeholder:text-zinc-500 focus-visible:outline-none min-w-0" />
+  {rightAction && <div className="shrink-0">{action}</div>}
+</div>
+```
+
 ### DsChip
 ```tsx
 <span className="inline-flex items-center gap-1.5 px-4 py-2 text-sm
@@ -417,6 +493,10 @@ Ver `src/components/design-system/`:
 - `DsChip` — Chip de estado
 - `DsToggle` — Toggle switch rectangular
 - `DsSkeleton` — Skeleton loading placeholder
+- `DsTextarea` — Textarea con underline `border-b`
+- `DsCheckbox` — Checkbox cuadrado con icono check
+- `DsRadioGroup` — Grupo de radio buttons tipo pill
+- `DsInputGroup` — Input con icono izquierdo y acción derecha
 
 Siempre que se implemente un nuevo componente en el app real, usar estos
 como referencia — no reintroducir `border-radius`, `border` en cards, ni

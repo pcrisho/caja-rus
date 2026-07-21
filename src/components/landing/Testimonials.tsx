@@ -35,7 +35,7 @@ export function Testimonials() {
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-900  px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
             <Star className="w-4 h-4 text-emerald-500 fill-emerald-500" />
-            <span>TESTIMONIOS OPERATIVOS</span>
+            <span className="text-emerald-500">TESTIMONIOS OPERATIVOS</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-black text-gray-900 dark:text-zinc-50 tracking-tight uppercase">
             BODEGUEROS PERUANOS QUE YA TIENEN EL CONTROL

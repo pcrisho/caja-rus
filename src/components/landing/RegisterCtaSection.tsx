@@ -9,7 +9,7 @@ export function RegisterCtaSection() {
           {/* Header Badge */}
           <div className="inline-flex items-center gap-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-900  px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase">
             <Sparkles className="w-4 h-4 text-emerald-500 stroke-[2.5]" />
-            <span>ACCESO INMEDIATO AL MVP</span>
+            <span className="text-emerald-500">ACCESO INMEDIATO AL MVP</span>
           </div>
 
           <h2 className="text-2xl sm:text-4xl font-black text-gray-900 dark:text-zinc-50 tracking-tight uppercase max-w-2xl">
