@@ -63,7 +63,7 @@ export default function NavigationPage() {
             Bottom Nav
           </h2>
           <DsCard>
-            <div className="bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl">
+            <div className="bg-white dark:bg-zinc-950">
               <nav className="flex items-center justify-around h-16">
                 {[
                   { label: "Ventas", icon: ShoppingCart, active: true },
@@ -136,7 +136,7 @@ export default function NavigationPage() {
                   ].map(({ label, icon: Icon, active }) => (
                     <div
                       key={label}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-lg ${
+                      className={`flex items-center gap-3 px-3 py-2 rounded-none ${
                         active
                           ? "bg-blue-900 text-white"
                           : "text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800"
@@ -161,7 +161,7 @@ export default function NavigationPage() {
                   ].map(({ label, icon: Icon }) => (
                     <div
                       key={label}
-                      className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                      className="flex items-center gap-3 px-3 py-2 rounded-none text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800"
                     >
                       <Icon size={20} />
                       <span className="text-sm font-medium">{label}</span>

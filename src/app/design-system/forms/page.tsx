@@ -132,8 +132,8 @@ export default function FormsPage() {
             File Upload
           </h2>
           <DsCard>
-            <div className="border-2 border-dashed border-gray-300 dark:border-zinc-700 rounded-xl p-8 flex flex-col items-center justify-center text-center">
-              <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-400 dark:text-zinc-500 mb-3">
+            <div className="border-2">
+              <div className="w-12 h-12 rounded-none bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-400 dark:text-zinc-500 mb-3">
                 <UploadCloud size={24} />
               </div>
               <p className="text-base font-bold text-gray-900 dark:text-zinc-50 mb-1">

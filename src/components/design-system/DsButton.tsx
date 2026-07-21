@@ -32,9 +32,9 @@ export function DsButton({
 }: DsButtonProps) {
   return (
     <button
-      className={`${variantStyles[variant]} ${sizeStyles[size]} rounded-xl ${
+      className={`${variantStyles[variant]} ${sizeStyles[size]} ${
         fullWidth ? "w-full" : ""
-      } flex items-center justify-center gap-2 ${className}`}
+      } font-mono flex items-center justify-center gap-2 ${className}`}
       {...props}
     >
       {icon}

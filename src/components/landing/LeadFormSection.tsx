@@ -15,11 +15,11 @@ export function LeadFormSection() {
   return (
     <section id="registro" className="py-16 sm:py-24 bg-gray-100 dark:bg-zinc-800 border-b-2 border-gray-300 dark:border-zinc-700">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        <div className="bg-white dark:bg-zinc-950 rounded-xl p-6 sm:p-10 border-2 border-gray-900">
+        <div className="bg-white dark:bg-zinc-950  p-6 sm:p-10">
           {/* Form Header */}
           <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
-            <div className="inline-flex items-center gap-1.5 bg-emerald-100 dark:bg-emerald-900/30 border-2 border-emerald-400 text-emerald-900 rounded-md px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
-              <Sparkles className="w-4 h-4 text-emerald-800 stroke-[2.5]" />
+            <div className="inline-flex items-center gap-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-900  px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
+              <Sparkles className="w-4 h-4 text-emerald-500 stroke-[2.5]" />
               <span>CONFIGURACIÓN ASISTIDA EN 5 MIN</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-black text-gray-900 dark:text-zinc-50 tracking-tight uppercase">
@@ -35,14 +35,14 @@ export function LeadFormSection() {
             <div
               role={state.success ? "status" : "alert"}
               aria-live="polite"
-              className={`mb-8 p-4 rounded-lg text-sm flex items-start gap-3 font-medium ${
+              className={`mb-8 p-4  text-sm flex items-start gap-3 font-medium ${
                 state.success
-                  ? "bg-emerald-100 dark:bg-emerald-900/30 border-2 border-emerald-400 text-emerald-950"
-                  : "bg-red-100 dark:bg-red-900/30 border-2 border-red-400 text-red-950"
+                  ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-950"
+                  : "bg-red-100 dark:bg-red-900/30 border-red-400 text-red-950"
               }`}
             >
               {state.success ? (
-                <CheckCircle2 className="w-5 h-5 text-emerald-800 shrink-0 mt-0.5 stroke-[2.5]" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5 stroke-[2.5]" />
               ) : (
                 <AlertCircle className="w-5 h-5 text-red-800 shrink-0 mt-0.5 stroke-[2.5]" />
               )}
@@ -55,11 +55,11 @@ export function LeadFormSection() {
 
           {/* Form Element */}
           {state.success ? (
-            <div className="bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-400 rounded-xl p-8 text-center flex flex-col items-center gap-4">
-              <div className="w-14 h-14 rounded-lg bg-emerald-700 text-white flex items-center justify-center font-black text-2xl border border-emerald-900">
+            <div className="bg-emerald-50 dark:bg-emerald-900/20  p-8 text-center flex flex-col items-center gap-4">
+              <div className="w-14 h-14  bg-emerald-700 text-white flex items-center justify-center font-black text-2xl border border-emerald-900">
                 ✓
               </div>
-              <h3 className="text-2xl font-black text-gray-900 dark:text-zinc-50 uppercase">¡GRACIAS POR REGISTRARTE!</h3>
+              <h3 className="text-2xl font-black text-gray-900 dark:text-zinc-50 tabular-nums uppercase">¡GRACIAS POR REGISTRARTE!</h3>
               <p className="text-base text-gray-800 dark:text-zinc-100 font-medium max-w-lg">
                 Te contactaremos al toque por WhatsApp para activar tu demo asistida de CajaRUS.
               </p>
@@ -80,7 +80,7 @@ export function LeadFormSection() {
                     aria-invalid={Boolean(state.errors?.name)}
                     aria-describedby={state.errors?.name ? "name-error" : undefined}
                     placeholder="EJ. JUAN PÉREZ"
-                    className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-lg py-3.5 px-4 text-base font-medium text-gray-900 dark:text-zinc-50 bg-white dark:bg-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:border-gray-900 uppercase placeholder:text-gray-400 dark:placeholder:text-zinc-500"
+                    className="w-full bg-transparent border-b border-gray-200 py-3 px-0 text-base font-medium text-gray-900 dark:text-zinc-50 focus-visible:outline-none focus-visible:border-blue-900 uppercase placeholder:text-gray-400 dark:placeholder:text-zinc-500 transition-colors"
                   />
                   {state.errors?.name && (
                     <span id="name-error" className="text-xs font-bold text-red-700">{state.errors.name}</span>
@@ -97,7 +97,7 @@ export function LeadFormSection() {
                     name="bodegaName"
                     type="text"
                     placeholder="EJ. BODEGA DON JUAN"
-                    className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-lg py-3.5 px-4 text-base font-medium text-gray-900 dark:text-zinc-50 bg-white dark:bg-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:border-gray-900 uppercase placeholder:text-gray-400 dark:placeholder:text-zinc-500"
+                    className="w-full bg-transparent border-b border-gray-200 py-3 px-0 text-base font-medium text-gray-900 dark:text-zinc-50 focus-visible:outline-none focus-visible:border-blue-900 uppercase placeholder:text-gray-400 dark:placeholder:text-zinc-500 transition-colors"
                   />
                 </div>
               </div>
@@ -116,7 +116,7 @@ export function LeadFormSection() {
                     aria-invalid={Boolean(state.errors?.phone)}
                     aria-describedby={state.errors?.phone ? "phone-error" : undefined}
                     placeholder="EJ. 987 654 321"
-                    className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-lg py-3.5 px-4 text-base font-medium text-gray-900 dark:text-zinc-50 bg-white dark:bg-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:border-gray-900 font-mono"
+                    className="w-full bg-transparent border-b border-gray-200 py-3 px-0 text-base font-medium text-gray-900 dark:text-zinc-50 focus-visible:outline-none focus-visible:border-blue-900 font-mono transition-colors"
                   />
                   {state.errors?.phone && (
                     <span id="phone-error" className="text-xs font-bold text-red-700">{state.errors.phone}</span>
@@ -136,7 +136,7 @@ export function LeadFormSection() {
                     aria-invalid={Boolean(state.errors?.email)}
                     aria-describedby={state.errors?.email ? "email-error" : undefined}
                     placeholder="juan@gmail.com"
-                    className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-lg py-3.5 px-4 text-base font-medium text-gray-900 dark:text-zinc-50 bg-white dark:bg-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:border-gray-900 font-mono"
+                    className="w-full bg-transparent border-b border-gray-200 py-3 px-0 text-base font-medium text-gray-900 dark:text-zinc-50 focus-visible:outline-none focus-visible:border-blue-900 font-mono transition-colors"
                   />
                   {state.errors?.email && (
                     <span id="email-error" className="text-xs font-bold text-red-700">{state.errors.email}</span>
@@ -153,7 +153,7 @@ export function LeadFormSection() {
                   id="currentSystem"
                   name="currentSystem"
                   defaultValue="cuaderno"
-                  className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-lg py-3.5 px-4 text-sm font-bold text-gray-900 dark:text-zinc-50 bg-white dark:bg-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:border-gray-900 uppercase"
+                  className="w-full bg-transparent border-b border-gray-200 py-3 px-0 text-sm font-bold text-gray-900 dark:text-zinc-50 focus-visible:outline-none focus-visible:border-blue-900 uppercase transition-colors"
                 >
                   <option value="cuaderno">Anotando en cuaderno o libreta a mano</option>
                   <option value="excel">En archivo de Excel en computadora</option>
@@ -172,7 +172,7 @@ export function LeadFormSection() {
                   name="notes"
                   rows={2}
                   placeholder="Escribe tu mensaje aquí..."
-                  className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-lg py-3 px-4 text-sm font-medium text-gray-900 dark:text-zinc-50 bg-white dark:bg-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:border-gray-900 placeholder:text-gray-400 dark:placeholder:text-zinc-500"
+                  className="w-full bg-transparent border-b border-gray-200 py-3 px-0 text-sm font-medium text-gray-900 dark:text-zinc-50 focus-visible:outline-none focus-visible:border-blue-900 placeholder:text-gray-400 dark:placeholder:text-zinc-500 transition-colors"
                 ></textarea>
               </div>
 
@@ -180,7 +180,7 @@ export function LeadFormSection() {
               <button
                 type="submit"
                 disabled={isPending}
-                className="w-full bg-emerald-700 text-white rounded-lg py-4 px-6 text-sm font-black uppercase tracking-wider hover:bg-emerald-800 active:scale-95 transition-transform cursor-pointer border-2 border-emerald-900 min-h-[56px] flex items-center justify-center gap-3 disabled:opacity-50 disabled:pointer-events-none mt-2"
+                className="w-full bg-emerald-600 text-white py-4 px-6 text-sm font-black font-mono uppercase tracking-wider hover:bg-emerald-700 active:scale-95 transition-transform cursor-pointer min-h-[56px] flex items-center justify-center gap-3 disabled:opacity-50 disabled:pointer-events-none mt-2"
               >
                 {isPending ? (
                   <>

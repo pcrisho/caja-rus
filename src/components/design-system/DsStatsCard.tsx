@@ -25,18 +25,18 @@ export function DsStatsCard({
 
   return (
     <div
-      className={`bg-white dark:bg-zinc-900 rounded-xl p-4 ${className}`}
+      className={`bg-white dark:bg-zinc-900 p-4 ${className}`}
     >
       <div className="flex items-center gap-2 text-gray-500 dark:text-zinc-400 mb-2">
         {icon}
         <p className="text-xs font-bold uppercase tracking-wider">{label}</p>
       </div>
       <div className="flex items-end justify-between">
-        <p className="text-2xl font-bold text-gray-900 dark:text-zinc-50">
+        <p className="text-2xl font-bold text-gray-900 dark:text-zinc-50 tabular-nums">
           {value}
         </p>
         {change && (
-          <p className={`text-sm font-semibold ${changeColors[changeType]}`}>
+          <p className={`text-sm font-semibold tabular-nums ${changeColors[changeType]}`}>
             {change}
           </p>
         )}

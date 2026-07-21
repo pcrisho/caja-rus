@@ -83,7 +83,7 @@ export default function SettingsPreview() {
         <DsCard>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-zinc-50">
+              <h2 className="text-lg font-bold text-gray-900 tabular-nums dark:text-zinc-50">
                 Preferencias
               </h2>
               <p className="text-sm text-gray-500 dark:text-zinc-400">
@@ -99,14 +99,14 @@ export default function SettingsPreview() {
               checked={darkMode}
               onChange={setDarkMode}
             />
-            <div className="border-t border-gray-100 dark:border-zinc-800" />
+            <div className="border-t" />
             <DsToggle
               label="Estadísticas públicas"
               description="Permite que otros vean tu actividad"
               checked={publicStats}
               onChange={setPublicStats}
             />
-            <div className="border-t border-gray-100 dark:border-zinc-800" />
+            <div className="border-t" />
             <DsToggle
               label="Notificaciones por email"
               description="Reportes mensuales de ventas"
@@ -178,7 +178,7 @@ export default function SettingsPreview() {
                   </p>
                 )}
                 {i < arr.length - 1 && (
-                  <div className="border-t border-gray-100 dark:border-zinc-800" />
+                  <div className="border-t" />
                 )}
               </div>
             ))}

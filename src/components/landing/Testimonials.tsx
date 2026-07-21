@@ -33,8 +33,8 @@ export function Testimonials() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-1.5 bg-emerald-100 dark:bg-emerald-900/30 border-2 border-emerald-400 text-emerald-900 rounded-md px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
-            <Star className="w-4 h-4 text-emerald-800 fill-emerald-800" />
+          <div className="inline-flex items-center gap-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-900  px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
+            <Star className="w-4 h-4 text-emerald-500 fill-emerald-500" />
             <span>TESTIMONIOS OPERATIVOS</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-black text-gray-900 dark:text-zinc-50 tracking-tight uppercase">
@@ -50,7 +50,7 @@ export function Testimonials() {
           {reviews.map((item, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-zinc-950 rounded-xl p-6 border-2 border-gray-300 dark:border-zinc-700 flex flex-col justify-between relative"
+              className="bg-white dark:bg-zinc-950  p-6 flex flex-col justify-between relative"
             >
               <div>
                 {/* Stars */}
@@ -67,11 +67,11 @@ export function Testimonials() {
                 </p>
               </div>
 
-              <div className="pt-4 border-t-2 border-gray-200 dark:border-zinc-800 flex flex-col gap-1">
+              <div className="pt-4 border-t border-gray-200 dark:border-zinc-800 flex flex-col gap-1">
                 <h4 className="font-black text-gray-900 dark:text-zinc-50 text-sm uppercase tracking-wide">{item.name}</h4>
                 <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">{item.bodega}</p>
-                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 px-2 py-0.5 rounded w-fit mt-1">
-                  <MapPin className="w-3 h-3 text-gray-900 dark:text-zinc-50 stroke-[2.5]" />
+                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5  w-fit mt-1">
+                  <MapPin className="w-3 h-3 text-emerald-700 dark:text-emerald-400 stroke-[2.5]" />
                   {item.location}
                 </span>
               </div>
