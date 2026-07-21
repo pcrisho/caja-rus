@@ -39,17 +39,17 @@ export function DsProgressBar({
             </p>
           )}
           {showValue && (
-            <p className="text-sm font-bold text-gray-900 dark:text-zinc-50">
+            <p className="text-sm font-bold text-gray-900 dark:text-zinc-50 tabular-nums">
               {Math.round(percentage)}%
             </p>
           )}
         </div>
       )}
       <div
-        className={`bg-gray-200 dark:bg-zinc-700 rounded-full ${sizeStyles[size]} overflow-hidden`}
+        className={`bg-gray-200 dark:bg-zinc-700 ${sizeStyles[size]} overflow-hidden`}
       >
         <div
-          className={`${colorStyles[color]} h-full rounded-full transition-all duration-500`}
+          className={`${colorStyles[color]} h-full transition-all duration-500`}
           style={{ width: `${percentage}%` }}
         />
       </div>

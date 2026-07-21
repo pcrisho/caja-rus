@@ -32,8 +32,8 @@ export function DsInput({
         )}
         <input
           id={inputId}
-          className={`w-full border-b border-gray-200 dark:border-zinc-700 py-3 text-base text-gray-900 dark:text-zinc-50 placeholder:text-gray-400 dark:placeholder:text-zinc-500 focus-visible:outline-none focus-visible:border-blue-900 transition-colors ${
-            icon ? "pl-8 pr-0" : "px-0"
+          className={`w-full bg-transparent border-b border-gray-200 dark:border-zinc-700 py-3 text-base text-gray-900 dark:text-zinc-50 placeholder:text-gray-400 dark:placeholder:text-zinc-500 focus-visible:outline-none focus-visible:border-blue-900 transition-colors ${
+            icon ? "pl-8" : ""
           } ${error ? "border-red-600" : ""} ${className}`}
           {...props}
         />

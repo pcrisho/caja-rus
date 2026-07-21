@@ -45,14 +45,14 @@ export default function InventoryPreview() {
         </div>
 
         {/* Search & filters */}
-        <DsCard variant="bordered">
+        <DsCard variant="default">
           <div className="flex flex-col gap-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500" size={20} />
               <input
                 type="text"
                 placeholder="Buscar por nombre o código..."
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-950 border-2 border-gray-300 dark:border-zinc-700 text-gray-900 dark:text-zinc-50 placeholder:text-gray-400 dark:placeholder:text-zinc-500 rounded-xl text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 focus-visible:border-blue-900"
+                className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-950"
               />
             </div>
             <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
@@ -115,21 +115,21 @@ export default function InventoryPreview() {
                     </div>
 
                     {isOutOfStock && (
-                      <div className="flex items-center gap-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-3 py-1 rounded-full text-sm font-medium">
+                      <div className="flex items-center gap-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-3 py-1 rounded-none text-sm font-medium">
                         <XCircle size={16} />
                         Agotado
                       </div>
                     )}
 
                     {isLowStock && (
-                      <div className="flex items-center gap-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-sm font-medium">
+                      <div className="flex items-center gap-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-none text-sm font-medium">
                         <AlertTriangle size={16} />
                         Stock bajo
                       </div>
                     )}
                   </div>
 
-                  <button className="mt-2 w-full bg-white dark:bg-zinc-900 border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-3 px-4 flex items-center justify-center gap-2 text-gray-900 dark:text-zinc-50 font-semibold hover:bg-gray-50 dark:hover:bg-zinc-700 active:scale-95 transition-transform">
+                  <button className="mt-2 w-full bg-white dark:bg-zinc-900">
                     <Pencil size={20} />
                     EDITAR
                   </button>

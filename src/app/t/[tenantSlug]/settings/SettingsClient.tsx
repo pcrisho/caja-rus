@@ -1,35 +1,38 @@
 "use client";
 
 import { useState } from "react";
-import { DsCard } from "@/components/design-system/DsCard";
-import { DsButton } from "@/components/design-system/DsButton";
-import { DsListItem } from "@/components/design-system/DsListItem";
-import { DsTabs } from "@/components/design-system/DsTabs";
-import { DsToggle } from "@/components/design-system/DsToggle";
-import { DsModal } from "@/components/design-system/DsModal";
+import { signOut } from "next-auth/react";
+import Link from "next/link";
 import {
-  Settings,
-  Bell,
-  Shield,
+  Users,
+  DollarSign,
+  RotateCcw,
   HelpCircle,
   FileText,
   LogOut,
+  Building2,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import { DsCard } from "@/components/design-system/DsCard";
+import { DsButton } from "@/components/design-system/DsButton";
+import { DsListItem } from "@/components/design-system/DsListItem";
+import { DsModal } from "@/components/design-system/DsModal";
+import { ThemeToggle } from "@/components/settings/ThemeToggle";
 
-export default function SettingsPreview() {
-  const [activeTab, setActiveTab] = useState("general");
+type Props = {
+  tenantSlug: string;
+  tenantName: string;
+  tenantSlugName: string;
+};
+
+export function SettingsClient({ tenantSlug, tenantName, tenantSlugName }: Props) {
   const [showFaq, setShowFaq] = useState<string | null>(null);
   const [showLogout, setShowLogout] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-  const [publicStats, setPublicStats] = useState(true);
-  const [emailNotifs, setEmailNotifs] = useState(false);
 
   return (
     <main className="min-h-dvh bg-gray-50 dark:bg-zinc-950 px-4 py-6 pb-24">
       <div className="mx-auto flex w-full max-w-md flex-col gap-6">
-        {/* Header */}
         <header className="flex flex-col gap-2">
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
             Ajustes
@@ -37,86 +40,65 @@ export default function SettingsPreview() {
           <h1 className="text-2xl font-black text-gray-900 dark:text-zinc-50 tracking-tight">
             Configuración
           </h1>
+          <p className="text-sm text-gray-600 dark:text-zinc-400">
+            {tenantName} — @{tenantSlugName}
+          </p>
         </header>
 
-        {/* Tabs */}
-        <DsTabs
-          tabs={[
-            { id: "general", label: "GENERAL" },
-            { id: "billing", label: "FACTURACIÓN" },
-            { id: "goals", label: "METAS" },
-          ]}
-          activeTab={activeTab}
-          onChange={setActiveTab}
-          fullWidth
-        />
-
-        {/* Account section */}
         <DsCard>
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 mb-2">
-            Cuenta
+            Administración
+          </p>
+          <div className="flex flex-col">
+            <Link href={`/t/${tenantSlug}/settings/users`}>
+              <DsListItem
+                icon={<Users size={20} />}
+                title="Gestión de Personal"
+                subtitle="Administra los accesos y roles de tu equipo"
+                chevron
+              />
+            </Link>
+            <Link href={`/t/${tenantSlug}/cash-closure`}>
+              <DsListItem
+                icon={<DollarSign size={20} />}
+                title="Cierre de Caja"
+                subtitle="Cuadra el efectivo y cierra el turno"
+                chevron
+              />
+            </Link>
+            <Link href={`/t/${tenantSlug}/returns`}>
+              <DsListItem
+                icon={<RotateCcw size={20} />}
+                title="Devoluciones"
+                subtitle="Procesa devoluciones de clientes"
+                chevron
+                showSeparator={false}
+              />
+            </Link>
+          </div>
+        </DsCard>
+
+        <DsCard>
+          <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 mb-2">
+            Bodega
           </p>
           <div className="flex flex-col">
             <DsListItem
-              icon={<Settings size={20} />}
-              title="Perfil"
-              subtitle="Administra tu información personal"
-              chevron
-            />
-            <DsListItem
-              icon={<Bell size={20} />}
-              title="Notificaciones"
-              subtitle="Configura alertas y avisos"
-              chevron
-            />
-            <DsListItem
-              icon={<Shield size={20} />}
-              title="Seguridad"
-              subtitle="Contraseña y verificación en dos pasos"
-              chevron
+              icon={<Building2 size={20} />}
+              title={tenantName}
+              subtitle={`@${tenantSlugName}`}
               showSeparator={false}
             />
           </div>
         </DsCard>
 
-        {/* Preferences */}
         <DsCard>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 tabular-nums dark:text-zinc-50">
-                Preferencias
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-zinc-400">
-                Administra tus ajustes y notificaciones
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <DsToggle
-              label="Modo oscuro"
-              description="Cambia la apariencia de la app"
-              checked={darkMode}
-              onChange={setDarkMode}
-            />
-            <div className="border-t" />
-            <DsToggle
-              label="Estadísticas públicas"
-              description="Permite que otros vean tu actividad"
-              checked={publicStats}
-              onChange={setPublicStats}
-            />
-            <div className="border-t" />
-            <DsToggle
-              label="Notificaciones por email"
-              description="Reportes mensuales de ventas"
-              checked={emailNotifs}
-              onChange={setEmailNotifs}
-            />
-          </div>
+          <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 mb-2">
+            Apariencia
+          </p>
+          <ThemeToggle />
         </DsCard>
 
-        {/* Support */}
         <DsCard>
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 mb-2">
             Soporte
@@ -138,7 +120,6 @@ export default function SettingsPreview() {
           </div>
         </DsCard>
 
-        {/* FAQ */}
         <DsCard>
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 mb-3">
             Preguntas Frecuentes
@@ -178,20 +159,18 @@ export default function SettingsPreview() {
                   </p>
                 )}
                 {i < arr.length - 1 && (
-                  <div className="border-t" />
+                  <div className="border-t border-gray-100 dark:border-zinc-800" />
                 )}
               </div>
             ))}
           </div>
         </DsCard>
 
-        {/* Logout */}
         <DsButton variant="destructive" onClick={() => setShowLogout(true)}>
-          <LogOut size={20} className="mr-2" />
+          <LogOut size={20} />
           CERRAR SESIÓN
         </DsButton>
 
-        {/* Logout modal */}
         <DsModal
           open={showLogout}
           onClose={() => setShowLogout(false)}
@@ -203,7 +182,7 @@ export default function SettingsPreview() {
             <DsButton variant="secondary" onClick={() => setShowLogout(false)}>
               CANCELAR
             </DsButton>
-            <DsButton variant="destructive" onClick={() => setShowLogout(false)}>
+            <DsButton variant="destructive" onClick={() => signOut({ callbackUrl: "/login" })}>
               CERRAR SESIÓN
             </DsButton>
           </div>

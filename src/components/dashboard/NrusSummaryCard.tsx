@@ -1,5 +1,6 @@
 import { NrusThermometer } from "@/components/dashboard/NrusThermometer";
 import { AlertTriangle, TrendingUp, ShoppingBag, DollarSign } from "lucide-react";
+import { DsBadge } from "@/components/design-system/DsBadge";
 
 type Props = {
   totalSales: number;
@@ -38,14 +39,12 @@ export function NrusSummaryCard({
   const cuota = CATEGORY_CUOTA[currentCategory];
   const isExceeded = lMes > 8000;
 
-  // Días restantes del mes
   const now = new Date();
   const lastDay = new Date(year, month, 0).getDate();
   const daysLeft = lastDay - now.getDate();
 
   return (
-    <div className="bg-gray-100 dark:bg-zinc-800 rounded-2xl p-6 flex flex-col gap-4">
-      {/* Header */}
+    <div className="bg-gray-100 dark:bg-zinc-800 p-6 flex flex-col gap-4">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
@@ -53,67 +52,64 @@ export function NrusSummaryCard({
           </p>
           <h2 className="mt-1 text-xl font-bold text-gray-900 dark:text-zinc-50">
             {isExceeded ? (
-              <span className="text-red-600 dark:text-red-400">⚠ EXCEDIDO este mes</span>
+              <span className="text-red-600 dark:text-red-400">EXCEDIDO este mes</span>
             ) : (
               `Categoría ${currentCategory}`
             )}
           </h2>
         </div>
         {!isExceeded && cuota && (
-          <div className="bg-white dark:bg-zinc-900 rounded-xl px-4 py-2 text-right">
+          <div className="bg-white dark:bg-zinc-900 px-4 py-2 text-right">
             <p className="text-xs text-gray-500 dark:text-zinc-400 font-medium">Cuota SUNAT</p>
-            <p className="text-xl font-bold text-gray-900 dark:text-zinc-50">S/ {cuota}</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-zinc-50 tabular-nums">S/ {cuota}</p>
           </div>
         )}
       </div>
 
-      {/* Alerta de exclusión */}
       {consecutiveExcess >= 2 && (
-        <div className="bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-xl p-3 flex items-start gap-2">
-          <AlertTriangle size={20} className="text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-          <p className="text-red-700 dark:text-red-400 text-sm font-semibold">
+        <div className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 p-3 flex items-start gap-2">
+          <AlertTriangle size={20} className="shrink-0 mt-0.5" />
+          <p className="text-sm font-semibold">
             Llevas 2 meses consecutivos excedido. Debes migrar al Régimen MYPE Tributario.
           </p>
         </div>
       )}
       {consecutiveExcess === 1 && (
-        <div className="bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-xl p-3 flex items-start gap-2">
-          <AlertTriangle size={20} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-          <p className="text-amber-700 dark:text-amber-400 text-sm font-semibold">
+        <div className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 p-3 flex items-start gap-2">
+          <AlertTriangle size={20} className="shrink-0 mt-0.5" />
+          <p className="text-sm font-semibold">
             Excediste el límite el mes pasado. Si lo excedes este mes también, deberás cambiar de régimen.
           </p>
         </div>
       )}
 
-      {/* Métricas */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white dark:bg-zinc-900 rounded-xl p-4">
+        <div className="bg-white dark:bg-zinc-900 p-4">
           <div className="flex items-center gap-2 text-gray-500 dark:text-zinc-400 mb-1">
             <TrendingUp size={16} />
             <p className="text-xs font-bold uppercase tracking-wider">Ventas</p>
           </div>
-          <p className="text-2xl font-bold text-gray-900 dark:text-zinc-50">
+          <p className="text-2xl font-bold text-gray-900 dark:text-zinc-50 tabular-nums">
             S/ {totalSales.toFixed(2)}
           </p>
         </div>
-        <div className="bg-white dark:bg-zinc-900 rounded-xl p-4">
+        <div className="bg-white dark:bg-zinc-900 p-4">
           <div className="flex items-center gap-2 text-gray-500 dark:text-zinc-400 mb-1">
             <ShoppingBag size={16} />
             <p className="text-xs font-bold uppercase tracking-wider">Compras</p>
           </div>
-          <p className="text-2xl font-bold text-gray-900 dark:text-zinc-50">
+          <p className="text-2xl font-bold text-gray-900 dark:text-zinc-50 tabular-nums">
             S/ {totalPurchases.toFixed(2)}
           </p>
         </div>
       </div>
 
-      {/* L_mes */}
-      <div className="bg-white dark:bg-zinc-900 rounded-xl p-4">
+      <div className="bg-white dark:bg-zinc-900 p-4">
         <div className="flex items-center justify-between mb-1">
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
             Límite del mes (L = max(V, C))
           </p>
-          <p className="text-lg font-bold text-gray-900 dark:text-zinc-50">
+          <p className="text-lg font-bold text-gray-900 dark:text-zinc-50 tabular-nums">
             S/ {lMes.toFixed(2)}
           </p>
         </div>
@@ -124,7 +120,6 @@ export function NrusSummaryCard({
         />
       </div>
 
-      {/* Footer */}
       <div className="flex items-center justify-between text-sm text-gray-500 dark:text-zinc-400">
         <span className="flex items-center gap-1">
           <DollarSign size={14} />

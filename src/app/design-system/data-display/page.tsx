@@ -155,9 +155,9 @@ export default function DataDisplayPage() {
               ].map((tx, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 py-2 border-b border-gray-100 dark:border-zinc-800 last:border-0"
+                  className="flex items-center gap-3 py-2"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-400 dark:text-zinc-500 shrink-0">
+                  <div className="w-10 h-10 rounded-none bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-400 dark:text-zinc-500 shrink-0">
                     <ShoppingBag size={18} />
                   </div>
                   <div className="flex-1 min-w-0">

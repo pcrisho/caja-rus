@@ -1,7 +1,7 @@
 "use client";
 
 type DayData = {
-  date: string; // "YYYY-MM-DD"
+  date: string;
   total: number;
 };
 
@@ -14,7 +14,7 @@ export function SalesSummaryChart({ data }: Props) {
   const days = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl p-4 flex flex-col gap-3">
+    <div className="bg-white dark:bg-zinc-900 p-4 flex flex-col gap-3">
       <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
         Ventas — últimos 7 días
       </p>
@@ -32,14 +32,13 @@ export function SalesSummaryChart({ data }: Props) {
               key={d.date}
               className="flex-1 flex flex-col items-center gap-1"
             >
-              {/* Amount on hover via title */}
               <div
                 className="w-full flex flex-col justify-end"
                 style={{ height: "88px" }}
                 title={`S/ ${d.total.toFixed(2)}`}
               >
                 <div
-                  className={`w-full rounded-t-lg transition-all duration-500 ${
+                  className={`w-full transition-all duration-500 ${
                     isToday ? "bg-emerald-600" : "bg-blue-900 dark:bg-blue-400"
                   }`}
                   style={{ height: `${Math.max(pct, 4)}%` }}
@@ -65,9 +64,9 @@ export function SalesSummaryChart({ data }: Props) {
           </strong>
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-sm bg-emerald-600 inline-block" />
+          <span className="w-3 h-3 bg-emerald-600 inline-block" />
           Hoy
-          <span className="w-3 h-3 rounded-sm bg-blue-900 dark:bg-blue-400 inline-block ml-1" />
+          <span className="w-3 h-3 bg-blue-900 dark:bg-blue-400 inline-block ml-1" />
           Otros días
         </span>
       </div>

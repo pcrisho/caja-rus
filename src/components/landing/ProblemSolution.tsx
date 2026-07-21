@@ -6,9 +6,9 @@ export function ProblemSolution() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-1.5 bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-400 text-amber-900 rounded-md px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
-            <AlertTriangle className="w-4 h-4 text-amber-800 stroke-[2.5]" />
-            <span>DIAGNÓSTICO OPERATIVO</span>
+          <div className="inline-flex items-center gap-1.5 bg-amber-100 dark:bg-amber-900/30 border-amber-400 text-amber-900  px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
+            <AlertTriangle className="w-4 h-4 text-amber-500 stroke-[2.5]" />
+            <span className="text-amber-500">DIAGNÓSTICO OPERATIVO</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-black text-gray-900 dark:text-zinc-50 tracking-tight uppercase">
             EL CONTROL DE TU BODEGA NO DEBE SER UN DOLOR DE CABEZA
@@ -21,10 +21,10 @@ export function ProblemSolution() {
         {/* Side-by-side Comparison Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Card: Traditional Way */}
-          <div className="bg-white dark:bg-zinc-950 border-2 border-red-300 rounded-xl p-6 sm:p-8 flex flex-col gap-6 relative">
-            <div className="flex items-center justify-between border-b-2 border-red-200 pb-4">
+          <div className="bg-white dark:bg-zinc-950  p-6 sm:p-8 flex flex-col gap-6 relative">
+            <div className="flex items-center justify-between border-b-2 border-red-200 dark:border-red-800 pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 border border-red-300 flex items-center justify-center font-black text-lg">
+                <div className="w-10 h-10  bg-red-100 dark:bg-red-900/30 text-red-700 border border-red-300 flex items-center justify-center font-black text-lg">
                   ✕
                 </div>
                 <div>
@@ -35,26 +35,26 @@ export function ProblemSolution() {
             </div>
 
             <ul className="flex flex-col gap-4 text-sm sm:text-base text-gray-900 dark:text-zinc-50 font-medium">
-              <li className="flex items-start gap-3 bg-red-50/50 p-3 rounded-lg border border-red-200">
-                <XCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5 stroke-[2.5]" />
+              <li className="flex items-start gap-3 bg-red-50/50 dark:bg-red-900/20 p-3 ">
+                <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5 stroke-[2.5]" />
                 <span>
                   <b>Descuadres de caja a las 10 PM:</b> Dudas constantes sobre vuelto mal entregado o billetes olvidados.
                 </span>
               </li>
-              <li className="flex items-start gap-3 bg-red-50/50 p-3 rounded-lg border border-red-200">
-                <XCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5 stroke-[2.5]" />
+              <li className="flex items-start gap-3 bg-red-50/50 dark:bg-red-900/20 p-3 ">
+                <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5 stroke-[2.5]" />
                 <span>
                   <b>Perder ventas por agotados:</b> Descubres que falta aceite o leche cuando el cliente ya está al frente.
                 </span>
               </li>
-              <li className="flex items-start gap-3 bg-red-50/50 p-3 rounded-lg border border-red-200">
-                <XCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5 stroke-[2.5]" />
+              <li className="flex items-start gap-3 bg-red-50/50 dark:bg-red-900/20 p-3 ">
+                <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5 stroke-[2.5]" />
                 <span>
                   <b>Susto constante con la SUNAT:</b> Desconocimiento del acumulado mensual y riesgo de multas NRUS.
                 </span>
               </li>
-              <li className="flex items-start gap-3 bg-red-50/50 p-3 rounded-lg border border-red-200">
-                <XCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5 stroke-[2.5]" />
+              <li className="flex items-start gap-3 bg-red-50/50 dark:bg-red-900/20 p-3 ">
+                <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5 stroke-[2.5]" />
                 <span>
                   <b>Cuadernos manchados o perdidos:</b> Horas anotando precios a mano y buscando comprobantes viejos.
                 </span>
@@ -63,42 +63,42 @@ export function ProblemSolution() {
           </div>
 
           {/* Card: CajaRUS Solution */}
-          <div className="bg-white dark:bg-zinc-950 border-2 border-emerald-400 rounded-xl p-6 sm:p-8 flex flex-col gap-6 relative">
-            <div className="flex items-center justify-between border-b-2 border-emerald-200 pb-4">
+          <div className="bg-white dark:bg-zinc-950  p-6 sm:p-8 flex flex-col gap-6 relative">
+            <div className="flex items-center justify-between border-b-2 border-emerald-200 dark:border-emerald-800 pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-700 text-white flex items-center justify-center font-black text-lg">
+                <div className="w-10 h-10  bg-emerald-700 text-white flex items-center justify-center font-black text-lg">
                   ✓
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold tracking-widest uppercase text-emerald-800">SISTEMA POS DIGITAL</span>
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-emerald-500">SISTEMA POS DIGITAL</span>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-zinc-50 uppercase">LA BODEGA CON CAJARUS</h3>
                 </div>
               </div>
-              <span className="bg-emerald-700 text-white text-[10px] font-mono font-bold px-2.5 py-1 rounded uppercase tracking-wider">
+              <span className="bg-emerald-700 text-white text-[10px] font-mono font-bold px-2.5 py-1  uppercase tracking-wider">
                 RECOMENDADO
               </span>
             </div>
 
             <ul className="flex flex-col gap-4 text-sm sm:text-base text-gray-900 dark:text-zinc-50 font-medium">
-              <li className="flex items-start gap-3 bg-emerald-50/60 dark:bg-emerald-900/20 p-3 rounded-lg border border-emerald-200">
+              <li className="flex items-start gap-3 bg-emerald-50/60 dark:bg-emerald-900/20 p-3 ">
                 <CheckCircle2 className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0 mt-0.5 stroke-[2.5]" />
                 <span>
                   <b>Cierre de caja exacto en 1 minuto:</b> Desglose nítido de lo cobrado en Efectivo, Yape, Plin y Tarjeta.
                 </span>
               </li>
-              <li className="flex items-start gap-3 bg-emerald-50/60 dark:bg-emerald-900/20 p-3 rounded-lg border border-emerald-200">
+              <li className="flex items-start gap-3 bg-emerald-50/60 dark:bg-emerald-900/20 p-3 ">
                 <CheckCircle2 className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0 mt-0.5 stroke-[2.5]" />
                 <span>
                   <b>Inventario y alertas de stock:</b> El sistema descuenta productos solos y te avisa antes de agotar productos clave.
                 </span>
               </li>
-              <li className="flex items-start gap-3 bg-emerald-50/60 dark:bg-emerald-900/20 p-3 rounded-lg border border-emerald-200">
+              <li className="flex items-start gap-3 bg-emerald-50/60 dark:bg-emerald-900/20 p-3 ">
                 <CheckCircle2 className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0 mt-0.5 stroke-[2.5]" />
                 <span>
                   <b>Termómetro NRUS SUNAT:</b> Supervisión en tiempo real del límite acumulado del mes sin sorpresas.
                 </span>
               </li>
-              <li className="flex items-start gap-3 bg-emerald-50/60 dark:bg-emerald-900/20 p-3 rounded-lg border border-emerald-200">
+              <li className="flex items-start gap-3 bg-emerald-50/60 dark:bg-emerald-900/20 p-3 ">
                 <CheckCircle2 className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0 mt-0.5 stroke-[2.5]" />
                 <span>
                   <b>Lectura de facturas por foto (OCR):</b> Ingreso automático de compras fotografiando la factura física.

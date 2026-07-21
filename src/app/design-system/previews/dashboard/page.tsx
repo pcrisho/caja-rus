@@ -31,34 +31,34 @@ export default function DashboardPreview() {
                 <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
                   NRUS — Junio 2026
                 </p>
-                <h2 className="mt-1 text-xl font-bold text-gray-900 dark:text-zinc-50">
+                <h2 className="mt-1 text-xl font-bold text-gray-900 tabular-nums dark:text-zinc-50">
                   Categoría 1
                 </h2>
               </div>
-              <div className="bg-gray-50 dark:bg-zinc-800 rounded-xl px-4 py-2 text-right">
+              <div className="bg-gray-50 dark:bg-zinc-800 rounded-none px-4 py-2 text-right">
                 <p className="text-xs text-gray-500 dark:text-zinc-400 font-medium">Cuota SUNAT</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-zinc-50">S/ 20</p>
+                <p className="text-xl font-bold text-gray-900 tabular-nums dark:text-zinc-50">S/ 20</p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-50 dark:bg-zinc-800 rounded-xl p-4">
+              <div className="bg-gray-50 dark:bg-zinc-800 rounded-none p-4">
                 <div className="flex items-center gap-2 text-gray-500 dark:text-zinc-400 mb-1">
                   <TrendingUp size={16} />
                   <p className="text-xs font-bold uppercase tracking-wider">Ventas</p>
                 </div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-zinc-50">S/ 3,200</p>
+                <p className="text-2xl font-bold text-gray-900 tabular-nums dark:text-zinc-50">S/ 3,200</p>
               </div>
-              <div className="bg-gray-50 dark:bg-zinc-800 rounded-xl p-4">
+              <div className="bg-gray-50 dark:bg-zinc-800 rounded-none p-4">
                 <div className="flex items-center gap-2 text-gray-500 dark:text-zinc-400 mb-1">
                   <ShoppingBag size={16} />
                   <p className="text-xs font-bold uppercase tracking-wider">Compras</p>
                 </div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-zinc-50">S/ 2,850</p>
+                <p className="text-2xl font-bold text-gray-900 tabular-nums dark:text-zinc-50">S/ 2,850</p>
               </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-zinc-800 rounded-xl p-4">
+            <div className="bg-gray-50 dark:bg-zinc-800 rounded-none p-4">
               <DsProgressBar value={65} color="emerald" label="Límite del mes" />
             </div>
 
@@ -97,9 +97,9 @@ export default function DashboardPreview() {
               <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
                 Ventas de la semana
               </p>
-              <p className="text-lg font-bold text-gray-900 dark:text-zinc-50">S/ 8,750</p>
+              <p className="text-lg font-bold text-gray-900 tabular-nums dark:text-zinc-50">S/ 8,750</p>
             </div>
-            <div className="h-32 bg-gray-50 dark:bg-zinc-800 rounded-xl flex items-end justify-around p-4 gap-2">
+            <div className="h-32 bg-gray-50 dark:bg-zinc-800 rounded-none flex items-end justify-around p-4 gap-2">
               {[40, 65, 45, 80, 55, 70, 90].map((h, i) => (
                 <div
                   key={i}
@@ -139,10 +139,10 @@ export default function DashboardPreview() {
               <div
                 key={i}
                 className={`flex items-center gap-3 py-3 ${
-                  i < arr.length - 1 ? "border-b border-gray-100 dark:border-zinc-800" : ""
+                  i < arr.length - 1 ? "border-b" : ""
                 }`}
               >
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-700 dark:text-emerald-400 shrink-0">
+                <div className="w-10 h-10 rounded-none bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-700 dark:text-emerald-400 shrink-0">
                   <ShoppingCart size={18} />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -152,7 +152,7 @@ export default function DashboardPreview() {
                   <p className="text-xs text-gray-500 dark:text-zinc-400">{tx.client}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-sm font-bold text-emerald-700 dark:text-emerald-400">
+                  <p className="text-sm font-bold text-emerald tabular-nums-700 dark:text-emerald-400">
                     {tx.amount}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-zinc-400">{tx.time}</p>

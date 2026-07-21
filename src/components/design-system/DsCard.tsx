@@ -19,12 +19,6 @@ const paddingStyles = {
   lg: "p-8",
 };
 
-const radiusStyles = {
-  default: "rounded-2xl",
-  hero: "rounded-2xl",
-  flat: "rounded-2xl",
-};
-
 export function DsCard({
   children,
   variant = "default",
@@ -33,7 +27,7 @@ export function DsCard({
 }: DsCardProps) {
   return (
     <div
-      className={`${variantStyles[variant]} ${paddingStyles[padding]} ${radiusStyles[variant]} ${className}`}
+      className={`${variantStyles[variant]} ${paddingStyles[padding]} ${className}`}
     >
       {children}
     </div>

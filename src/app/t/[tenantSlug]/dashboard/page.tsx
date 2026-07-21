@@ -6,6 +6,7 @@ import { ExpenseList } from "@/components/dashboard/ExpenseList";
 import { PageHeader } from "@/components/ui/page-header";
 import { getTenantHubPath } from "@/lib/tenancy";
 import { redirect } from "next/navigation";
+import { DsAlert } from "@/components/design-system/DsAlert";
 
 export const metadata = {
   title: "Dashboard | CajaRUS",
@@ -35,8 +36,8 @@ export default async function DashboardPage({
 
   if (!dashboardRes.success || !dashboardRes.data) {
     return (
-      <div className="p-4 text-red-600 bg-red-100 rounded-xl m-4">
-        Error al cargar el dashboard: {dashboardRes.error}
+      <div className="m-4">
+        <DsAlert variant="error" message={`Error al cargar el dashboard: ${dashboardRes.error}`} />
       </div>
     );
   }
