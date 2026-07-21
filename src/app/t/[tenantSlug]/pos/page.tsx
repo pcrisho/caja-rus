@@ -1,6 +1,7 @@
 import { requireTenantAuth } from "@/lib/auth-helpers";
 import { getProductsAction } from "@/actions/products";
 import { PosClient } from "@/components/pos/PosClient";
+import { PageHeader } from "@/components/ui/page-header";
 import { CartProduct } from "@/store/usePosStore";
 import { UnitType } from "@/generated/prisma/enums";
 import { getTenantHubPath } from "@/lib/tenancy";
@@ -37,19 +38,13 @@ export default async function TenantPosPage(props: {
   }
 
   return (
-    <main className="min-h-dvh bg-gray-50 px-4 py-6 pb-24">
-      <div className="mx-auto flex w-full max-w-sm flex-col gap-4">
-        <header className="rounded-2xl border border-gray-200 bg-white p-6">
-          <p className="text-sm font-semibold uppercase tracking-wide text-blue-900">
-            Punto de venta
-          </p>
-          <h1 className="mt-2 text-3xl font-bold text-gray-900">
-            {authResult.tenantName}
-          </h1>
-          <p className="mt-3 text-base text-gray-700">
-            Bodega activa: @{authResult.tenantSlug}
-          </p>
-        </header>
+    <main className="min-h-dvh bg-gray-50 dark:bg-zinc-950 px-4 py-6 pb-24">
+      <div className="mx-auto flex w-full max-w-md flex-col gap-4">
+        <PageHeader
+          categoryTag="Punto de venta"
+          title={authResult.tenantName}
+          subtitle={`Bodega activa: @${authResult.tenantSlug}`}
+        />
 
         <PosClient tenantSlug={tenantSlug} initialProducts={mappedProducts} />
       </div>

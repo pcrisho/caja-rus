@@ -1,7 +1,6 @@
 import { requireTenantAuth } from '@/lib/auth-helpers';
 import { CsvImport } from '@/components/inventory/CsvImport';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
 
 export default async function ImportProductsPage({
   params,
@@ -12,17 +11,20 @@ export default async function ImportProductsPage({
   await requireTenantAuth(tenantSlug);
 
   return (
-    <div className="flex flex-col min-h-dvh bg-white pb-[env(safe-area-inset-bottom)]">
-      <header className="bg-blue-900 text-white p-4 sticky top-0 z-10 shadow-sm flex items-center gap-3">
-        <Link href={`/t/${tenantSlug}/inventory`} className="p-2 -ml-2 rounded-full hover:bg-white/10 transition-colors">
-          <ArrowLeft size={24} />
-        </Link>
-        <h1 className="text-xl font-bold">Importar Productos</h1>
-      </header>
-
-      <main className="flex-1 p-4 w-full">
+    <main className="min-h-dvh bg-gray-50 dark:bg-zinc-950 px-4 py-6 pb-24">
+      <div className="mx-auto flex w-full max-w-md flex-col gap-6">
+        <PageHeader
+          categoryTag="Inventario"
+          title="Importar CSV"
+          subtitle="Carga tus productos masivamente mediante un archivo CSV"
+          backHref={`/t/${tenantSlug}/inventory`}
+          breadcrumbs={[
+            { label: "Inventario", href: `/t/${tenantSlug}/inventory` },
+            { label: "Importar CSV" },
+          ]}
+        />
         <CsvImport tenantSlug={tenantSlug} />
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

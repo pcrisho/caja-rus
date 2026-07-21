@@ -6,7 +6,7 @@
 > esmeralda profundo — sobre blanco y gris cálido, diseñado para leerse bajo
 > el sol con una sola mano.
 
-**Theme:** light (único modo — ver §8 "Dark mode")
+**Theme:** light + dark (toggle nativo con `dark:` prefix de Tailwind v4)
 
 CajaRUS corre sobre un lienzo neutro, técnico y luminoso: blanco puro (`#FFFFFF`) y un gris
 de soporte (`gray-50`/`gray-100`) sosteniendo texto casi negro (`gray-900`).
@@ -338,13 +338,46 @@ para evitar que quede desincronizada. Reglas rápidas para copy nuevo:
 
 ## 8. Dark mode
 
-**No está planeado y no se debe implementar en el MVP.** El principio de
-"luz solar directa" (§0.3) apunta a UN modo de alto contraste optimizado
-para exteriores, no a dos modos. Si se agrega a futuro, re-validar
-contraste desde cero — no asumir que invertir los colores actuales es
-seguro (en particular, `emerald-600`/`amber-600` sobre fondo OSCURO
-probablemente tengan un contraste completamente distinto al calculado
-aquí sobre blanco).
+Soportado desde julio 2026 con `dark:` prefix de Tailwind v4 directamente en
+clases, sin tokens custom (el bug documentado en §9.2 impide usar `@theme`).
+El toggle persiste en `localStorage` y respeta `prefers-color-scheme` en
+primera carga.
+
+**Paleta dark mode:**
+
+Neutros en `zinc-*` (estilo shadcn — grises puros sin tinte azul; el `gray-*`
+de Tailwind tiene matiz azulado que en dark se percibe "frío SaaS"). Los
+semánticos emerald/amber/red/blue se mantienen iguales en ambos temas.
+
+| Rol | Clase Tailwind (light) | Clase Tailwind (dark) |
+|---|---|---|
+| Canvas / fondo de página | `bg-white` | `dark:bg-zinc-950` |
+| Superficie secundaria | `bg-gray-50` | `dark:bg-zinc-900` |
+| Superficie de tarjeta | `bg-gray-100` | `dark:bg-zinc-800` |
+| Superficie elevada (badge/chip) | `bg-white` | `dark:bg-zinc-700` |
+| Borde / hairline | `border-gray-200` | `dark:border-zinc-800` |
+| Borde 2px | `border-gray-300` | `dark:border-zinc-700` |
+| Texto primario | `text-gray-900` | `dark:text-zinc-50` |
+| Texto secundario | `text-gray-700` | `dark:text-zinc-300` |
+| Texto muted | `text-gray-500` | `dark:text-zinc-400` |
+| Acción (texto) | `text-emerald-700` | `dark:text-emerald-400` |
+| Navegación (texto) | `text-blue-900` | `dark:text-blue-400` |
+| Advertencia (texto) | `text-amber-700` | `dark:text-amber-400` |
+| Peligro (texto) | `text-red-700` | `dark:text-red-400` |
+| Badge éxito | `bg-emerald-100` | `dark:bg-emerald-900/30` |
+| Badge advertencia | `bg-amber-100` | `dark:bg-amber-900/30` |
+| Badge peligro | `bg-red-100` | `dark:bg-red-900/30` |
+
+**Reglas dark mode:**
+- Los botones de acción (`bg-emerald-600`, `bg-red-600`, `bg-amber-600`) se
+  mantienen sin variante dark — funcionan bien sobre fondo oscuro.
+- Headers `bg-blue-900` se mantienen sin variante dark — el azul profundo
+  contrasta bien en ambos modos.
+- Subtítulos de header azul usan `text-blue-100` (no `text-blue-200`).
+- Todo color nuevo debe verificarse en ambos temas.
+- Si se necesita fidelidad exacta a un hex de marca en un contexto
+  específico, usar el valor arbitrario literal (ej. `text-[#059669]`) —
+  **no usar `var(--x)` en className** (ver §9.2).
 
 ## 9. Notas técnicas verificadas (Tailwind v4 + Turbopack)
 

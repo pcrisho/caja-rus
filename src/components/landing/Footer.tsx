@@ -27,7 +27,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div className="md:col-span-3 flex flex-col gap-3">
-            <h4 className="text-xs font-black tracking-widest uppercase text-gray-400">Módulos POS</h4>
+            <h4 className="text-xs font-black tracking-widest uppercase text-gray-400 dark:text-zinc-500">Módulos POS</h4>
             <ul className="flex flex-col gap-2 text-xs font-bold uppercase tracking-wider text-gray-300">
               <li>
                 <a href="#caracteristicas" className="hover:text-emerald-400 transition-colors">
@@ -54,7 +54,7 @@ export function Footer() {
 
           {/* Account Links */}
           <div className="md:col-span-4 flex flex-col gap-3">
-            <h4 className="text-xs font-black tracking-widest uppercase text-gray-400">Acceso a la App</h4>
+            <h4 className="text-xs font-black tracking-widest uppercase text-gray-400 dark:text-zinc-500">Acceso a la App</h4>
             <p className="text-xs text-gray-300 font-medium">
               ¿Ya eres usuario registrado? Ingresa a tu bodega desde cualquier celular.
             </p>
@@ -76,7 +76,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Disclaimer & Copyright */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono font-medium text-gray-400">
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono font-medium text-gray-400 dark:text-zinc-500">
           <p>© 2026 CAJARUS PERÚ · TODOS LOS DERECHOS RESERVADOS.</p>
           <p className="flex items-center gap-1 text-center">
             DISEÑADO CON <Heart className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400" /> PARA BODEGAS EN PERÚ

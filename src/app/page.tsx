@@ -61,7 +61,7 @@ export default async function Home() {
   const isLoggedIn = Boolean(session?.user?.isActive);
 
   return (
-    <div className="min-h-dvh flex flex-col bg-white font-sans text-gray-900 selection:bg-emerald-200 selection:text-emerald-900">
+    <div className="min-h-dvh flex flex-col bg-white dark:bg-zinc-950 font-sans text-gray-900 dark:text-zinc-50 selection:bg-emerald-200 selection:text-emerald-900">
       <Navbar isLoggedIn={isLoggedIn} />
       <main className="flex-1">
         <Hero />

@@ -26,9 +26,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       const isInitialSignIn = Boolean(user);
-      // Si el usuario aún está en onboarding (isFirstLogin=true), forzar
-      // relectura de BD en cada petición para detectar el momento exacto
-      // en que completa la configuración de su bodega.
       const pendingOnboarding = token.isFirstLogin === true;
       const isStale =
         pendingOnboarding ||
@@ -36,45 +33,51 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         SESSION_REVALIDATE_INTERVAL_MS;
 
       if ((isInitialSignIn || isStale) && token.id) {
-        const [dbUser, tenantMemberships] = await Promise.all([
-          prisma.user.findUnique({
-            where: { id: token.id as string },
-            select: { isActive: true, isFirstLogin: true },
-          }),
-          getTenantMemberships(token.id as string),
-        ]);
-        if (dbUser) {
-          const activeMemberships = tenantMemberships.filter(
-            (membership) => membership.isActive
-          );
-          const primaryMembership =
-            activeMemberships.find((membership) => membership.isPrimary) ??
-            activeMemberships[0] ??
-            null;
+        try {
+          const [dbUser, tenantMemberships] = await Promise.all([
+            prisma.user.findUnique({
+              where: { id: token.id as string },
+              select: { isActive: true, isFirstLogin: true },
+            }),
+            getTenantMemberships(token.id as string),
+          ]);
+          if (dbUser) {
+            const activeMemberships = tenantMemberships.filter(
+              (membership) => membership.isActive
+            );
+            const primaryMembership =
+              activeMemberships.find((membership) => membership.isPrimary) ??
+              activeMemberships[0] ??
+              null;
 
-          token.isActive = dbUser.isActive;
-          token.isFirstLogin = dbUser.isFirstLogin;
-          token.tenantMemberships = tenantMemberships;
-          token.tenantId = primaryMembership?.tenantId;
-          token.tenantSlug = primaryMembership?.tenantSlug;
-          token.tenantName = primaryMembership?.tenantName;
-          token.tenantRole = primaryMembership?.tenantRole;
-          token.validatedAt = now;
-        } else {
-          if (isInitialSignIn) {
-            token.isActive = true;
-            token.isFirstLogin = true;
-            token.tenantMemberships = [];
-            token.validatedAt = 0;
-          } else {
-            token.isActive = false;
-            token.isFirstLogin = false;
-            token.tenantMemberships = [];
-            token.tenantId = undefined;
-            token.tenantSlug = undefined;
-            token.tenantName = undefined;
-            token.tenantRole = undefined;
+            token.isActive = dbUser.isActive;
+            token.isFirstLogin = dbUser.isFirstLogin;
+            token.tenantMemberships = tenantMemberships;
+            token.tenantId = primaryMembership?.tenantId;
+            token.tenantSlug = primaryMembership?.tenantSlug;
+            token.tenantName = primaryMembership?.tenantName;
+            token.tenantRole = primaryMembership?.tenantRole;
             token.validatedAt = now;
+          } else {
+            if (isInitialSignIn) {
+              token.isActive = true;
+              token.isFirstLogin = true;
+              token.tenantMemberships = [];
+              token.validatedAt = 0;
+            } else {
+              token.isActive = false;
+              token.isFirstLogin = false;
+              token.tenantMemberships = [];
+              token.tenantId = undefined;
+              token.tenantSlug = undefined;
+              token.tenantName = undefined;
+              token.tenantRole = undefined;
+              token.validatedAt = now;
+            }
+          }
+        } catch {
+          if (!isInitialSignIn) {
+            token.validatedAt = 0;
           }
         }
       }
@@ -113,80 +116,77 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       const dbUser = await prisma.user.findUnique({
         where: { email },
-        select: { isActive: true },
+        select: { id: true, isActive: true, isFirstLogin: true },
       });
 
-      if (dbUser) {
-        return dbUser.isActive ? true : "/login?error=inactive";
-      }
-
-      if (!getBootstrapAdminEmails().includes(email)) {
+      if (!dbUser) {
         return "/login?error=inactive";
       }
 
-      return true;
-    },
-  },
-  events: {
-    async createUser({ user }) {
-      if (!user.id) return;
-      const userId = user.id;
-      const userEmail = user.email ? user.email.toLowerCase() : "";
-      const isBootstrapAdmin = getBootstrapAdminEmails().includes(userEmail);
+      if (dbUser.isFirstLogin) {
+        const isBootstrapAdmin = getBootstrapAdminEmails().includes(email);
 
-      if (!isBootstrapAdmin) {
-        await prisma.user.update({
-          where: { id: userId },
-          data: { isActive: false },
+        if (!isBootstrapAdmin) {
+          await prisma.user.update({
+            where: { id: dbUser.id },
+            data: { isActive: false, isFirstLogin: false },
+          });
+          return "/login?error=inactive";
+        }
+
+        const tenantName = getBootstrapTenantName();
+        const tenantSlug = getBootstrapTenantSlug();
+
+        await prisma.$transaction(async (tx) => {
+          await tx.user.update({
+            where: { id: dbUser.id },
+            data: { isActive: true, isFirstLogin: false },
+          });
+
+          const tenant = await tx.tenant.upsert({
+            where: { slug: tenantSlug },
+            update: {
+              name: tenantName,
+              isActive: true,
+            },
+            create: {
+              name: tenantName,
+              slug: tenantSlug,
+              isActive: true,
+            },
+          });
+
+          await tx.tenantMember.upsert({
+            where: {
+              tenantId_userId: {
+                tenantId: tenant.id,
+                userId: dbUser.id,
+              },
+            },
+            update: {
+              role: "ADMIN",
+              isActive: true,
+              isPrimary: true,
+            },
+            create: {
+              tenantId: tenant.id,
+              userId: dbUser.id,
+              role: "ADMIN",
+              isActive: true,
+              isPrimary: true,
+            },
+          });
         });
-        return;
+
+        return true;
       }
 
-      const tenantName = getBootstrapTenantName();
-      const tenantSlug = getBootstrapTenantSlug();
-
-      await prisma.$transaction(async (tx) => {
-        await tx.user.update({
-          where: { id: userId },
-          data: { isActive: true, isFirstLogin: false },
-        });
-
-        const tenant = await tx.tenant.upsert({
-          where: { slug: tenantSlug },
-          update: {
-            name: tenantName,
-            isActive: true,
-          },
-          create: {
-            name: tenantName,
-            slug: tenantSlug,
-            isActive: true,
-          },
-        });
-
-        await tx.tenantMember.upsert({
-          where: {
-            tenantId_userId: {
-              tenantId: tenant.id,
-              userId,
-            },
-          },
-          update: {
-            role: "ADMIN",
-            isActive: true,
-            isPrimary: true,
-          },
-          create: {
-            tenantId: tenant.id,
-            userId,
-            role: "ADMIN",
-            isActive: true,
-            isPrimary: true,
-          },
-        });
-      });
+      return dbUser.isActive ? true : "/login?error=inactive";
     },
   },
+  // Events removido: el aprovisionamiento de usuario y tenant 
+  // se hace síncronamente en el callback signIn para evitar 
+  // condiciones de carrera con la creación de la sesión (jwt).
   providers: [
     Credentials({
       name: "Credentials",
@@ -223,12 +223,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientId: process.env.AUTH_GOOGLE_ID!.trim(),
       clientSecret: process.env.AUTH_GOOGLE_SECRET!.trim(),
       allowDangerousEmailAccountLinking: true,
-      authorization: {
-        params: {
-          prompt: "select_account",
-          access_type: "offline",
-        },
-      },
     }),
   ],
 });

@@ -14,10 +14,10 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-dvh p-6 bg-gray-50 text-center">
+    <div className="flex flex-col items-center justify-center min-h-dvh p-6 bg-gray-50 dark:bg-zinc-950 text-center">
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-bold text-emerald-600 mb-2">CajaRUS</h1>
-        <p className="text-lg text-gray-700 mb-6">
+        <h1 className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">CajaRUS</h1>
+        <p className="text-lg text-gray-700 dark:text-zinc-300 mb-6">
           Algo salió mal. Ya estamos trabajando para arreglarlo.
         </p>
         <button

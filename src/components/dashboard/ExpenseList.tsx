@@ -78,13 +78,13 @@ export function ExpenseList({ expenses: initial, tenantSlug }: Props) {
   };
 
   return (
-    <div className="bg-gray-100 rounded-xl p-4 flex flex-col gap-3">
+    <div className="bg-gray-100 dark:bg-zinc-800 rounded-xl p-4 flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
+          <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
             Gastos operativos
           </p>
-          <p className="text-xl font-bold text-gray-900 mt-1">
+          <p className="text-xl font-bold text-gray-900 dark:text-zinc-50 mt-1">
             S/ {total.toFixed(2)}
           </p>
         </div>
@@ -99,9 +99,9 @@ export function ExpenseList({ expenses: initial, tenantSlug }: Props) {
 
       {/* Formulario inline */}
       {showForm && (
-        <div className="bg-white rounded-xl p-4 flex flex-col gap-3 border border-gray-200">
+        <div className="bg-white dark:bg-zinc-900 rounded-xl p-4 flex flex-col gap-3 border border-gray-200 dark:border-zinc-800">
           <div>
-            <label htmlFor="expense-desc" className="block text-sm font-semibold text-gray-700 mb-1">
+            <label htmlFor="expense-desc" className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-zinc-300 mb-1">
               Descripción
             </label>
             <input
@@ -110,12 +110,12 @@ export function ExpenseList({ expenses: initial, tenantSlug }: Props) {
               placeholder="Ej: Alquiler del mes"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full border-2 border-gray-300 rounded-xl py-3 px-4 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 focus-visible:border-blue-900"
+              className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-3 px-4 text-base bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 focus-visible:border-blue-900"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="expense-amount" className="block text-sm font-semibold text-gray-700 mb-1">
+              <label htmlFor="expense-amount" className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-zinc-300 mb-1">
                 Monto (S/)
               </label>
               <input
@@ -127,18 +127,18 @@ export function ExpenseList({ expenses: initial, tenantSlug }: Props) {
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full border-2 border-gray-300 rounded-xl py-3 px-4 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 focus-visible:border-blue-900"
+                className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-3 px-4 text-base bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 focus-visible:border-blue-900"
               />
             </div>
             <div>
-              <label htmlFor="expense-cat" className="block text-sm font-semibold text-gray-700 mb-1">
+              <label htmlFor="expense-cat" className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-zinc-300 mb-1">
                 Categoría
               </label>
               <select
                 id="expense-cat"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full border-2 border-gray-300 rounded-xl py-3 px-4 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 focus-visible:border-blue-900"
+                className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-3 px-4 text-base bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 focus-visible:border-blue-900"
               >
                 {EXPENSE_CATEGORIES.map((c) => (
                   <option key={c} value={c}>
@@ -149,7 +149,7 @@ export function ExpenseList({ expenses: initial, tenantSlug }: Props) {
             </div>
           </div>
           {error && (
-            <p className="text-red-600 text-sm" role="alert">
+            <p className="text-red-600 dark:text-red-400 text-sm" role="alert">
               {error}
             </p>
           )}
@@ -169,22 +169,22 @@ export function ExpenseList({ expenses: initial, tenantSlug }: Props) {
           {expenses.map((e) => (
             <div
               key={e.id}
-              className="bg-white rounded-xl p-3 flex items-center justify-between"
+              className="bg-white dark:bg-zinc-900 rounded-xl p-3 flex items-center justify-between"
             >
               <div>
-                <p className="text-base font-semibold text-gray-900">
+                <p className="text-base font-semibold text-gray-900 dark:text-zinc-50">
                   {e.description}
                 </p>
-                <p className="text-sm text-gray-500">{e.category}</p>
+                <p className="text-sm text-gray-500 dark:text-zinc-400">{e.category}</p>
               </div>
-              <p className="text-base font-bold text-gray-900">
+              <p className="text-base font-bold text-gray-900 dark:text-zinc-50">
                 S/ {e.amount.toFixed(2)}
               </p>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-sm text-gray-500 text-center py-2">
+        <p className="text-sm text-gray-500 dark:text-zinc-400 text-center py-2">
           Sin gastos registrados este mes
         </p>
       )}

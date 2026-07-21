@@ -1,7 +1,9 @@
 import { requireTenantAuth } from '@/lib/auth-helpers';
+import { getProductsAction } from '@/actions/products';
+import { getCategoriesAction } from '@/actions/categories';
+import { getPastSuppliersAction } from '@/actions/purchases';
 import { OcrUploader } from '@/components/purchases/OcrUploader';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
 
 export default async function NewPurchasePage({
   params,
@@ -11,18 +13,36 @@ export default async function NewPurchasePage({
   const { tenantSlug } = await params;
   await requireTenantAuth(tenantSlug);
 
-  return (
-    <div className="flex flex-col min-h-dvh bg-white pb-[env(safe-area-inset-bottom)]">
-      <header className="bg-blue-900 text-white p-4 sticky top-0 z-10 shadow-sm flex items-center gap-3">
-        <Link href={`/t/${tenantSlug}/purchases`} className="p-2 -ml-2 rounded-full hover:bg-white/10 transition-colors">
-          <ArrowLeft size={24} />
-        </Link>
-        <h1 className="text-xl font-bold">Registrar Compra</h1>
-      </header>
+  const [productsRes, categoriesRes, suppliersRes] = await Promise.all([
+    getProductsAction(tenantSlug, { limit: 500 }),
+    getCategoriesAction(tenantSlug),
+    getPastSuppliersAction(tenantSlug),
+  ]);
 
-      <main className="flex-1 p-4 w-full">
-        <OcrUploader tenantSlug={tenantSlug} />
-      </main>
-    </div>
+  const catalogProducts = productsRes.success && productsRes.data?.products ? productsRes.data.products : [];
+  const categories = categoriesRes.success && categoriesRes.data ? (categoriesRes.data as any[]) : [];
+  const suppliers = suppliersRes.success && suppliersRes.data ? suppliersRes.data : [];
+
+  return (
+    <main className="min-h-dvh bg-gray-50 dark:bg-zinc-950 px-4 py-6 pb-24">
+      <div className="mx-auto flex w-full max-w-md flex-col gap-6">
+        <PageHeader
+          categoryTag="Compras"
+          title="Registrar Compra"
+          subtitle="Escanea tu boleta/factura con IA o ingresa los ítems manualmente"
+          backHref={`/t/${tenantSlug}/purchases`}
+          breadcrumbs={[
+            { label: "Compras", href: `/t/${tenantSlug}/purchases` },
+            { label: "Registrar Compra" },
+          ]}
+        />
+        <OcrUploader
+          tenantSlug={tenantSlug}
+          catalogProducts={catalogProducts}
+          categories={categories}
+          suppliers={suppliers}
+        />
+      </div>
+    </main>
   );
 }

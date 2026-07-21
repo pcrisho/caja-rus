@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 /**
  * NOTA para quien implemente componentes (ver DESIGN.md §9 "Notas técnicas
@@ -25,16 +26,36 @@
  * de `bg-[var(--x)]`) — ver DESIGN.md §9.1.
  */
 :root {
-  /* Semánticos — valores reales renderizados por Tailwind v4 (ver DESIGN.md
-     §9.1), para que coincidan pixel a pixel con el resto de la UI basada en
-     clases de Tailwind. Solo para uso fuera de className (inline style,
-     SVG, canvas/chart). */
+  color-scheme: light dark;
+
+  /* Superficies — light */
+  --color-canvas: #ffffff;
+  --color-surface: #f3f4f6; /* gray-100 */
+
+  /* Semánticos — light (valores reales renderizados por Tailwind v4, ver DESIGN.md §9.1).
+     Solo para uso fuera de className (inline style, SVG, canvas/chart). */
   --color-action: #009767; /* emerald-600 */
   --color-action-text: #007956; /* emerald-700 */
   --color-nav: #1c398e; /* blue-900 */
   --color-warning: #dd7400; /* amber-600 */
   --color-warning-text: #b75000; /* amber-700 */
   --color-danger: #e40014; /* red-600 */
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* Superficies — dark (zinc, estilo shadcn: neutros sin tinte azul) */
+  --color-canvas: #09090b; /* zinc-950 */
+  --color-surface: #18181b; /* zinc-900 */
+
+  /* Semánticos — dark (contraste verificado sobre fondo oscuro) */
+  --color-action: #34d399; /* emerald-400 — brillante sobre dark */
+  --color-action-text: #6ee7b7; /* emerald-300 */
+  --color-nav: #60a5fa; /* blue-400 */
+  --color-warning: #fbbf24; /* amber-400 */
+  --color-warning-text: #fcd34d; /* amber-300 */
+  --color-danger: #f87171; /* red-400 */
 }
 
 

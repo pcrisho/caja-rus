@@ -29,18 +29,18 @@ export function Testimonials() {
   ];
 
   return (
-    <section className="py-16 sm:py-24 bg-white border-b-2 border-gray-300">
+    <section className="py-16 sm:py-24 bg-white dark:bg-zinc-950 border-b-2 border-gray-300 dark:border-zinc-700">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-1.5 bg-emerald-100 border-2 border-emerald-400 text-emerald-900 rounded-md px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
+          <div className="inline-flex items-center gap-1.5 bg-emerald-100 dark:bg-emerald-900/30 border-2 border-emerald-400 text-emerald-900 rounded-md px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase mb-3">
             <Star className="w-4 h-4 text-emerald-800 fill-emerald-800" />
             <span>TESTIMONIOS OPERATIVOS</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-black text-gray-900 tracking-tight uppercase">
+          <h2 className="text-2xl sm:text-4xl font-black text-gray-900 dark:text-zinc-50 tracking-tight uppercase">
             BODEGUEROS PERUANOS QUE YA TIENEN EL CONTROL
           </h2>
-          <p className="text-base sm:text-lg text-gray-700 mt-2 font-medium">
+          <p className="text-base sm:text-lg text-gray-700 dark:text-zinc-300 mt-2 font-medium">
             Descubre cómo cambia la rutina diaria de trabajo en bodegas de todo el Perú.
           </p>
         </div>
@@ -50,7 +50,7 @@ export function Testimonials() {
           {reviews.map((item, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl p-6 border-2 border-gray-300 flex flex-col justify-between relative"
+              className="bg-white dark:bg-zinc-950 rounded-xl p-6 border-2 border-gray-300 dark:border-zinc-700 flex flex-col justify-between relative"
             >
               <div>
                 {/* Stars */}
@@ -60,18 +60,18 @@ export function Testimonials() {
                   ))}
                 </div>
 
-                <Quote className="w-7 h-7 text-gray-400 mb-2" />
+                <Quote className="w-7 h-7 text-gray-400 dark:text-zinc-500 mb-2" />
 
-                <p className="text-sm text-gray-800 leading-relaxed font-medium mb-6">
+                <p className="text-sm text-gray-800 dark:text-zinc-100 leading-relaxed font-medium mb-6">
                   &ldquo;{item.quote}&rdquo;
                 </p>
               </div>
 
-              <div className="pt-4 border-t-2 border-gray-200 flex flex-col gap-1">
-                <h4 className="font-black text-gray-900 text-sm uppercase tracking-wide">{item.name}</h4>
-                <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider">{item.bodega}</p>
-                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-gray-600 bg-gray-100 border border-gray-300 px-2 py-0.5 rounded w-fit mt-1">
-                  <MapPin className="w-3 h-3 text-gray-900 stroke-[2.5]" />
+              <div className="pt-4 border-t-2 border-gray-200 dark:border-zinc-800 flex flex-col gap-1">
+                <h4 className="font-black text-gray-900 dark:text-zinc-50 text-sm uppercase tracking-wide">{item.name}</h4>
+                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">{item.bodega}</p>
+                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 px-2 py-0.5 rounded w-fit mt-1">
+                  <MapPin className="w-3 h-3 text-gray-900 dark:text-zinc-50 stroke-[2.5]" />
                   {item.location}
                 </span>
               </div>

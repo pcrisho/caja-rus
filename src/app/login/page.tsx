@@ -82,24 +82,24 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-dvh bg-gray-100 flex flex-col justify-between p-4 sm:p-6 font-sans text-gray-900">
+    <div className="min-h-dvh bg-gray-100 dark:bg-zinc-950 flex flex-col justify-between p-4 sm:p-6 font-sans text-gray-900 dark:text-zinc-50">
       {/* Header Logo */}
       <header className="max-w-md mx-auto w-full flex items-center justify-between py-4">
         <Link
           href="/"
           className="flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 rounded-md p-1"
         >
-          <div className="w-10 h-10 rounded-lg bg-emerald-700 text-white flex items-center justify-center font-bold text-xl shadow-xs">
+          <div className="w-10 h-10 rounded-lg bg-emerald-700 text-white flex items-center justify-center font-bold text-xl">
             <Store className="w-6 h-6 stroke-[2.5]" />
           </div>
-          <span className="text-2xl font-black text-gray-900 tracking-tight uppercase">
-            Caja<span className="text-emerald-700">RUS</span>
+          <span className="text-2xl font-black text-gray-900 dark:text-zinc-50 tracking-tight uppercase">
+            Caja<span className="text-emerald-700 dark:text-emerald-400">RUS</span>
           </span>
         </Link>
 
         <Link
           href="/register"
-          className="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 border border-emerald-300 rounded-lg px-3.5 py-2 hover:bg-emerald-200 transition-colors"
+            className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 rounded-xl px-3.5 py-2 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors"
         >
           Registrarse
         </Link>
@@ -107,17 +107,17 @@ function LoginContent() {
 
       {/* Main Login Container */}
       <main className="max-w-md mx-auto w-full my-auto">
-        <div className="bg-white border-2 border-gray-900 rounded-xl p-6 sm:p-8 shadow-md">
+        <div className="bg-white dark:bg-zinc-900 border-2 border-gray-900 dark:border-zinc-700 rounded-xl p-6 sm:p-8">
           {/* Header Card */}
-          <div className="text-center mb-6 border-b-2 border-gray-200 pb-4">
-            <div className="inline-flex items-center gap-1.5 bg-gray-100 border border-gray-300 text-gray-800 rounded-md px-3 py-1 text-[10px] font-bold tracking-widest uppercase mb-2">
+          <div className="text-center mb-6 border-b-2 border-gray-200 dark:border-zinc-800 pb-4">
+            <div className="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 text-gray-800 dark:text-zinc-300 rounded-md px-3 py-1 text-[10px] font-bold tracking-widest uppercase mb-2">
               <LogIn className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>INGRESO A TU BODEGA</span>
             </div>
-            <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">
+            <h1 className="text-2xl font-black text-gray-900 dark:text-zinc-50 uppercase tracking-tight">
               INICIAR SESIÓN
             </h1>
-            <p className="text-xs text-gray-600 font-medium mt-1">
+            <p className="text-xs text-gray-600 dark:text-zinc-400 font-medium mt-1">
               Ingresa tus credenciales para administrar tus ventas y caja.
             </p>
           </div>
@@ -126,9 +126,9 @@ function LoginContent() {
           {errorParam === "inactive" && (
             <div
               role="alert"
-              className="bg-red-100 border-2 border-red-400 text-red-950 p-3.5 rounded-lg text-xs font-medium mb-5 flex items-start gap-2.5"
+              className="bg-red-100 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 p-3.5 rounded-xl text-xs font-medium mb-5 flex items-start gap-2.5"
             >
-              <AlertCircle className="w-4 h-4 text-red-800 shrink-0 mt-0.5 stroke-[2.5]" />
+              <AlertCircle className="w-4 h-4 text-red-700 dark:text-red-400 shrink-0 mt-0.5 stroke-[2.5]" />
               <span>Cuenta desactivada. Contacta al administrador o soporte de CajaRUS.</span>
             </div>
           )}
@@ -136,9 +136,9 @@ function LoginContent() {
           {errorParam === "session_expired" && (
             <div
               role="alert"
-              className="bg-amber-100 border-2 border-amber-400 text-amber-950 p-3.5 rounded-lg text-xs font-medium mb-5 flex items-start gap-2.5"
+              className="bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-400 dark:border-amber-700 text-amber-700 dark:text-amber-300 p-3.5 rounded-xl text-xs font-medium mb-5 flex items-start gap-2.5"
             >
-              <AlertCircle className="w-4 h-4 text-amber-800 shrink-0 mt-0.5 stroke-[2.5]" />
+              <AlertCircle className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5 stroke-[2.5]" />
               <span>Tu sesión ha expirado. Inicia sesión nuevamente.</span>
             </div>
           )}
@@ -146,9 +146,9 @@ function LoginContent() {
           {errorParam === "OAuthAccountNotLinked" && (
             <div
               role="alert"
-              className="bg-amber-100 border-2 border-amber-400 text-amber-950 p-3.5 rounded-lg text-xs font-medium mb-5 flex items-start gap-2.5"
+              className="bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-400 dark:border-amber-700 text-amber-700 dark:text-amber-300 p-3.5 rounded-xl text-xs font-medium mb-5 flex items-start gap-2.5"
             >
-              <AlertCircle className="w-4 h-4 text-amber-800 shrink-0 mt-0.5 stroke-[2.5]" />
+              <AlertCircle className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5 stroke-[2.5]" />
               <span>Este correo ya estaba registrado. Se ha habilitado la vinculación; por favor, vuelve a hacer clic en Continuar con Google para acceder.</span>
             </div>
           )}
@@ -157,9 +157,9 @@ function LoginContent() {
           {errorMessage && (
             <div
               role="alert"
-              className="bg-red-100 border-2 border-red-400 text-red-950 p-3.5 rounded-lg text-xs font-medium mb-5 flex items-start gap-2.5"
+              className="bg-red-100 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 p-3.5 rounded-xl text-xs font-medium mb-5 flex items-start gap-2.5"
             >
-              <AlertCircle className="w-4 h-4 text-red-800 shrink-0 mt-0.5 stroke-[2.5]" />
+              <AlertCircle className="w-4 h-4 text-red-700 dark:text-red-400 shrink-0 mt-0.5 stroke-[2.5]" />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -168,12 +168,12 @@ function LoginContent() {
           {unregisteredEmail && (
             <div
               role="alert"
-              className="bg-amber-50 border-2 border-amber-400 rounded-xl p-4 mb-5 text-xs text-amber-950 flex flex-col gap-3"
+              className="bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-400 dark:border-amber-700 rounded-xl p-4 mb-5 text-xs text-amber-700 dark:text-amber-300 flex flex-col gap-3"
             >
               <div className="flex items-start gap-2.5">
-                <UserPlus className="w-5 h-5 text-amber-800 shrink-0 mt-0.5 stroke-[2.5]" />
+                <UserPlus className="w-5 h-5 text-amber-800 dark:text-amber-400 shrink-0 mt-0.5 stroke-[2.5]" />
                 <div>
-                  <p className="font-black uppercase tracking-wider text-[11px] text-amber-900">
+                  <p className="font-black uppercase tracking-wider text-[11px] text-amber-900 dark:text-amber-300">
                     BODEGA NO REGISTRADA
                   </p>
                   <p className="mt-1 font-medium leading-relaxed">
@@ -184,7 +184,7 @@ function LoginContent() {
 
               <Link
                 href={`/register?email=${encodeURIComponent(unregisteredEmail)}`}
-                className="w-full bg-amber-600 text-white rounded-lg py-3 px-4 text-xs font-black uppercase tracking-wider hover:bg-amber-700 active:scale-95 transition-transform text-center shadow-xs flex items-center justify-center gap-2"
+                className="w-full bg-amber-600 text-white rounded-xl py-3 px-4 text-sm font-bold uppercase tracking-wider hover:bg-amber-700 active:scale-95 transition-transform text-center flex items-center justify-center gap-2"
               >
                 REGISTRAR MI BODEGA CON ESTE CORREO
                 <ArrowRight className="w-4 h-4 stroke-[2.5]" />
@@ -197,8 +197,8 @@ function LoginContent() {
           {/* ─────────────────────────────────────────────────── */}
           <form onSubmit={handleLoginSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="email" className="text-xs font-black tracking-widest uppercase text-gray-800 flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-gray-600 stroke-[2.5]" />
+              <label htmlFor="email" className="text-xs font-black tracking-widest uppercase text-gray-800 dark:text-zinc-300 flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-gray-600 dark:text-zinc-400 stroke-[2.5]" />
                 Correo Electrónico <span className="text-red-600">*</span>
               </label>
               <input
@@ -208,13 +208,13 @@ function LoginContent() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="ejemplo@gmail.com"
-                className="w-full border-2 border-gray-300 rounded-lg py-3 px-4 text-sm font-mono text-gray-900 bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
+                className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-3 px-4 text-sm text-gray-900 dark:text-zinc-50 bg-white dark:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 dark:focus-visible:ring-blue-400"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="password" className="text-xs font-black tracking-widest uppercase text-gray-800 flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5 text-gray-600 stroke-[2.5]" />
+              <label htmlFor="password" className="text-xs font-black tracking-widest uppercase text-gray-800 dark:text-zinc-300 flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-gray-600 dark:text-zinc-400 stroke-[2.5]" />
                 Contraseña <span className="text-red-600">*</span>
               </label>
               <input
@@ -224,7 +224,7 @@ function LoginContent() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full border-2 border-gray-300 rounded-lg py-3 px-4 text-sm font-mono text-gray-900 bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
+                className="w-full border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-3 px-4 text-sm text-gray-900 dark:text-zinc-50 bg-white dark:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 dark:focus-visible:ring-blue-400"
               />
             </div>
 
@@ -232,7 +232,7 @@ function LoginContent() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full bg-emerald-700 text-white rounded-lg py-4 px-6 text-xs font-black uppercase tracking-wider hover:bg-emerald-800 active:scale-95 transition-transform cursor-pointer shadow-xs border-2 border-emerald-900 min-h-[56px] flex items-center justify-center gap-2 disabled:opacity-50 mt-1"
+              className="w-full bg-emerald-700 dark:bg-emerald-600 text-white rounded-xl py-4 px-6 text-base font-semibold hover:bg-emerald-800 dark:hover:bg-emerald-700 active:scale-95 transition-transform cursor-pointer border-2 border-emerald-900 dark:border-emerald-700 min-h-[56px] flex items-center justify-center gap-2 disabled:opacity-50 mt-1"
             >
               {isPending ? (
                 <>
@@ -249,8 +249,8 @@ function LoginContent() {
 
           {/* Visual Divider */}
           <div className="relative my-5 flex items-center justify-center">
-            <hr className="w-full border-gray-300" />
-            <span className="absolute bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-gray-500">
+            <hr className="w-full border-gray-300 dark:border-zinc-700" />
+            <span className="absolute bg-white dark:bg-zinc-900 px-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
               O ACCEDE RÁPIDO CON
             </span>
           </div>
@@ -261,7 +261,7 @@ function LoginContent() {
           <button
             type="button"
             onClick={() => signIn("google", { callbackUrl: callbackUrlParam })}
-            className="w-full bg-white border-2 border-gray-300 rounded-lg py-3.5 px-4 text-xs font-bold text-gray-900 flex items-center justify-center gap-3 hover:bg-gray-50 active:scale-95 transition-transform cursor-pointer shadow-xs"
+            className="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-zinc-700 rounded-xl py-3.5 px-4 text-sm font-bold text-gray-900 dark:text-zinc-50 flex items-center justify-center gap-3 hover:bg-gray-50 dark:hover:bg-zinc-700 active:scale-95 transition-transform cursor-pointer"
           >
             <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
               <path
@@ -285,11 +285,11 @@ function LoginContent() {
           </button>
 
           {/* Registration Redirect Link */}
-          <div className="mt-6 pt-4 border-t border-gray-200 text-center">
-            <p className="text-xs text-gray-600 font-medium mb-1.5">¿Primera vez en CajaRUS?</p>
+          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-zinc-800 text-center">
+            <p className="text-xs text-gray-600 dark:text-zinc-400 font-medium mb-1.5">¿Primera vez en CajaRUS?</p>
             <Link
               href="/register"
-              className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-emerald-700 hover:underline"
+              className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400 hover:underline"
             >
               REGISTRAR MI BODEGA EN 3 PASOS
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
@@ -299,7 +299,7 @@ function LoginContent() {
       </main>
 
       {/* Footer */}
-      <footer className="max-w-md mx-auto w-full text-center py-4 text-xs text-gray-500 font-bold uppercase tracking-wider">
+      <footer className="max-w-md mx-auto w-full text-center py-4 text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wider">
         <p>© 2026 CAJARUS PERÚ · INICIO DE SESIÓN</p>
       </footer>
     </div>
@@ -310,7 +310,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-dvh flex items-center justify-center bg-gray-100">
+        <div className="min-h-dvh flex items-center justify-center bg-gray-100 dark:bg-zinc-950">
           <Loader2 className="w-8 h-8 animate-spin text-emerald-700" />
         </div>
       }

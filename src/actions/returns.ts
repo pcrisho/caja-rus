@@ -120,7 +120,6 @@ export async function createReturnAction(tenantSlug: string, saleId: string, ite
 
         totalReturnAmount += reqItem.totalAmount;
         returnItemsToCreate.push({
-          tenantId: auth.tenantId,
           saleItemId: reqItem.saleItemId,
           quantity: reqItem.quantity,
           totalAmount: reqItem.totalAmount
