@@ -184,6 +184,39 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return true;
       }
 
+      // Auto-consume pending invites for this email
+      if (dbUser.isActive) {
+        try {
+          const pendingInvites = await prisma.invite.findMany({
+            where: { email, consumed: false, expiresAt: { gte: new Date() } },
+          });
+          for (const invite of pendingInvites) {
+            await prisma.tenantMember.upsert({
+              where: {
+                tenantId_userId: {
+                  tenantId: invite.tenantId,
+                  userId: dbUser.id,
+                },
+              },
+              update: { isActive: true },
+              create: {
+                tenantId: invite.tenantId,
+                userId: dbUser.id,
+                role: invite.role,
+                isActive: true,
+                isPrimary: false,
+              },
+            });
+            await prisma.invite.update({
+              where: { id: invite.id },
+              data: { consumed: true },
+            });
+          }
+        } catch {
+          // Silently ignore — el invite ya será consumido manualmente
+        }
+      }
+
       return dbUser.isActive ? true : "/login?error=inactive";
     },
   },
