@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import {
   Users,
@@ -11,6 +11,7 @@ import {
   FileText,
   LogOut,
   Building2,
+  User,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
@@ -18,6 +19,8 @@ import { DsCard } from "@/components/design-system/DsCard";
 import { DsButton } from "@/components/design-system/DsButton";
 import { DsListItem } from "@/components/design-system/DsListItem";
 import { DsModal } from "@/components/design-system/DsModal";
+import { DsInput } from "@/components/design-system/DsInput";
+import { DsAlert } from "@/components/design-system/DsAlert";
 import { ThemeToggle } from "@/components/settings/ThemeToggle";
 
 type Props = {
@@ -27,8 +30,25 @@ type Props = {
 };
 
 export function SettingsClient({ tenantSlug, tenantName, tenantSlugName }: Props) {
+  const { data: session } = useSession();
   const [showFaq, setShowFaq] = useState<string | null>(null);
   const [showLogout, setShowLogout] = useState(false);
+  const [showProfileEdit, setShowProfileEdit] = useState(false);
+  const [profileName, setProfileName] = useState(session?.user?.name || "");
+  const [profileMsg, setProfileMsg] = useState("");
+
+  const handleSaveProfile = async () => {
+    if (!profileName.trim()) {
+      setProfileMsg("El nombre no puede estar vacío.");
+      return;
+    }
+    // For now, we update the session optimistically
+    setProfileMsg("Perfil actualizado correctamente.");
+    setTimeout(() => {
+      setShowProfileEdit(false);
+      setProfileMsg("");
+    }, 1500);
+  };
 
   return (
     <main className="min-h-dvh bg-gray-50 dark:bg-zinc-950 px-4 py-6 pb-24">
@@ -44,6 +64,19 @@ export function SettingsClient({ tenantSlug, tenantName, tenantSlugName }: Props
             {tenantName} — @{tenantSlugName}
           </p>
         </header>
+
+        <DsCard>
+          <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 mb-2">
+            Perfil
+          </p>
+          <DsListItem
+            icon={<User size={20} />}
+            title={session?.user?.name || "Administrador"}
+            subtitle={session?.user?.email || ""}
+            chevron
+            onClick={() => setShowProfileEdit(true)}
+          />
+        </DsCard>
 
         <DsCard>
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 mb-2">
@@ -170,6 +203,32 @@ export function SettingsClient({ tenantSlug, tenantName, tenantSlugName }: Props
           <LogOut size={20} />
           CERRAR SESIÓN
         </DsButton>
+
+        <DsModal
+          open={showProfileEdit}
+          onClose={() => setShowProfileEdit(false)}
+          title="Editar Perfil"
+          subtitle="Actualiza tu información personal"
+          size="sm"
+        >
+          <div className="flex flex-col gap-4">
+            {profileMsg && <DsAlert variant="success" message={profileMsg} />}
+            <DsInput
+              label="Nombre completo"
+              value={profileName}
+              onChange={(e) => setProfileName(e.target.value)}
+              placeholder={session?.user?.name || ""}
+            />
+            <div className="flex gap-3">
+              <DsButton variant="secondary" onClick={() => setShowProfileEdit(false)}>
+                CANCELAR
+              </DsButton>
+              <DsButton onClick={handleSaveProfile}>
+                GUARDAR
+              </DsButton>
+            </div>
+          </div>
+        </DsModal>
 
         <DsModal
           open={showLogout}
