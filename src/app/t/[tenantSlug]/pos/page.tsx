@@ -42,8 +42,7 @@ export default async function TenantPosPage(props: {
       <div className="mx-auto flex w-full max-w-md flex-col gap-4">
         <PageHeader
           categoryTag="Punto de venta"
-          title={authResult.tenantName}
-          subtitle={`Bodega activa: @${authResult.tenantSlug}`}
+          title="Cobrar"
         />
 
         <PosClient tenantSlug={tenantSlug} initialProducts={mappedProducts} />
