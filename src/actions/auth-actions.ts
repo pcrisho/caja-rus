@@ -156,6 +156,102 @@ export async function registerBodegaAction(
   }
 }
 
+export type InviteRegistrationResult = {
+  success: boolean;
+  message: string;
+  tenantSlug?: string;
+};
+
+/**
+ * Registro de usuario invitado.
+ * Solo crea el usuario y lo vincula al tenant existente via el token de invitación.
+ * No crea un nuevo tenant.
+ */
+export async function registerInvitedUserAction(
+  _prevState: InviteRegistrationResult | null,
+  formData: FormData
+): Promise<InviteRegistrationResult> {
+  try {
+    const inviteToken = (formData.get("inviteToken") as string || "").trim();
+    const name = (formData.get("name") as string || "").trim();
+    const email = (formData.get("email") as string || "").trim().toLowerCase();
+    const password = (formData.get("password") as string || "");
+    const confirmPassword = (formData.get("confirmPassword") as string || "");
+
+    if (!name || name.length < 2) {
+      return { success: false, message: "Ingresa tus nombres y apellidos completos." };
+    }
+
+    if (!email) {
+      return { success: false, message: "No se pudo identificar el correo de la invitación." };
+    }
+
+    if (!password || password.length < 6) {
+      return { success: false, message: "La contraseña debe tener al menos 6 caracteres." };
+    }
+
+    if (password !== confirmPassword) {
+      return { success: false, message: "Las contraseñas no coinciden." };
+    }
+
+    const { getInviteByTokenAction, consumeInviteAction } = await import("@/actions/invites");
+    
+    const inviteRes = await getInviteByTokenAction(inviteToken);
+    if (!inviteRes.success || !inviteRes.data) {
+      return { success: false, message: "Invitación inválida o expirada." };
+    }
+
+    const { tenantId, tenantName } = inviteRes.data;
+    const tenantSlugName = tenantName.toLowerCase().replace(/[^a-z0-9]/g, "-");
+
+    // Verificar si el email del formulario coincide con el de la invitación
+    if (email !== inviteRes.data.email) {
+      return { success: false, message: "El correo no coincide con la invitación." };
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+
+    let userId: string;
+
+    if (existingUser) {
+      // Si ya tiene cuenta, solo consumir la invitación
+      userId = existingUser.id;
+    } else {
+      // Crear el usuario
+      const newUser = await prisma.user.create({
+        data: {
+          name,
+          email,
+          passwordHash,
+          isActive: true,
+          isFirstLogin: false,
+        },
+      });
+      userId = newUser.id;
+    }
+
+    // Consumir la invitación (crea TenantMember)
+    const consumed = await consumeInviteAction(inviteToken, userId);
+    if (!consumed.success) {
+      return { success: false, message: consumed.error || "Error al procesar la invitación." };
+    }
+
+    return {
+      success: true,
+      message: `¡Bienvenido a ${tenantName}! Ya formas parte del equipo.`,
+      tenantSlug: tenantSlugName,
+    };
+  } catch (error) {
+    console.error("[registerInvitedUserAction Error]:", error);
+    return {
+      success: false,
+      message: "Ocurrió un error al procesar tu invitación.",
+    };
+  }
+}
+
 export type InviteMemberResult = {
   success: boolean;
   message: string;

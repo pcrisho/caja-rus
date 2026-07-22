@@ -6,10 +6,9 @@ import { prisma } from "@/lib/prisma";
 import { getBootstrapAdminEmails } from "@/lib/env";
 import bcrypt from "bcryptjs";
 import {
-  getBootstrapTenantName,
-  getBootstrapTenantSlug,
   getTenantMemberships,
 } from "@/lib/tenancy";
+import { slugifyTenantName } from "@/lib/tenancy-utils";
 
 const SESSION_REVALIDATE_INTERVAL_MS = 5 * 60 * 1000; // 5 minutos
 
@@ -124,9 +123,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       if (dbUser.isFirstLogin) {
-        const isBootstrapAdmin = getBootstrapAdminEmails().includes(email);
+        const bootstrapEmails = getBootstrapAdminEmails();
 
-        if (!isBootstrapAdmin) {
+        // Si hay lista definida y el usuario no está en ella → rechazar
+        if (bootstrapEmails.length > 0 && !bootstrapEmails.includes(email)) {
           await prisma.user.update({
             where: { id: dbUser.id },
             data: { isActive: false, isFirstLogin: false },
@@ -134,8 +134,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return "/login?error=inactive";
         }
 
-        const tenantName = getBootstrapTenantName();
-        const tenantSlug = getBootstrapTenantSlug();
+        // Nombre del tenant: usa BOOTSTRAP_TENANT_NAME si está configurado,
+        // o genera uno único basado en el nombre del usuario
+        const tenantName = process.env.BOOTSTRAP_TENANT_NAME?.trim()
+          || `${user.name?.split(" ")[0] || "Mi"} Bodega`;
+        const tenantSlug = slugifyTenantName(tenantName);
 
         await prisma.$transaction(async (tx) => {
           await tx.user.update({
@@ -179,6 +182,39 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
 
         return true;
+      }
+
+      // Auto-consume pending invites for this email
+      if (dbUser.isActive) {
+        try {
+          const pendingInvites = await prisma.invite.findMany({
+            where: { email, consumed: false, expiresAt: { gte: new Date() } },
+          });
+          for (const invite of pendingInvites) {
+            await prisma.tenantMember.upsert({
+              where: {
+                tenantId_userId: {
+                  tenantId: invite.tenantId,
+                  userId: dbUser.id,
+                },
+              },
+              update: { isActive: true },
+              create: {
+                tenantId: invite.tenantId,
+                userId: dbUser.id,
+                role: invite.role,
+                isActive: true,
+                isPrimary: false,
+              },
+            });
+            await prisma.invite.update({
+              where: { id: invite.id },
+              data: { consumed: true },
+            });
+          }
+        } catch {
+          // Silently ignore — el invite ya será consumido manualmente
+        }
       }
 
       return dbUser.isActive ? true : "/login?error=inactive";

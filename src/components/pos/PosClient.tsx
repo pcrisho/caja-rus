@@ -11,6 +11,8 @@ import { DsButton } from "@/components/design-system/DsButton";
 import { DsAlert } from "@/components/design-system/DsAlert";
 import { DsCard } from "@/components/design-system/DsCard";
 import { DsEmptyState } from "@/components/design-system/DsEmptyState";
+import { DsModal } from "@/components/design-system/DsModal";
+import { DsInput } from "@/components/design-system/DsInput";
 
 type Props = {
   tenantSlug: string;
@@ -53,6 +55,12 @@ export function PosClient({ tenantSlug, initialProducts }: Props) {
   const [isSubmitting, startSubmit] = useTransition();
   const [toast, setToast] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
   const [showScanner, setShowScanner] = useState(false);
+  const [showShiftOpening, setShowShiftOpening] = useState(
+    () => typeof window !== "undefined" && !sessionStorage.getItem("cajarus-shift-open")
+  );
+  const [shiftCash, setShiftCash] = useState("");
+  const [shiftYape, setShiftYape] = useState("");
+  const [shiftPlin, setShiftPlin] = useState("");
 
   const total = cartTotal(items);
 
@@ -136,6 +144,53 @@ export function PosClient({ tenantSlug, initialProducts }: Props) {
       )}
 
       <WeightKeypad />
+
+      <DsModal
+        open={showShiftOpening}
+        onClose={() => {}}
+        title="Apertura de Caja"
+        subtitle="Define cuánto dinero dejas en cada método al iniciar el turno"
+        size="sm"
+        closable={false}
+      >
+        <div className="flex flex-col gap-4">
+          <DsInput
+            label="Efectivo (S/)"
+            type="number"
+            step="0.01"
+            min="0"
+            value={shiftCash}
+            onChange={(e) => setShiftCash(e.target.value)}
+            placeholder="0.00"
+          />
+          <DsInput
+            label="Yape (S/)"
+            type="number"
+            step="0.01"
+            min="0"
+            value={shiftYape}
+            onChange={(e) => setShiftYape(e.target.value)}
+            placeholder="0.00"
+          />
+          <DsInput
+            label="Plin (S/)"
+            type="number"
+            step="0.01"
+            min="0"
+            value={shiftPlin}
+            onChange={(e) => setShiftPlin(e.target.value)}
+            placeholder="0.00"
+          />
+          <DsButton
+            onClick={() => {
+              sessionStorage.setItem("cajarus-shift-open", "true");
+              setShowShiftOpening(false);
+            }}
+          >
+            ABRIR CAJA
+          </DsButton>
+        </div>
+      </DsModal>
 
       {toast && (
         <div className="fixed top-4 left-4 right-4 z-40">

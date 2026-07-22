@@ -141,6 +141,7 @@ model User {
   auditLogs        AuditLog[]
   wasteAdjustments WasteAdjustment[]
   processedReturns SaleReturn[]
+  createdInvites   Invite[]         @relation("CreatedInvites")
 
   @@map("users")
 }
@@ -169,6 +170,7 @@ model Tenant {
   saleReturns      SaleReturn[]
   saleReturnItems  SaleReturnItem[]
   salePayments     SalePayment[]
+  invites          Invite[]
 
   @@map("tenants")
 }
@@ -631,5 +633,25 @@ model Lead {
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@map("leads")
+}
+
+model Invite {
+  id        String   @id @default(uuid()) @db.Uuid
+  token     String   @unique
+  email     String
+  role      UserRole
+  tenantId  String   @map("tenant_id") @db.Uuid
+  createdBy String   @map("created_by") @db.Uuid
+  consumed  Boolean  @default(false)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant  Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  creator User   @relation("CreatedInvites", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  @@index([tenantId])
+  @@index([token])
+  @@index([email])
+  @@map("invites")
 }
 

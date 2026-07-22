@@ -9,6 +9,7 @@ type DsModalProps = {
   title: string;
   subtitle?: string;
   size?: "sm" | "md" | "lg";
+  closable?: boolean;
   children: ReactNode;
 };
 
@@ -24,6 +25,7 @@ export function DsModal({
   title,
   subtitle,
   size = "md",
+  closable = true,
   children,
 }: DsModalProps) {
   useEffect(() => {
@@ -42,7 +44,7 @@ export function DsModal({
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 dark:bg-black/70"
-        onClick={onClose}
+        onClick={closable ? onClose : undefined}
         aria-hidden="true"
       />
 
@@ -68,13 +70,15 @@ export function DsModal({
               </p>
             )}
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
-            aria-label="Cerrar"
-          >
-            <X size={20} />
-          </button>
+          {closable && (
+            <button
+              onClick={onClose}
+              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
+              aria-label="Cerrar"
+            >
+              <X size={20} />
+            </button>
+          )}
         </div>
 
         {/* Content */}
